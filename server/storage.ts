@@ -336,14 +336,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createFormTemplate(insertTemplate: InsertFormTemplate): Promise<FormTemplate> {
-    const [template] = await db.insert(formTemplates).values(insertTemplate).returning();
+    const [template] = await db.insert(formTemplates).values(insertTemplate as any).returning();
     return template;
   }
 
   async updateFormTemplate(id: string, updates: Partial<InsertFormTemplate>): Promise<FormTemplate> {
     const [template] = await db
       .update(formTemplates)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...(updates as any), updatedAt: new Date() })
       .where(eq(formTemplates.id, id))
       .returning();
     return template;
@@ -364,14 +364,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createFieldLibraryItem(insertField: InsertFieldLibrary): Promise<FieldLibrary> {
-    const [field] = await db.insert(fieldLibrary).values(insertField).returning();
+    const [field] = await db.insert(fieldLibrary).values(insertField as any).returning();
     return field;
   }
 
   async updateFieldLibraryItem(id: string, updates: Partial<InsertFieldLibrary>): Promise<FieldLibrary> {
     const [field] = await db
       .update(fieldLibrary)
-      .set(updates)
+      .set(updates as any)
       .where(eq(fieldLibrary.id, id))
       .returning();
     return field;
@@ -420,14 +420,14 @@ export class DatabaseStorage implements IStorage {
       return existingField[0];
     }
 
-    const [field] = await db.insert(formTemplateFields).values(insertField).returning();
+    const [field] = await db.insert(formTemplateFields).values(insertField as any).returning();
     return field;
   }
 
   async updateFormTemplateField(id: string, updates: Partial<InsertFormTemplateField>): Promise<FormTemplateField> {
     const [field] = await db
       .update(formTemplateFields)
-      .set(updates)
+      .set(updates as any)
       .where(eq(formTemplateFields.id, id))
       .returning();
     return field;
@@ -460,14 +460,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLandingPageTemplate(insertTemplate: InsertLandingPageTemplate): Promise<LandingPageTemplate> {
-    const [template] = await db.insert(landingPageTemplates).values(insertTemplate).returning();
+    const [template] = await db.insert(landingPageTemplates).values(insertTemplate as any).returning();
     return template;
   }
 
   async updateLandingPageTemplate(id: string, updates: Partial<InsertLandingPageTemplate>): Promise<LandingPageTemplate> {
     const [template] = await db
       .update(landingPageTemplates)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...(updates as any), updatedAt: new Date() })
       .where(eq(landingPageTemplates.id, id))
       .returning();
     return template;
@@ -521,14 +521,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async assignFormToSite(assignment: InsertSiteFormAssignment): Promise<SiteFormAssignment> {
-    const [result] = await db.insert(siteFormAssignments).values(assignment).returning();
+    const [result] = await db.insert(siteFormAssignments).values(assignment as any).returning();
     return result;
   }
 
   async updateSiteFormAssignment(id: string, updates: Partial<InsertSiteFormAssignment>): Promise<SiteFormAssignment> {
     const [assignment] = await db
       .update(siteFormAssignments)
-      .set(updates)
+      .set(updates as any)
       .where(eq(siteFormAssignments.id, id))
       .returning();
     return assignment;
@@ -545,14 +545,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSiteLandingConfig(insertConfig: InsertSiteLandingConfig): Promise<SiteLandingConfig> {
-    const [config] = await db.insert(siteLandingConfigs).values(insertConfig).returning();
+    const [config] = await db.insert(siteLandingConfigs).values(insertConfig as any).returning();
     return config;
   }
 
   async updateSiteLandingConfig(siteId: string, updates: Partial<InsertSiteLandingConfig>): Promise<SiteLandingConfig> {
     const [config] = await db
       .update(siteLandingConfigs)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...(updates as any), updatedAt: new Date() })
       .where(eq(siteLandingConfigs.siteId, siteId))
       .returning();
     return config;
@@ -572,13 +572,14 @@ export class DatabaseStorage implements IStorage {
         permissions: siteMemberships.permissions,
         createdAt: siteMemberships.createdAt,
         updatedAt: siteMemberships.updatedAt,
+        collectiveRole: siteMemberships.collectiveRole,
         site: {
           siteId: sites.siteId,
           name: sites.name
         }
       })
       .from(siteMemberships)
-      .leftJoin(sites, eq(siteMemberships.siteId, sites.siteId))
+      .innerJoin(sites, eq(siteMemberships.siteId, sites.siteId))
       .where(eq(siteMemberships.userId, userId));
   }
 
@@ -595,6 +596,7 @@ export class DatabaseStorage implements IStorage {
         permissions: siteMemberships.permissions,
         createdAt: siteMemberships.createdAt,
         updatedAt: siteMemberships.updatedAt,
+        collectiveRole: siteMemberships.collectiveRole,
         user: {
           firstName: users.firstName,
           lastName: users.lastName,
@@ -602,7 +604,7 @@ export class DatabaseStorage implements IStorage {
         }
       })
       .from(siteMemberships)
-      .leftJoin(users, eq(siteMemberships.userId, users.id))
+      .innerJoin(users, eq(siteMemberships.userId, users.id))
       .where(eq(siteMemberships.siteId, siteId));
   }
 

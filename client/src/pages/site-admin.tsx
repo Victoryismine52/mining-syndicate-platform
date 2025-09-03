@@ -842,19 +842,27 @@ export function SiteAdmin(props: SiteAdminProps) {
   // Form assignment update mutation
   const updateFormAssignmentMutation = useMutation({
     mutationFn: async ({ assignmentId, updates }: { assignmentId: string; updates: any }) => {
+      console.log('Updating form assignment:', assignmentId, 'with updates:', updates);
       const response = await apiRequest('PUT', `/api/site-form-assignments/${assignmentId}`, updates);
-      return response;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Form assignment update failed:', response.status, errorText);
+        throw new Error(`Update failed: ${response.status} ${errorText}`);
+      }
+      return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Form assignment updated successfully:', data);
       // Force immediate refresh with manual refetch
       setTimeout(() => {
         refetchFormAssignments();
       }, 100);
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Form assignment update error:', error);
       toast({
         title: "Error",
-        description: "Failed to update form configuration",
+        description: `Failed to update form configuration: ${error.message || 'Unknown error'}`,
         variant: "destructive",
       });
     }
