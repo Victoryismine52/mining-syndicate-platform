@@ -43,7 +43,8 @@ export interface IStorage {
   deleteLandingPageTemplate(id: string): Promise<void>;
 
   // Site Form Assignment operations
-  getSiteFormAssignments(siteId: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate })[]>;
+  getSiteFormAssignments(siteId: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate | null })[]>;
+  getSiteFormAssignmentById(id: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate | null }) | undefined>;
   assignFormToSite(assignment: InsertSiteFormAssignment): Promise<SiteFormAssignment>;
   updateSiteFormAssignment(id: string, updates: Partial<InsertSiteFormAssignment>): Promise<SiteFormAssignment>;
   removeFormFromSite(id: string): Promise<void>;
@@ -495,6 +496,28 @@ export class DatabaseStorage implements IStorage {
       .from(siteFormAssignments)
       .leftJoin(formTemplates, eq(siteFormAssignments.formTemplateId, formTemplates.id))
       .where(eq(siteFormAssignments.siteId, siteId));
+  }
+
+  async getSiteFormAssignmentById(id: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate | null }) | undefined> {
+    const [assignment] = await db
+      .select({
+        id: siteFormAssignments.id,
+        siteId: siteFormAssignments.siteId,
+        formTemplateId: siteFormAssignments.formTemplateId,
+        sectionId: siteFormAssignments.sectionId,
+        displayOrder: siteFormAssignments.displayOrder,
+        cardPosition: siteFormAssignments.cardPosition,
+        isActive: siteFormAssignments.isActive,
+        selectedLanguage: siteFormAssignments.selectedLanguage,
+        overrideConfig: siteFormAssignments.overrideConfig,
+        createdAt: siteFormAssignments.createdAt,
+        formTemplate: formTemplates,
+      })
+      .from(siteFormAssignments)
+      .leftJoin(formTemplates, eq(siteFormAssignments.formTemplateId, formTemplates.id))
+      .where(eq(siteFormAssignments.id, id));
+
+    return assignment || undefined;
   }
 
   async assignFormToSite(assignment: InsertSiteFormAssignment): Promise<SiteFormAssignment> {

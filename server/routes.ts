@@ -334,9 +334,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/site-form-assignments/:id", requireAuth, async (req, res, next) => {
     try {
       // Get the existing assignment to check if it's a join card
-      const existingAssignments = await storage.getSiteFormAssignments('all');
-      const existingAssignment = existingAssignments.find(a => a.id === req.params.id);
-      
+      const existingAssignment = await storage.getSiteFormAssignmentById(req.params.id);
+
       if (!existingAssignment) {
         return res.status(404).json({ error: "Form assignment not found" });
       }
