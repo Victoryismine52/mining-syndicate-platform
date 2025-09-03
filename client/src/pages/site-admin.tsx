@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Settings, Users, BarChart3, Eye, UserPlus, X, FileText, Shield, ExternalLink, Plus, Trash2, Edit, Images, Globe, Download, CheckCircle, GripVertical, ChevronUp, ChevronDown, Folder } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import type { Site, SiteLead, SiteManager, LegalDisclaimer, SiteDisclaimer } from '@shared/site-schema';
 import { SlideManager } from '@/components/slide-manager';
@@ -77,6 +78,33 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
   const [titleOverride, setTitleOverride] = useState(assignment.overrideConfig?.title || '');
   const [subtitleOverride, setSubtitleOverride] = useState(assignment.overrideConfig?.subtitle || '');
   const [descriptionOverride, setDescriptionOverride] = useState(assignment.overrideConfig?.description || '');
+
+  const { debounced: debouncedTitleUpdate, flush: flushTitleUpdate } = useDebouncedCallback((value: string) => {
+    onUpdate(assignment.id, {
+      overrideConfig: {
+        ...(assignment.overrideConfig || {}),
+        title: value,
+      },
+    });
+  }, 400);
+
+  const { debounced: debouncedSubtitleUpdate, flush: flushSubtitleUpdate } = useDebouncedCallback((value: string) => {
+    onUpdate(assignment.id, {
+      overrideConfig: {
+        ...(assignment.overrideConfig || {}),
+        subtitle: value,
+      },
+    });
+  }, 400);
+
+  const { debounced: debouncedDescriptionUpdate, flush: flushDescriptionUpdate } = useDebouncedCallback((value: string) => {
+    onUpdate(assignment.id, {
+      overrideConfig: {
+        ...(assignment.overrideConfig || {}),
+        description: value,
+      },
+    });
+  }, 400);
 
   useEffect(() => {
     setColorOverride(assignment.overrideConfig?.color || '');
@@ -285,13 +313,9 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
                       onChange={(e) => {
                         const value = e.target.value;
                         setTitleOverride(value);
-                        onUpdate(assignment.id, {
-                          overrideConfig: {
-                            ...(assignment.overrideConfig || {}),
-                            title: value
-                          }
-                        });
+                        debouncedTitleUpdate(value);
                       }}
+                      onBlur={() => flushTitleUpdate()}
                       placeholder={template?.config?.title || template?.name || 'Default title'}
                       className="w-full px-3 py-2 bg-slate-800/50 border border-slate-600 rounded text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       data-testid={`input-title-override-${assignment.id}`}
@@ -306,13 +330,9 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
                       onChange={(e) => {
                         const value = e.target.value;
                         setSubtitleOverride(value);
-                        onUpdate(assignment.id, {
-                          overrideConfig: {
-                            ...(assignment.overrideConfig || {}),
-                            subtitle: value
-                          }
-                        });
+                        debouncedSubtitleUpdate(value);
                       }}
+                      onBlur={() => flushSubtitleUpdate()}
                       placeholder={template?.config?.subtitle || 'Default subtitle'}
                       className="w-full px-3 py-2 bg-slate-800/50 border border-slate-600 rounded text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       data-testid={`input-subtitle-override-${assignment.id}`}
@@ -326,13 +346,9 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
                       onChange={(e) => {
                         const value = e.target.value;
                         setDescriptionOverride(value);
-                        onUpdate(assignment.id, {
-                          overrideConfig: {
-                            ...(assignment.overrideConfig || {}),
-                            description: value
-                          }
-                        });
+                        debouncedDescriptionUpdate(value);
                       }}
+                      onBlur={() => flushDescriptionUpdate()}
                       placeholder={template?.config?.description || 'Default description'}
                       className="w-full px-3 py-2 bg-slate-800/50 border border-slate-600 rounded text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       rows={3}
