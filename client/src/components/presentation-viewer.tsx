@@ -149,6 +149,10 @@ function DynamicFormsSlide({ forms, siteId, onPrevSlide, onNextSlide }: DynamicF
             // Use override color first, then template color, then default to blue
             const effectiveColor = formAssignment.overrideConfig?.color || config.color || 'blue';
             const colorTheme = getFormColor(effectiveColor);
+            const effectiveTitle = formAssignment.overrideConfig?.title || config.title || formTemplate.name;
+            const effectiveSubtitle = formAssignment.overrideConfig?.subtitle ?? config.subtitle;
+            const effectiveDescription = formAssignment.overrideConfig?.description || config.description || formTemplate.description || 'Click to learn more and get in touch';
+            const buttonText = formAssignment.overrideConfig?.buttonText || config.buttonText || 'Get Started';
             
             return (
               <Card 
@@ -162,27 +166,27 @@ function DynamicFormsSlide({ forms, siteId, onPrevSlide, onNextSlide }: DynamicF
                     {getFormIcon(config.icon || 'file')}
                   </div>
                   <CardTitle className="text-xl text-white mb-2">
-                    {config.title || formTemplate.name}
+                    {effectiveTitle}
                   </CardTitle>
-                  {config.subtitle && (
+                  {effectiveSubtitle && (
                     <p className="text-slate-400 text-xs mb-2 font-medium">
-                      {config.subtitle}
+                      {effectiveSubtitle}
                     </p>
                   )}
                   <CardDescription className="text-slate-300 text-sm whitespace-pre-line">
-                    {config.description || formTemplate.description || 'Click to learn more and get in touch'}
+                    {effectiveDescription}
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent className="text-center pt-0 mt-auto">
-                  <Button 
+                  <Button
                     className={`w-full ${colorTheme.button} text-white font-semibold transition-all duration-300`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleFormCardClick(formAssignment);
                     }}
                   >
-                    {config.buttonText || 'Get Started'}
+                    {buttonText}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </CardContent>
