@@ -1894,8 +1894,8 @@ export function SiteAdmin(props: SiteAdminProps) {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="text-lg font-medium text-white">Available Forms from Library</h3>
-                        <p className="text-sm text-slate-400">Forms available to add to this site</p>
+                        <h3 className="text-lg font-medium text-white">Available Cards from Library</h3>
+                        <p className="text-sm text-slate-400">Cards available to add to this site</p>
                       </div>
                     </div>
 
