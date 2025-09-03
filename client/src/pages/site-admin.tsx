@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Settings, Users, BarChart3, Eye, UserPlus, X, FileText, Shield, ExternalLink, Plus, Trash2, Edit, Images, Globe, Download, CheckCircle, GripVertical, Monitor, ChevronUp, ChevronDown, Folder } from 'lucide-react';
+import { Settings, Users, BarChart3, Eye, UserPlus, X, FileText, Shield, ExternalLink, Plus, Trash2, Edit, Images, Globe, Download, CheckCircle, GripVertical, ChevronUp, ChevronDown, Folder } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -72,20 +72,20 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
   const [isExpanded, setIsExpanded] = useState(false);
   const [colorOverride, setColorOverride] = useState(assignment.overrideConfig?.color || '');
   const [includeInPresentation, setIncludeInPresentation] = useState(assignment.overrideConfig?.includeInPresentation || false);
-  
+
   // Content customization state
   const [titleOverride, setTitleOverride] = useState(assignment.overrideConfig?.title || '');
   const [subtitleOverride, setSubtitleOverride] = useState(assignment.overrideConfig?.subtitle || '');
   const [descriptionOverride, setDescriptionOverride] = useState(assignment.overrideConfig?.description || '');
+
+  useEffect(() => {
+    setColorOverride(assignment.overrideConfig?.color || '');
+    setIncludeInPresentation(assignment.overrideConfig?.includeInPresentation || false);
+    setTitleOverride(assignment.overrideConfig?.title || '');
+    setSubtitleOverride(assignment.overrideConfig?.subtitle || '');
+    setDescriptionOverride(assignment.overrideConfig?.description || '');
+  }, [assignment.overrideConfig?.color, assignment.overrideConfig?.includeInPresentation, assignment.overrideConfig?.title, assignment.overrideConfig?.subtitle, assignment.overrideConfig?.description]);
   
-  // Display Configuration State
-  const [displaySize, setDisplaySize] = useState(assignment.overrideConfig?.displaySize || 'medium');
-  const [displayStyle, setDisplayStyle] = useState(assignment.overrideConfig?.displayStyle || 'default');
-  const [showIcon, setShowIcon] = useState(assignment.overrideConfig?.showIcon ?? true);
-  const [showSubtitle, setShowSubtitle] = useState(assignment.overrideConfig?.showSubtitle ?? true);
-  const [borderStyle, setBorderStyle] = useState(assignment.overrideConfig?.borderStyle || 'none');
-  const [shadowLevel, setShadowLevel] = useState(assignment.overrideConfig?.shadowLevel || 'none');
-  const [customCss, setCustomCss] = useState(assignment.overrideConfig?.customCss || '');
 
   const {
     attributes,
@@ -108,7 +108,7 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
     setColorOverride(finalColor);
     onUpdate(assignment.id, {
       overrideConfig: {
-        ...assignment.overrideConfig,
+        ...(assignment.overrideConfig || {}),
         color: finalColor
       }
     });
@@ -118,82 +118,12 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
     setIncludeInPresentation(checked);
     onUpdate(assignment.id, {
       overrideConfig: {
-        ...assignment.overrideConfig,
+        ...(assignment.overrideConfig || {}),
         includeInPresentation: checked
       }
     });
   };
 
-  // Display Configuration Update Handlers
-  const handleDisplaySizeChange = (size: string) => {
-    setDisplaySize(size);
-    onUpdate(assignment.id, {
-      overrideConfig: {
-        ...assignment.overrideConfig,
-        displaySize: size
-      }
-    });
-  };
-
-  const handleDisplayStyleChange = (style: string) => {
-    setDisplayStyle(style);
-    onUpdate(assignment.id, {
-      overrideConfig: {
-        ...assignment.overrideConfig,
-        displayStyle: style
-      }
-    });
-  };
-
-  const handleShowIconToggle = (checked: boolean) => {
-    setShowIcon(checked);
-    onUpdate(assignment.id, {
-      overrideConfig: {
-        ...assignment.overrideConfig,
-        showIcon: checked
-      }
-    });
-  };
-
-  const handleShowSubtitleToggle = (checked: boolean) => {
-    setShowSubtitle(checked);
-    onUpdate(assignment.id, {
-      overrideConfig: {
-        ...assignment.overrideConfig,
-        showSubtitle: checked
-      }
-    });
-  };
-
-  const handleBorderStyleChange = (border: string) => {
-    setBorderStyle(border);
-    onUpdate(assignment.id, {
-      overrideConfig: {
-        ...assignment.overrideConfig,
-        borderStyle: border
-      }
-    });
-  };
-
-  const handleShadowLevelChange = (shadow: string) => {
-    setShadowLevel(shadow);
-    onUpdate(assignment.id, {
-      overrideConfig: {
-        ...assignment.overrideConfig,
-        shadowLevel: shadow
-      }
-    });
-  };
-
-  const handleCustomCssChange = (css: string) => {
-    setCustomCss(css);
-    onUpdate(assignment.id, {
-      overrideConfig: {
-        ...assignment.overrideConfig,
-        customCss: css
-      }
-    });
-  };
 
   const colorOptions = [
     { name: 'Blue', value: 'blue', class: 'bg-blue-500' },
@@ -351,13 +281,17 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
                     <Label className="text-sm font-medium text-slate-300">Card Title Override</Label>
                     <input
                       type="text"
-                      value={assignment.overrideConfig?.title || ''}
-                      onChange={(e) => onUpdate(assignment.id, {
-                        overrideConfig: {
-                          ...assignment.overrideConfig,
-                          title: e.target.value
-                        }
-                      })}
+                      value={titleOverride}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setTitleOverride(value);
+                        onUpdate(assignment.id, {
+                          overrideConfig: {
+                            ...(assignment.overrideConfig || {}),
+                            title: value
+                          }
+                        });
+                      }}
                       placeholder={template?.config?.title || template?.name || 'Default title'}
                       className="w-full px-3 py-2 bg-slate-800/50 border border-slate-600 rounded text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       data-testid={`input-title-override-${assignment.id}`}
@@ -368,13 +302,17 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
                     <Label className="text-sm font-medium text-slate-300">Card Subtitle Override</Label>
                     <input
                       type="text"
-                      value={assignment.overrideConfig?.subtitle || ''}
-                      onChange={(e) => onUpdate(assignment.id, {
-                        overrideConfig: {
-                          ...assignment.overrideConfig,
-                          subtitle: e.target.value
-                        }
-                      })}
+                      value={subtitleOverride}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setSubtitleOverride(value);
+                        onUpdate(assignment.id, {
+                          overrideConfig: {
+                            ...(assignment.overrideConfig || {}),
+                            subtitle: value
+                          }
+                        });
+                      }}
                       placeholder={template?.config?.subtitle || 'Default subtitle'}
                       className="w-full px-3 py-2 bg-slate-800/50 border border-slate-600 rounded text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       data-testid={`input-subtitle-override-${assignment.id}`}
@@ -384,13 +322,17 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
                   <div>
                     <Label className="text-sm font-medium text-slate-300">Card Description Override</Label>
                     <textarea
-                      value={assignment.overrideConfig?.description || ''}
-                      onChange={(e) => onUpdate(assignment.id, {
-                        overrideConfig: {
-                          ...assignment.overrideConfig,
-                          description: e.target.value
-                        }
-                      })}
+                      value={descriptionOverride}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setDescriptionOverride(value);
+                        onUpdate(assignment.id, {
+                          overrideConfig: {
+                            ...(assignment.overrideConfig || {}),
+                            description: value
+                          }
+                        });
+                      }}
                       placeholder={template?.config?.description || 'Default description'}
                       className="w-full px-3 py-2 bg-slate-800/50 border border-slate-600 rounded text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       rows={3}
@@ -406,148 +348,6 @@ function SortableFormItem({ assignment, template, onRemove, onUpdate }: Sortable
               </div>
             </div>
 
-            {/* Display Configuration Section */}
-            <div className="border-t border-slate-600 pt-6 mt-6 space-y-4">
-              <Label className="text-base font-medium text-white flex items-center gap-2">
-                <Monitor className="w-4 h-4" />
-                Display Configuration
-              </Label>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Display Size */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium text-slate-300">Display Size</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['small', 'medium', 'large'].map((size) => (
-                      <Button
-                        key={size}
-                        variant={displaySize === size ? "default" : "outline"}
-                        size="sm"
-                        className={`${displaySize === size 
-                          ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-800' 
-                          : 'border-slate-600 hover:bg-slate-600'}`}
-                        onClick={() => handleDisplaySizeChange(size)}
-                        data-testid={`button-size-${size}-${assignment.id}`}
-                      >
-                        <span className="text-xs capitalize">{size}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Display Style */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium text-slate-300">Display Style</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['default', 'compact', 'featured'].map((style) => (
-                      <Button
-                        key={style}
-                        variant={displayStyle === style ? "default" : "outline"}
-                        size="sm"
-                        className={`${displayStyle === style 
-                          ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-800' 
-                          : 'border-slate-600 hover:bg-slate-600'}`}
-                        onClick={() => handleDisplayStyleChange(style)}
-                        data-testid={`button-style-${style}-${assignment.id}`}
-                      >
-                        <span className="text-xs capitalize">{style}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Visibility Toggles */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium text-slate-300">Visibility Options</Label>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2 p-2 bg-slate-800/50 rounded border border-slate-600">
-                      <input
-                        type="checkbox"
-                        id={`showIcon-${assignment.id}`}
-                        checked={showIcon}
-                        onChange={(e) => handleShowIconToggle(e.target.checked)}
-                        className="rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
-                        data-testid={`checkbox-show-icon-${assignment.id}`}
-                      />
-                      <Label htmlFor={`showIcon-${assignment.id}`} className="text-xs text-slate-300 cursor-pointer">
-                        Show Icon
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-2 bg-slate-800/50 rounded border border-slate-600">
-                      <input
-                        type="checkbox"
-                        id={`showSubtitle-${assignment.id}`}
-                        checked={showSubtitle}
-                        onChange={(e) => handleShowSubtitleToggle(e.target.checked)}
-                        className="rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
-                        data-testid={`checkbox-show-subtitle-${assignment.id}`}
-                      />
-                      <Label htmlFor={`showSubtitle-${assignment.id}`} className="text-xs text-slate-300 cursor-pointer">
-                        Show Subtitle
-                      </Label>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Border Style */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium text-slate-300">Border Style</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['none', 'solid', 'dashed', 'gradient'].map((border) => (
-                      <Button
-                        key={border}
-                        variant={borderStyle === border ? "default" : "outline"}
-                        size="sm"
-                        className={`${borderStyle === border 
-                          ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-800' 
-                          : 'border-slate-600 hover:bg-slate-600'}`}
-                        onClick={() => handleBorderStyleChange(border)}
-                        data-testid={`button-border-${border}-${assignment.id}`}
-                      >
-                        <span className="text-xs capitalize">{border}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Shadow Level */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium text-slate-300">Shadow Level</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['none', 'subtle', 'medium', 'strong'].map((shadow) => (
-                      <Button
-                        key={shadow}
-                        variant={shadowLevel === shadow ? "default" : "outline"}
-                        size="sm"
-                        className={`${shadowLevel === shadow 
-                          ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-800' 
-                          : 'border-slate-600 hover:bg-slate-600'}`}
-                        onClick={() => handleShadowLevelChange(shadow)}
-                        data-testid={`button-shadow-${shadow}-${assignment.id}`}
-                      >
-                        <span className="text-xs capitalize">{shadow}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Custom CSS */}
-                <div className="space-y-3 md:col-span-2">
-                  <Label className="text-sm font-medium text-slate-300">Custom CSS Classes</Label>
-                  <input
-                    type="text"
-                    value={customCss}
-                    onChange={(e) => handleCustomCssChange(e.target.value)}
-                    placeholder="e.g., hover:scale-105 transition-transform"
-                    className="w-full px-3 py-2 bg-slate-800/50 border border-slate-600 rounded text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    data-testid={`input-custom-css-${assignment.id}`}
-                  />
-                  <p className="text-xs text-slate-400">
-                    Add custom Tailwind CSS classes to further customize the card appearance
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </CardContent>

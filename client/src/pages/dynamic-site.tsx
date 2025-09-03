@@ -25,6 +25,7 @@ import { z } from 'zod';
 import { PresentationViewer } from '@/components/presentation-viewer';
 import { ComingSoon } from '@/components/coming-soon';
 import { VideoCard } from '@/components/video-card';
+import { YouTubeCard } from '@/components/youtube-card';
 import { useAuth } from '@/hooks/use-auth';
 import type { Site } from '@shared/site-schema';
 
@@ -1109,20 +1110,25 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
                           // Use override color first, then template color, then default to blue
                           const effectiveColor = cardAssignment.overrideConfig?.color || config.color || 'blue';
                           const colorTheme = getFormColor(effectiveColor);
-                          
+
                           // Get button text - for hyperlinks, default is "Visit" instead of "Get Started"
                           const defaultButtonText = cardType === 'hyperlink' ? 'Visit' : 'Get Started';
                           const buttonText = cardAssignment.overrideConfig?.buttonText || config.buttonText || defaultButtonText;
-                          
+
+                          // Content overrides
+                          const effectiveTitle = cardAssignment.overrideConfig?.title || config.title || cardTemplate.name;
+                          const effectiveSubtitle = cardAssignment.overrideConfig?.subtitle ?? config.subtitle;
+                          const effectiveDescription = cardAssignment.overrideConfig?.description || config.description || cardTemplate.description || (cardType === 'hyperlink' ? 'Click to visit the link' : 'Click to learn more and get in touch');
+
                           // Render video cards (YouTube and Vimeo) differently from standard cards
                           if (cardType === 'youtube' || cardType === 'vimeo') {
                             return (
-                              <div 
+                              <div
                                 key={cardAssignment.id}
                                 className="w-full max-w-md mx-auto"
                                 data-testid={`card-${cardType}-${cardTemplate.name.toLowerCase().replace(/\s+/g, '-')}`}
                               >
-                                <VideoCard 
+                                <VideoCard
                                   template={cardTemplate}
                                   className="transition-all duration-300 hover:scale-105"
                                 />
@@ -1132,7 +1138,7 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
 
                           // Standard cards for forms and hyperlinks
                           return (
-                            <Card 
+                            <Card
                               key={cardAssignment.id}
                               className={`bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-600 backdrop-blur-sm hover:border-slate-500 transition-all duration-300 cursor-pointer transform hover:scale-105 flex flex-col h-full ${colorTheme.shadow}`}
                               onClick={() => handleCardClick(cardAssignment)}
@@ -1142,9 +1148,9 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
                                 {/* Logo for hyperlink cards or icon for form cards */}
                                 {cardType === 'hyperlink' && config.logo ? (
                                   <div className="w-20 h-20 rounded-xl mx-auto mb-4 flex items-center justify-center border-2 border-slate-600 bg-white p-2">
-                                    <img 
-                                      src={config.logo} 
-                                      alt={`${config.title || cardTemplate.name} logo`}
+                                    <img
+                                      src={config.logo}
+                                      alt={`${effectiveTitle} logo`}
                                       className="max-w-full max-h-full object-contain"
                                     />
                                   </div>
@@ -1154,20 +1160,20 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
                                   </div>
                                 )}
                                 <CardTitle className="text-xl text-white mb-2">
-                                  {config.title || cardTemplate.name}
+                                  {effectiveTitle}
                                 </CardTitle>
-                                {config.subtitle && (
+                                {effectiveSubtitle && (
                                   <p className="text-slate-400 text-xs mb-2 font-medium">
-                                    {config.subtitle}
+                                    {effectiveSubtitle}
                                   </p>
                                 )}
                                 <CardDescription className="text-slate-300 text-sm whitespace-pre-line">
-                                  {config.description || cardTemplate.description || (cardType === 'hyperlink' ? 'Click to visit the link' : 'Click to learn more and get in touch')}
+                                  {effectiveDescription}
                                 </CardDescription>
                               </CardHeader>
-                              
+
                               <CardContent className="text-center pt-0 mt-auto">
-                                <Button 
+                                <Button
                                   className={`w-full ${colorTheme.button} text-white font-semibold transition-all duration-300`}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -1175,8 +1181,8 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
                                   }}
                                 >
                                   {buttonText}
-                                  {cardType === 'hyperlink' ? 
-                                    <ExternalLink className="w-4 h-4 ml-2" /> : 
+                                  {cardType === 'hyperlink' ?
+                                    <ExternalLink className="w-4 h-4 ml-2" /> :
                                     <ArrowRight className="w-4 h-4 ml-2" />
                                   }
                                 </Button>
@@ -1221,6 +1227,9 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
                         const colorTheme = getFormColor(effectiveColor);
                         const defaultButtonText = cardType === 'hyperlink' ? 'Visit' : 'Get Started';
                         const buttonText = cardAssignment.overrideConfig?.buttonText || config.buttonText || defaultButtonText;
+                        const effectiveTitle = cardAssignment.overrideConfig?.title || config.title || cardTemplate.name;
+                        const effectiveSubtitle = cardAssignment.overrideConfig?.subtitle ?? config.subtitle;
+                        const effectiveDescription = cardAssignment.overrideConfig?.description || config.description || cardTemplate.description || (cardType === 'hyperlink' ? 'Click to visit the link' : 'Click to learn more and get in touch');
                         
                         if (cardType === 'youtube') {
                           return (
@@ -1245,29 +1254,29 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
                             data-testid={`card-${cardType}-${cardTemplate.name.toLowerCase().replace(/\s+/g, '-')}`}
                           >
                             <CardHeader className="text-center pb-4 flex-grow">
-                              {cardType === 'hyperlink' && config.logo ? (
-                                <div className="w-20 h-20 rounded-xl mx-auto mb-4 flex items-center justify-center border-2 border-slate-600 bg-white p-2">
-                                  <img 
-                                    src={config.logo} 
-                                    alt={`${config.title || cardTemplate.name} logo`}
-                                    className="max-w-full max-h-full object-contain"
-                                  />
-                                </div>
-                              ) : (
-                                <div className={`w-20 h-20 rounded-xl mx-auto mb-4 flex items-center justify-center border-2 ${colorTheme.icon}`}>
-                                  {getFormIcon(config.icon || 'file')}
-                                </div>
-                              )}
+                                {cardType === 'hyperlink' && config.logo ? (
+                                  <div className="w-20 h-20 rounded-xl mx-auto mb-4 flex items-center justify-center border-2 border-slate-600 bg-white p-2">
+                                    <img
+                                      src={config.logo}
+                                      alt={`${effectiveTitle} logo`}
+                                      className="max-w-full max-h-full object-contain"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className={`w-20 h-20 rounded-xl mx-auto mb-4 flex items-center justify-center border-2 ${colorTheme.icon}`}>
+                                    {getFormIcon(config.icon || 'file')}
+                                  </div>
+                                )}
                               <CardTitle className="text-xl text-white mb-2">
-                                {config.title || cardTemplate.name}
+                                {effectiveTitle}
                               </CardTitle>
-                              {config.subtitle && (
+                              {effectiveSubtitle && (
                                 <p className="text-slate-400 text-xs mb-2 font-medium">
-                                  {config.subtitle}
+                                  {effectiveSubtitle}
                                 </p>
                               )}
                               <CardDescription className="text-slate-300 text-sm whitespace-pre-line">
-                                {config.description || cardTemplate.description || (cardType === 'hyperlink' ? 'Click to visit the link' : 'Click to learn more and get in touch')}
+                                {effectiveDescription}
                               </CardDescription>
                             </CardHeader>
                             
