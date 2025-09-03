@@ -1,8 +1,11 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
+import fs from "fs";
+import { exec } from "child_process";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log, setupViteFor, serveStaticFor } from "./vite";
 import { scan } from "../packages/code-explorer/scan.js";
+import { buildFileTree } from "../packages/code-explorer/file-tree.js";
 
 const BASE_DEV_URL = "http://0.0.0.0:5000/api";
 const BASE_CODEX_URL = "https://485e2e64-1b2c-43eb-99b5-63298da289f4-00-1kpwljks2mo2e.kirk.replit.dev/api";
@@ -67,6 +70,23 @@ app.get("/explorer/api/data", (_req, res) => {
   const targetDir = process.cwd();
   const data = scan(targetDir);
   res.json(data);
+});
+
+// clone a repository and return its file tree
+app.post("/explorer/api/clone", async (req, res) => {
+  const { repo } = req.body as { repo?: string };
+  if (!repo) {
+    return res.status(400).json({ error: "repo required" });
+  }
+  const tempDir = path.join(process.cwd(), "tmp", Date.now().toString());
+  await fs.promises.mkdir(tempDir, { recursive: true });
+  exec(`git clone ${repo} ${tempDir}`, (err) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    const tree = buildFileTree(tempDir);
+    res.json(tree);
+  });
 });
 
 (async () => {
