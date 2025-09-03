@@ -26,6 +26,8 @@ import { SiteDisclaimerRedirect } from "@/pages/site-disclaimer-redirect";
 import { CollectiveHome } from "@/pages/collective-home";
 import BlogPostView from "@/pages/blog-post-view";
 import BuilderLab from "@/pages/BuilderLab";
+import { CardBuilderApp } from "../../packages/card-builder";
+import { CodeExplorerApp } from "../../packages/code-explorer";
 
 function Router() {
   return (
@@ -73,7 +75,11 @@ function Router() {
       {/* Blog post view route */}
       <Route path="/site/:siteId/blog/:postId" component={BlogPostView} />
       <Route path="/disclaimer/:disclaimerId" component={DisclaimerPage} />
-      
+
+      {/* Standalone tools routes */}
+      <Route path="/card-builder" component={CardBuilderApp} />
+      <Route path="/code-explorer" component={CodeExplorerApp} />
+
       {/* Builder Lab route */}
       <Route path="/builder" component={BuilderLab} />
       
