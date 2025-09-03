@@ -98,7 +98,7 @@ export function SlideManager({ siteId }: SlideManagerProps) {
   // Update slide mutation
   const updateSlideMutation = useMutation({
     mutationFn: async ({ slideId, updates }: { slideId: string; updates: Partial<SiteSlide> }) => {
-      return apiRequest(`/api/sites/${siteId}/slides/${slideId}`, "PUT", updates);
+      return apiRequest("PUT", `/api/sites/${siteId}/slides/${slideId}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sites/${siteId}/slides`] });
@@ -120,7 +120,7 @@ export function SlideManager({ siteId }: SlideManagerProps) {
   // Delete slide mutation
   const deleteSlideMutation = useMutation({
     mutationFn: async (slideId: string) => {
-      return apiRequest(`/api/sites/${siteId}/slides/${slideId}`, "DELETE");
+      return apiRequest("DELETE", `/api/sites/${siteId}/slides/${slideId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sites/${siteId}/slides`] });
@@ -141,7 +141,7 @@ export function SlideManager({ siteId }: SlideManagerProps) {
   // Reorder slides mutation
   const reorderSlidesMutation = useMutation({
     mutationFn: async (slideOrders: Array<{ id: string; slideOrder: string }>) => {
-      return apiRequest(`/api/sites/${siteId}/slides/reorder`, "POST", { slideOrders });
+      return apiRequest("POST", `/api/sites/${siteId}/slides/reorder`, { slideOrders });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sites/${siteId}/slides`] });
