@@ -2,6 +2,30 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+const BASE_DEV_URL = "http://0.0.0.0:5000/api";
+const BASE_CODEX_URL = "https://485e2e64-1b2c-43eb-99b5-63298da289f4-00-1kpwljks2mo2e.kirk.replit.dev/api";
+
+async function init() {
+  try {
+    const response = await fetch(`${BASE_DEV_URL}/visible-slides`);
+    if (!response.ok) {
+      throw new Error("Local API not reachable");
+    }
+    console.log("Successfully connected to the local API!");
+  } catch (error: any) {
+    console.error("Falling back to Codex API:", error.message);
+    try {
+      const response = await fetch(`${BASE_CODEX_URL}/visible-slides`);
+      if (!response.ok) {
+        throw new Error("Codex API call failed");
+      }
+      console.log("Successfully connected to the Codex API!");
+    } catch (error) {
+      console.error("Failed to connect to the Codex API:", error);
+    }
+  }
+}
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -65,7 +89,8 @@ app.use((req, res, next) => {
     port,
     host: "0.0.0.0",
     reusePort: true,
-  }, () => {
+  }, async () => {
     log(`serving on port ${port}`);
+    await init();
   });
 })();
