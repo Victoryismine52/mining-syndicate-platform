@@ -9,9 +9,7 @@
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "test": "vitest run",
-    "db:push": "drizzle-kit push",
-    "card-builder": "node packages/card-builder/dev.js",
-    "code-explorer": "node packages/code-explorer/dev.js"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
