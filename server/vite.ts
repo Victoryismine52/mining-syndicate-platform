@@ -83,3 +83,59 @@ export function serveStatic(app: Express) {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
+
+// Setup a Vite-powered SPA under a specific route during development
+export async function setupViteFor(
+  app: Express,
+  server: Server,
+  rootDir: string,
+  route: string,
+) {
+  const serverOptions = {
+    middlewareMode: true,
+    hmr: { server },
+    allowedHosts: true as const,
+  };
+
+  const vite = await createViteServer({
+    ...viteConfig,
+    configFile: false,
+    root: rootDir,
+    server: serverOptions,
+    appType: "custom",
+  });
+
+  app.use(route, vite.middlewares);
+  app.use(`${route}/*`, async (req, res, next) => {
+    try {
+      const url = req.originalUrl.replace(route, "");
+      const templatePath = path.resolve(rootDir, "index.html");
+      let template = await fs.promises.readFile(templatePath, "utf-8");
+      template = template.replace(
+        `src="/src`,
+        `src="${route}/src`,
+      );
+      const page = await vite.transformIndexHtml(url, template);
+      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+    } catch (e) {
+      vite.ssrFixStacktrace(e as Error);
+      next(e);
+    }
+  });
+}
+
+// Serve a built SPA under a specific route in production
+export function serveStaticFor(app: Express, rootDir: string, route: string) {
+  const distPath = path.resolve(rootDir, "dist");
+
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    );
+  }
+
+  app.use(route, express.static(distPath));
+  app.use(`${route}/*`, (_req, res) => {
+    res.sendFile(path.resolve(distPath, "index.html"));
+  });
+}

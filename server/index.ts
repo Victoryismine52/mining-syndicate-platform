@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite, serveStatic, log, setupViteFor, serveStaticFor } from "./vite";
+import { scan } from "../packages/code-explorer/scan.js";
 
 const BASE_DEV_URL = "http://0.0.0.0:5000/api";
 const BASE_CODEX_URL = "https://485e2e64-1b2c-43eb-99b5-63298da289f4-00-1kpwljks2mo2e.kirk.replit.dev/api";
@@ -60,6 +62,13 @@ app.use((req, res, next) => {
   next();
 });
 
+// expose scan results for the code explorer
+app.get("/explorer/api/data", (_req, res) => {
+  const targetDir = process.cwd();
+  const data = scan(targetDir);
+  res.json(data);
+});
+
 (async () => {
   const server = await registerRoutes(app);
 
@@ -74,10 +83,26 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
+  const cardRoot = path.resolve(
+    import.meta.dirname,
+    "..",
+    "packages",
+    "card-builder",
+  );
+  const explorerRoot = path.resolve(
+    import.meta.dirname,
+    "..",
+    "packages",
+    "code-explorer",
+  );
   if (app.get("env") === "development") {
     await setupVite(app, server);
+    await setupViteFor(app, server, cardRoot, "/admin");
+    await setupViteFor(app, server, explorerRoot, "/explorer");
   } else {
     serveStatic(app);
+    serveStaticFor(app, cardRoot, "/admin");
+    serveStaticFor(app, explorerRoot, "/explorer");
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
