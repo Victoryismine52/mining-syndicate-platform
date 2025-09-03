@@ -1,0 +1,335 @@
+{
+    "results": [
+        {
+            "id": "2ce38611-be28-4354-b55b-695b2958cb47",
+            "name": "MS Lending Pool",
+            "createdAt": "2025-08-14T18:52:07.133Z",
+            "updatedAt": "2025-08-14T18:52:07.133Z",
+            "archived": false,
+            "fieldGroups": [
+                {
+                    "groupType": "default_group",
+                    "richTextType": "text",
+                    "fields": [
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "firstname",
+                            "label": "First Name",
+                            "required": false,
+                            "hidden": false,
+                            "fieldType": "single_line_text"
+                        },
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "lastname",
+                            "label": "Last Name",
+                            "required": false,
+                            "hidden": false,
+                            "fieldType": "single_line_text"
+                        },
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "email",
+                            "label": "Email",
+                            "required": true,
+                            "hidden": false,
+                            "validation": {
+                                "blockedEmailDomains": [],
+                                "useDefaultBlockList": false
+                            },
+                            "fieldType": "email"
+                        }
+                    ]
+                }
+            ],
+            "configuration": {
+                "language": "en",
+                "cloneable": true,
+                "postSubmitAction": {
+                    "type": "thank_you",
+                    "value": ""
+                },
+                "editable": true,
+                "archivable": true,
+                "recaptchaEnabled": false,
+                "notifyContactOwner": false,
+                "notifyRecipients": [
+                    "60186137"
+                ],
+                "createNewContactForNewEmail": false,
+                "prePopulateKnownValues": true,
+                "allowLinkToResetKnownValues": false,
+                "lifecycleStages": []
+            },
+            "displayOptions": {
+                "renderRawHtml": false,
+                "theme": "default_style",
+                "submitButtonText": "",
+                "style": {
+                    "fontFamily": "arial, helvetica, sans-serif",
+                    "backgroundWidth": "100%",
+                    "labelTextColor": "#33475b",
+                    "labelTextSize": "11px",
+                    "helpTextColor": "#7C98B6",
+                    "helpTextSize": "11px",
+                    "legalConsentTextColor": "#33475b",
+                    "legalConsentTextSize": "14px",
+                    "submitColor": "#ff7a59",
+                    "submitAlignment": "left",
+                    "submitFontColor": "#ffffff",
+                    "submitSize": "12px"
+                },
+                "cssClass": null
+            },
+            "legalConsentOptions": {
+                "type": "none"
+            },
+            "formType": "hubspot"
+        },
+        {
+            "id": "a80848d2-590b-49ee-91f8-00195f9d11f7",
+            "name": "Economic Awakening Form",
+            "createdAt": "2023-09-01T16:15:38.504Z",
+            "updatedAt": "2023-09-01T16:27:37.556Z",
+            "archived": false,
+            "fieldGroups": [
+                {
+                    "groupType": "default_group",
+                    "richTextType": "text",
+                    "fields": [
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "email",
+                            "label": "Email",
+                            "required": true,
+                            "hidden": false,
+                            "validation": {
+                                "blockedEmailDomains": [],
+                                "useDefaultBlockList": false
+                            },
+                            "fieldType": "email"
+                        }
+                    ]
+                }
+            ],
+            "configuration": {
+                "language": "en",
+                "cloneable": true,
+                "postSubmitAction": {
+                    "type": "thank_you",
+                    "value": "<p>Thanks for submitting. We'll be in touch!</p>"
+                },
+                "editable": true,
+                "archivable": true,
+                "recaptchaEnabled": false,
+                "notifyContactOwner": false,
+                "notifyRecipients": [],
+                "createNewContactForNewEmail": false,
+                "prePopulateKnownValues": true,
+                "allowLinkToResetKnownValues": false,
+                "lifecycleStages": []
+            },
+            "displayOptions": {
+                "renderRawHtml": false,
+                "theme": "default_style",
+                "submitButtonText": "Get Early Access",
+                "style": {
+                    "fontFamily": "arial, helvetica, sans-serif",
+                    "backgroundWidth": "100%",
+                    "labelTextColor": "#212D3A",
+                    "labelTextSize": "13px",
+                    "helpTextColor": "#7C98B6",
+                    "helpTextSize": "11px",
+                    "legalConsentTextColor": "#33475B",
+                    "legalConsentTextSize": "14px",
+                    "submitColor": "#000000",
+                    "submitAlignment": "right",
+                    "submitFontColor": "#FFFFFF",
+                    "submitSize": "12px"
+                },
+                "cssClass": "hs-form stacked"
+            },
+            "legalConsentOptions": {
+                "subscriptionTypeIds": [
+                    223729663
+                ],
+                "lawfulBasis": "lead",
+                "privacyText": "<p>By subscribing you agree to our <a href=\"/Privacy_Policy-5608773c.pdf\" rel=\"noopener\">Privacy Policy</a>.</p>",
+                "type": "legitimate_interest"
+            },
+            "formType": "hubspot"
+        },
+        {
+            "id": "9597adda-e78b-47bd-99e9-79687b6f40d5",
+            "name": "MS Learn More",
+            "createdAt": "2025-08-13T21:37:34.573Z",
+            "updatedAt": "2025-08-13T21:37:34.573Z",
+            "archived": false,
+            "fieldGroups": [
+                {
+                    "groupType": "default_group",
+                    "richTextType": "text",
+                    "fields": [
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "firstname",
+                            "label": "First Name",
+                            "required": false,
+                            "hidden": false,
+                            "fieldType": "single_line_text"
+                        },
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "lastname",
+                            "label": "Last Name",
+                            "required": false,
+                            "hidden": false,
+                            "fieldType": "single_line_text"
+                        },
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "email",
+                            "label": "Email",
+                            "required": true,
+                            "hidden": false,
+                            "validation": {
+                                "blockedEmailDomains": [],
+                                "useDefaultBlockList": false
+                            },
+                            "fieldType": "email"
+                        }
+                    ]
+                }
+            ],
+            "configuration": {
+                "language": "en",
+                "cloneable": true,
+                "postSubmitAction": {
+                    "type": "thank_you",
+                    "value": ""
+                },
+                "editable": true,
+                "archivable": true,
+                "recaptchaEnabled": false,
+                "notifyContactOwner": false,
+                "notifyRecipients": [
+                    "60186137"
+                ],
+                "createNewContactForNewEmail": false,
+                "prePopulateKnownValues": true,
+                "allowLinkToResetKnownValues": false,
+                "lifecycleStages": []
+            },
+            "displayOptions": {
+                "renderRawHtml": false,
+                "theme": "default_style",
+                "submitButtonText": "",
+                "style": {
+                    "fontFamily": "arial, helvetica, sans-serif",
+                    "backgroundWidth": "100%",
+                    "labelTextColor": "#33475b",
+                    "labelTextSize": "11px",
+                    "helpTextColor": "#7C98B6",
+                    "helpTextSize": "11px",
+                    "legalConsentTextColor": "#33475b",
+                    "legalConsentTextSize": "14px",
+                    "submitColor": "#ff7a59",
+                    "submitAlignment": "left",
+                    "submitFontColor": "#ffffff",
+                    "submitSize": "12px"
+                },
+                "cssClass": null
+            },
+            "legalConsentOptions": {
+                "type": "none"
+            },
+            "formType": "hubspot"
+        },
+        {
+            "id": "1b6cc881-83ac-4977-80d8-dc549df4e4ce",
+            "name": "MS Mining Pool",
+            "createdAt": "2025-08-14T18:49:23.034Z",
+            "updatedAt": "2025-08-14T18:49:23.034Z",
+            "archived": false,
+            "fieldGroups": [
+                {
+                    "groupType": "default_group",
+                    "richTextType": "text",
+                    "fields": [
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "firstname",
+                            "label": "First Name",
+                            "required": false,
+                            "hidden": false,
+                            "fieldType": "single_line_text"
+                        },
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "lastname",
+                            "label": "Last Name",
+                            "required": false,
+                            "hidden": false,
+                            "fieldType": "single_line_text"
+                        },
+                        {
+                            "objectTypeId": "0-1",
+                            "name": "email",
+                            "label": "Email",
+                            "required": true,
+                            "hidden": false,
+                            "validation": {
+                                "blockedEmailDomains": [],
+                                "useDefaultBlockList": false
+                            },
+                            "fieldType": "email"
+                        }
+                    ]
+                }
+            ],
+            "configuration": {
+                "language": "en",
+                "cloneable": true,
+                "postSubmitAction": {
+                    "type": "thank_you",
+                    "value": ""
+                },
+                "editable": true,
+                "archivable": true,
+                "recaptchaEnabled": false,
+                "notifyContactOwner": false,
+                "notifyRecipients": [
+                    "60186137"
+                ],
+                "createNewContactForNewEmail": false,
+                "prePopulateKnownValues": true,
+                "allowLinkToResetKnownValues": false,
+                "lifecycleStages": []
+            },
+            "displayOptions": {
+                "renderRawHtml": false,
+                "theme": "default_style",
+                "submitButtonText": "",
+                "style": {
+                    "fontFamily": "arial, helvetica, sans-serif",
+                    "backgroundWidth": "100%",
+                    "labelTextColor": "#33475b",
+                    "labelTextSize": "11px",
+                    "helpTextColor": "#7C98B6",
+                    "helpTextSize": "11px",
+                    "legalConsentTextColor": "#33475b",
+                    "legalConsentTextSize": "14px",
+                    "submitColor": "#ff7a59",
+                    "submitAlignment": "left",
+                    "submitFontColor": "#ffffff",
+                    "submitSize": "12px"
+                },
+                "cssClass": null
+            },
+            "legalConsentOptions": {
+                "type": "none"
+            },
+            "formType": "hubspot"
+        }
+    ]
+}

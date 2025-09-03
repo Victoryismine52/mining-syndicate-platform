@@ -1,0 +1,115 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.nuxt/
+.cache/
+.parcel-cache/
+server/public/
+
+# Environment files and secrets (CRITICAL - DO NOT COMMIT!)
+.env
+.env.*
+!.env.example
+*.env
+*.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Secret files and credentials (CRITICAL - DO NOT COMMIT!)
+*secret*
+*Secret*
+*SECRET*
+*credential*
+*Credential*
+*CREDENTIAL*
+*key*.json
+*Key*.json
+*KEY*.json
+config/secrets.json
+secrets/
+.secrets/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+database.json
+db-config.json
+
+# API Keys and Auth configs (CRITICAL - DO NOT COMMIT!)
+*api-key*
+*API-KEY*
+*oauth*
+*OAUTH*
+*token*
+*TOKEN*
+*auth-config*
+*AUTH-CONFIG*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage and testing
+coverage/
+*.lcov
+.nyc_output/
+.jest/
+
+# IDE and editor files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+.tmp/
+
+# Other
+*.tgz
+*.tar.gz
+vite.config.ts.*
+
+# Replit specific
+.replit
+.upm/
+.config/
+
+# Local configuration that shouldn't be shared
+local.json
+development.json

@@ -1,0 +1,96 @@
+// components/TaskDetailsDialog.tsx
+import * as React from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
+export type Task = {
+  id: string
+  title: string
+  description?: string
+  due_date?: string | Date | null
+  status?: "todo" | "in_progress" | "done" | string
+  assignee_name?: string
+  created_at?: string | Date
+  metadata?: Record<string, unknown>
+}
+
+type Props = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  task: Task | null
+  onStartTask?: (taskId: string) => Promise<void> | void
+}
+
+export default function TaskDetailsDialog({ open, onOpenChange, task, onStartTask }: Props) {
+  const due =
+    task?.due_date
+      ? typeof task.due_date === "string"
+        ? new Date(task.due_date)
+        : task.due_date
+      : null
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg md:max-w-xl">
+        <DialogHeader>
+          <DialogTitle className="truncate">
+            {task?.title ?? "Task"}
+          </DialogTitle>
+          <DialogDescription>
+            {task?.status ? `Status: ${String(task.status)}` : null}
+          </DialogDescription>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[50vh] pr-2">
+          <div className="space-y-3 text-sm">
+            {task?.description ? (
+              <p className="leading-relaxed whitespace-pre-wrap">{task.description}</p>
+            ) : (
+              <p className="italic text-muted-foreground">No description provided.</p>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
+              <Info label="Assignee" value={task?.assignee_name} />
+              <Info label="Due" value={due ? due.toLocaleString() : "—"} />
+              <Info label="Created" value={task?.created_at ? new Date(task.created_at as any).toLocaleString() : "—"} />
+              <Info label="ID" value={task?.id} />
+            </div>
+
+            {task?.metadata && (
+              <div>
+                <h4 className="font-medium mb-1">Metadata</h4>
+                <pre className="rounded-lg bg-muted p-3 text-xs overflow-x-auto">
+                  {JSON.stringify(task.metadata, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        <DialogFooter className="gap-2 sm:space-x-2">
+          {task?.id && onStartTask ? (
+            <Button
+              onClick={() => onStartTask(task.id)}
+              className="w-full sm:w-auto"
+            >
+              Start Task
+            </Button>
+          ) : null}
+          <Button variant="secondary" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function Info({ label, value }: { label: string; value?: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border p-2">
+      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="text-sm">{value ?? "—"}</div>
+    </div>
+  )
+}

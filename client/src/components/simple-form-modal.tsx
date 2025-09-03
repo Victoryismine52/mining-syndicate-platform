@@ -1,0 +1,649 @@
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+import { ExternalLink, Mail, Users, Phone, FileText, Info, DollarSign, Pickaxe, Star, Heart, Shield, Plus, Minus, HelpCircle } from 'lucide-react';
+import { SuccessConfirmation } from '@/components/success-confirmation';
+
+interface DynamicFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  formTemplate: any;
+  siteId: string;
+  colorTheme?: any;
+}
+
+// Helper function for form icons
+const getFormIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'mail': return <Mail className="w-6 h-6 text-white" />;
+    case 'users': return <Users className="w-6 h-6 text-white" />;
+    case 'phone': return <Phone className="w-6 h-6 text-white" />;
+    case 'file': return <FileText className="w-6 h-6 text-white" />;
+    case 'info': return <Info className="w-6 h-6 text-white" />;
+    case 'dollar': return <DollarSign className="w-6 h-6 text-white" />;
+    case 'pickaxe': return <Pickaxe className="w-6 h-6 text-white" />;
+    case 'star': return <Star className="w-6 h-6 text-white" />;
+    case 'heart': return <Heart className="w-6 h-6 text-white" />;
+    case 'shield': return <Shield className="w-6 h-6 text-white" />;
+    default: return <FileText className="w-6 h-6 text-white" />;
+  }
+};
+
+export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }: DynamicFormModalProps) {
+  const { toast } = useToast();
+  const [showSuccess, setShowSuccess] = useState(false);
+  
+  const config = formTemplate.config || {};
+
+  // Fetch the actual form template fields
+  const { data: formFields = [], isLoading } = useQuery<any[]>({
+    queryKey: [`/api/form-templates/${formTemplate.id}/fields`],
+    enabled: !!formTemplate.id && isOpen,
+  });
+
+  // Create dynamic form schema based on actual fields
+  const createDynamicSchema = () => {
+    let schemaFields: any = {};
+    
+    formFields.forEach((field) => {
+      const fieldName = field.fieldLibrary.name;
+      let fieldSchema = z.string();
+      
+      // Apply validation based on field type and custom validation
+      if (field.fieldLibrary.dataType === 'email') {
+        fieldSchema = z.string().email("Please enter a valid email address");
+      } else if (field.fieldLibrary.dataType === 'phone') {
+        fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
+      } else if (field.fieldLibrary.dataType === 'number') {
+        fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
+      }
+
+      // Handle required validation before special field types
+      if (field.isRequired) {
+        fieldSchema = fieldSchema.min(1, "This field is required");
+      }
+
+      // Handle extensible_list fields
+      if (field.fieldLibrary.dataType === 'extensible_list') {
+        if (field.isRequired) {
+          fieldSchema = z.array(z.string()).min(1, "At least one item is required");
+        } else {
+          fieldSchema = z.array(z.string()).optional();
+        }
+      }
+      // Handle radio fields with special validation (after required validation)
+      else if (field.fieldLibrary.dataType === 'radio') {
+        const options = field.fieldLibrary.defaultValidation?.options || [];
+        if (options.length > 0) {
+          if (field.isRequired) {
+            // For required radio fields, ensure a value is selected and it's valid
+            fieldSchema = z.string()
+              .min(1, "Please select an option")
+              .refine(
+                (value) => options.includes(value),
+                { message: "Please select one of the available options" }
+              );
+          } else {
+            // For optional radio fields
+            fieldSchema = z.string()
+              .optional()
+              .refine(
+                (value) => !value || value === "" || options.includes(value),
+                { message: "Please select one of the available options" }
+              );
+          }
+        }
+      } else {
+        // For non-radio fields, apply optional after required validation
+        if (!field.isRequired) {
+          fieldSchema = fieldSchema.optional();
+        }
+      }
+
+      schemaFields[fieldName] = fieldSchema;
+    });
+
+    return z.object(schemaFields);
+  };
+
+  // Create default values based on form fields
+  const createDefaultValues = () => {
+    let defaultValues: any = {};
+    
+    formFields.forEach((field) => {
+      const fieldName = field.fieldLibrary.name;
+      if (field.fieldLibrary.dataType === 'checkbox') {
+        defaultValues[fieldName] = 'false';
+      } else if (field.fieldLibrary.dataType === 'extensible_list') {
+        defaultValues[fieldName] = [''];
+      } else {
+        defaultValues[fieldName] = '';
+      }
+    });
+
+    return defaultValues;
+  };
+
+  const form = useForm({
+    resolver: zodResolver(createDynamicSchema()),
+    defaultValues: createDefaultValues(),
+  });
+
+  // Reset form when formFields change
+  useEffect(() => {
+    if (formFields.length > 0) {
+      form.reset(createDefaultValues());
+    }
+  }, [formFields]);
+
+  // Submit mutation
+  const submitFormMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest(`/api/sites/${siteId}/leads`, {
+        method: 'POST',
+        body: {
+          formTemplateId: formTemplate.id,
+          formData: data
+        }
+      });
+    },
+    onSuccess: () => {
+      setShowSuccess(true);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Submission Failed",
+        description: error.message || "There was an error submitting your form. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Field label component with tooltip support
+  const FieldLabel = ({ 
+    label, 
+    isRequired, 
+    description, 
+    htmlFor 
+  }: { 
+    label: string; 
+    isRequired: boolean; 
+    description?: string; 
+    htmlFor?: string; 
+  }) => {
+    return (
+      <div className="flex items-center gap-1">
+        <Label htmlFor={htmlFor} className="text-sm font-medium text-gray-300">
+          {label} {isRequired && <span className="text-red-400">*</span>}
+        </Label>
+        {description && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="w-3 h-3 text-slate-400 hover:text-slate-300 cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              <p className="text-xs">{description}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+    );
+  };
+
+  // Extensible List Field Component
+  const ExtensibleListFieldComponent = ({
+    fieldName,
+    label,
+    isRequired,
+    description,
+    itemLabel,
+    itemPlaceholder,
+    minItems,
+    maxItems,
+    form,
+    commonClasses
+  }: {
+    fieldName: string;
+    label: string;
+    isRequired: boolean;
+    description?: string;
+    itemLabel: string;
+    itemPlaceholder: string;
+    minItems: number;
+    maxItems?: number;
+    form: any;
+    commonClasses: string;
+  }) => {
+    const [items, setItems] = useState<string[]>([""]);
+
+    useEffect(() => {
+      // Set form value whenever items change
+      form.setValue(fieldName, items);
+    }, [items, fieldName, form]);
+
+    const addItem = () => {
+      if (!maxItems || items.length < maxItems) {
+        setItems([...items, ""]);
+      }
+    };
+
+    const removeItem = (index: number) => {
+      if (items.length > minItems) {
+        const newItems = items.filter((_, i) => i !== index);
+        setItems(newItems);
+      }
+    };
+
+    const updateItem = (index: number, value: string) => {
+      const newItems = [...items];
+      newItems[index] = value;
+      setItems(newItems);
+    };
+
+    return (
+      <div className="space-y-3">
+        <FieldLabel 
+          label={label}
+          isRequired={isRequired}
+          description={description}
+        />
+        
+        <div className="space-y-2">
+          {items.map((item, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={item}
+                onChange={(e) => updateItem(index, e.target.value)}
+                placeholder={itemPlaceholder}
+                className={commonClasses}
+                data-testid={`input-${fieldName}-${index}`}
+              />
+              
+              {items.length > minItems && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeItem(index)}
+                  className="flex-shrink-0 text-red-400 hover:text-red-300"
+                  data-testid={`button-remove-${fieldName}-${index}`}
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {(!maxItems || items.length < maxItems) && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addItem}
+            className="text-slate-300 hover:text-white"
+            data-testid={`button-add-${fieldName}`}
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Add {itemLabel}
+          </Button>
+        )}
+
+        {form.formState.errors[fieldName] && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors[fieldName]?.message?.toString()}
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  // Dynamic field renderer component
+  const renderFormField = (field: any) => {
+    const fieldName = field.fieldLibrary.name;
+    
+    // Get language from formAssignment or default to 'en'
+    const selectedLanguage = 'en'; // TODO: Get from site form assignment
+    
+    // Use translations if available, otherwise fall back to default
+    const translation = field.fieldLibrary.translations?.[selectedLanguage];
+    const label = field.customLabel || translation?.label || field.fieldLibrary.label;
+    const placeholder = field.placeholder || translation?.placeholder || field.fieldLibrary.defaultPlaceholder || '';
+    const description = translation?.description || field.fieldLibrary.defaultValidation?.description;
+    const isRequired = field.isRequired;
+    
+    const commonClasses = "bg-card border-border text-foreground focus:border-accent";
+    
+    switch (field.fieldLibrary.dataType) {
+      case 'text':
+      case 'email':
+      case 'phone':
+      case 'number':
+        return (
+          <div key={field.id} className="space-y-2">
+            <FieldLabel 
+              label={label}
+              isRequired={isRequired}
+              description={description}
+              htmlFor={fieldName}
+            />
+            <Input
+              id={fieldName}
+              type={field.fieldLibrary.dataType === 'email' ? 'email' : field.fieldLibrary.dataType === 'phone' ? 'tel' : field.fieldLibrary.dataType === 'number' ? 'number' : 'text'}
+              placeholder={placeholder}
+              className={commonClasses}
+              {...form.register(fieldName)}
+              data-testid={`input-${fieldName}`}
+            />
+            {form.formState.errors[fieldName] && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors[fieldName]?.message?.toString()}
+              </p>
+            )}
+          </div>
+        );
+      
+      case 'textarea':
+        return (
+          <div key={field.id} className="space-y-2">
+            <FieldLabel 
+              label={label}
+              isRequired={isRequired}
+              description={description}
+              htmlFor={fieldName}
+            />
+            <textarea
+              id={fieldName}
+              placeholder={placeholder}
+              className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm ${commonClasses}`}
+              {...form.register(fieldName)}
+              data-testid={`textarea-${fieldName}`}
+            />
+            {form.formState.errors[fieldName] && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors[fieldName]?.message?.toString()}
+              </p>
+            )}
+          </div>
+        );
+      
+      case 'select':
+        const options = field.fieldLibrary.defaultValidation?.options || [];
+        return (
+          <div key={field.id} className="space-y-2">
+            <FieldLabel 
+              label={label}
+              isRequired={isRequired}
+              description={description}
+              htmlFor={fieldName}
+            />
+            <Select onValueChange={(value) => form.setValue(fieldName, value)}>
+              <SelectTrigger className={commonClasses}>
+                <SelectValue placeholder={placeholder || `Select ${label.toLowerCase()}`} />
+              </SelectTrigger>
+              <SelectContent>
+                {options.map((option: string, index: number) => (
+                  <SelectItem key={index} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {form.formState.errors[fieldName] && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors[fieldName]?.message?.toString()}
+              </p>
+            )}
+          </div>
+        );
+      
+      case 'checkbox':
+        return (
+          <div key={field.id} className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={fieldName}
+                onCheckedChange={(checked: boolean) => form.setValue(fieldName, checked ? 'true' : 'false')}
+                data-testid={`checkbox-${fieldName}`}
+              />
+              <FieldLabel 
+                label={label}
+                isRequired={isRequired}
+                description={description}
+                htmlFor={fieldName}
+              />
+            </div>
+            {form.formState.errors[fieldName] && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors[fieldName]?.message?.toString()}
+              </p>
+            )}
+          </div>
+        );
+      
+      case 'radio':
+        const radioOptions = translation?.options || field.fieldLibrary.defaultValidation?.options || [];
+        
+        return (
+          <div key={field.id} className="space-y-3">
+            <FieldLabel 
+              label={label}
+              isRequired={isRequired}
+              description={description}
+            />
+            <div className="space-y-2">
+              {radioOptions.map((option: string, index: number) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id={`${fieldName}_${index}`}
+                    value={option}
+                    className="text-accent-foreground focus:ring-accent"
+                    {...form.register(fieldName)}
+                    data-testid={`radio-${fieldName}-${index}`}
+                  />
+                  <Label 
+                    htmlFor={`${fieldName}_${index}`} 
+                    className="text-sm text-gray-300 cursor-pointer"
+                  >
+                    {option}
+                  </Label>
+                </div>
+              ))}
+            </div>
+            {form.formState.errors[fieldName] && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors[fieldName]?.message?.toString()}
+              </p>
+            )}
+          </div>
+        );
+      
+      case 'array':
+        const arrayOptions = translation?.options || field.fieldLibrary.defaultValidation?.options || [];
+        
+        if (arrayOptions.length > 0) {
+          // Multi-select checkboxes for predefined options
+          return (
+            <div key={field.id} className="space-y-3">
+              <FieldLabel 
+                label={label}
+                isRequired={isRequired}
+                description={description}
+              />
+              <div className="space-y-2">
+                {arrayOptions.map((option: string, index: number) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`${fieldName}_${index}`}
+                      checked={form.watch(fieldName)?.includes(option) || false}
+                      onCheckedChange={(checked: boolean) => {
+                        const currentValues = form.getValues(fieldName) || [];
+                        let updatedValues;
+                        if (checked) {
+                          updatedValues = [...currentValues, option];
+                        } else {
+                          updatedValues = currentValues.filter((val: string) => val !== option);
+                        }
+                        form.setValue(fieldName, updatedValues);
+                      }}
+                      data-testid={`checkbox-${fieldName}-${index}`}
+                    />
+                    <Label 
+                      htmlFor={`${fieldName}_${index}`} 
+                      className="text-sm text-gray-300 cursor-pointer"
+                    >
+                      {option}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {form.formState.errors[fieldName] && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors[fieldName]?.message?.toString()}
+                </p>
+              )}
+            </div>
+          );
+        }
+        // Fall through to extensible_list for arrays without predefined options
+        
+      case 'extensible_list':
+        const itemLabel = field.fieldLibrary.defaultValidation?.itemLabel || 'Item';
+        const itemPlaceholder = field.fieldLibrary.defaultValidation?.itemPlaceholder || `Enter ${itemLabel.toLowerCase()}...`;
+        const minItems = field.fieldLibrary.defaultValidation?.minItems || 1;
+        const maxItems = field.fieldLibrary.defaultValidation?.maxItems;
+        
+        return (
+          <ExtensibleListFieldComponent
+            key={field.id}
+            fieldName={fieldName}
+            label={label}
+            isRequired={isRequired}
+            description={description}
+            itemLabel={itemLabel}
+            itemPlaceholder={itemPlaceholder}
+            minItems={minItems}
+            maxItems={maxItems}
+            form={form}
+            commonClasses={commonClasses}
+          />
+        );
+      
+      default:
+        return (
+          <div key={field.id} className="space-y-2">
+            <Label htmlFor={fieldName} className="text-sm font-medium text-gray-300">
+              {label} {isRequired && '*'}
+            </Label>
+            <Input
+              id={fieldName}
+              type="text"
+              placeholder={placeholder}
+              className={commonClasses}
+              {...form.register(fieldName)}
+              data-testid={`input-${fieldName}`}
+            />
+            {form.formState.errors[fieldName] && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors[fieldName]?.message?.toString()}
+              </p>
+            )}
+          </div>
+        );
+    }
+  };
+
+  const onSubmit = (data: any) => {
+    submitFormMutation.mutate(data);
+  };
+
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className={`sm:max-w-lg bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 ${colorTheme?.icon || 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
+                {getFormIcon(config.icon || 'file')}
+              </div>
+              {config.title || formTemplate.name}
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              {config.subtitle || formTemplate.description || 'Please fill out the form below to get in touch.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-slate-400">Loading form fields...</div>
+              </div>
+            )}
+
+            {/* Dynamic Form Fields */}
+            {!isLoading && formFields.length > 0 && (
+              <TooltipProvider>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    {formFields
+                      .sort((a, b) => parseInt(a.order) - parseInt(b.order))
+                      .map(renderFormField)}
+                  </div>
+                </div>
+              </TooltipProvider>
+            )}
+
+            {/* No Fields Message */}
+            {!isLoading && formFields.length === 0 && (
+              <div className="p-4 border-2 border-dashed border-yellow-500 rounded-lg">
+                <p className="text-yellow-400 text-center">
+                  No form fields configured. Please contact the administrator to set up this form.
+                </p>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={onClose}
+                className="text-slate-400 hover:text-slate-200"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={submitFormMutation.isPending}
+                className={`${colorTheme?.button || 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'} text-white font-semibold min-w-[120px] transition-all duration-300`}
+              >
+                {submitFormMutation.isPending ? 'Submitting...' : (config.buttonText || 'Submit')}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <SuccessConfirmation 
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        title="Thank You!"
+        description={config.successMessage || "We've received your submission and will be in touch soon."}
+      />
+    </>
+  );
+}
