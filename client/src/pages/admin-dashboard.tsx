@@ -1889,20 +1889,6 @@ export function AdminDashboard() {
 
       <div className="container mx-auto px-6 py-8">
 
-        <div className="mt-4 space-y-2">
-          <h2 className="text-base font-semibold">Tools</h2>
-          <Link href="/card-builder">
-            <button className="rounded-lg border px-3 py-2 w-full text-left">
-              Card Builder
-            </button>
-          </Link>
-          <Link href="/code-explorer">
-            <button className="rounded-lg border px-3 py-2 w-full text-left">
-              Code Explorer
-            </button>
-          </Link>
-        </div>
-
         <Tabs defaultValue="overview" className="w-full">
           <div className="flex justify-center mb-8">
             <TabsList className="grid grid-cols-6 bg-slate-800/50 border border-slate-700">
@@ -2608,6 +2594,20 @@ export function AdminDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        <div className="mt-8 space-y-2">
+          <h2 className="text-base font-semibold">Tools</h2>
+          <Link href="/card-builder">
+            <button className="rounded-lg border px-3 py-2 w-full text-left">
+              Card Explorer
+            </button>
+          </Link>
+          <Link href="/code-explorer">
+            <button className="rounded-lg border px-3 py-2 w-full text-left">
+              Code Explorer
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );
