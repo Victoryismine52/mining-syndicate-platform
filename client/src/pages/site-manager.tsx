@@ -675,7 +675,7 @@ export function SiteManager() {
                         name="password"
                         type="password"
                         defaultValue={editingSite.password || ''}
-                        placeholder="Leave empty to use global password"
+                        placeholder="(optional)"
                         className="bg-slate-700/50 border-slate-600 focus:border-blue-500"
                         data-testid="input-edit-password"
                       />
