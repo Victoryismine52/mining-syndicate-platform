@@ -333,30 +333,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/site-form-assignments/:id", requireAuth, async (req, res, next) => {
     try {
-      // Get the existing assignment to check if it's a join card
-      const existingAssignments = await storage.getSiteFormAssignments('all');
-      const existingAssignment = existingAssignments.find(a => a.id === req.params.id);
-      
+      console.log(`Updating site form assignment ${req.params.id} with data:`, req.body);
+
+      // Look up the existing assignment with its template
+      const existingAssignment = await storage.getSiteFormAssignmentById(req.params.id);
+
       if (!existingAssignment) {
+        console.log(`Form assignment ${req.params.id} not found`);
         return res.status(404).json({ error: "Form assignment not found" });
       }
 
+      console.log(`Found existing assignment:`, existingAssignment);
+
       // Prevent deactivating Join Cards on collective sites
-      if (req.body.isActive === false && 
+      if (req.body.isActive === false &&
           existingAssignment.formTemplate?.cardType === 'join-card') {
-        
+
         // Get the site to check if it's a collective
         const site = await siteStorage.getSite(existingAssignment.siteId);
         if (site?.siteType === 'collective') {
-          return res.status(400).json({ 
+          return res.status(400).json({
             error: "Join Cards cannot be deactivated on collective sites as they are required for members to join the collective." 
           });
         }
       }
 
       const assignment = await storage.updateSiteFormAssignment(req.params.id, req.body);
+      console.log(`Updated assignment:`, assignment);
       res.json(assignment);
     } catch (error) {
+      console.error('Error updating site form assignment:', error);
       next(error);
     }
   });
