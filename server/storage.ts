@@ -44,7 +44,7 @@ export interface IStorage {
 
   // Site Form Assignment operations
   getSiteFormAssignments(siteId: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate | null })[]>;
-  getSiteFormAssignmentById(id: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate | null }) | undefined>;
+  getSiteFormAssignmentById(id: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate | null }) | null>;
   assignFormToSite(assignment: InsertSiteFormAssignment): Promise<SiteFormAssignment>;
   updateSiteFormAssignment(id: string, updates: Partial<InsertSiteFormAssignment>): Promise<SiteFormAssignment>;
   removeFormFromSite(id: string): Promise<void>;
@@ -498,7 +498,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(siteFormAssignments.siteId, siteId));
   }
 
-  async getSiteFormAssignmentById(id: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate | null }) | undefined> {
+  async getSiteFormAssignmentById(id: string): Promise<(SiteFormAssignment & { formTemplate: FormTemplate | null }) | null> {
     const [assignment] = await db
       .select({
         id: siteFormAssignments.id,
@@ -515,9 +515,10 @@ export class DatabaseStorage implements IStorage {
       })
       .from(siteFormAssignments)
       .leftJoin(formTemplates, eq(siteFormAssignments.formTemplateId, formTemplates.id))
-      .where(eq(siteFormAssignments.id, id));
+      .where(eq(siteFormAssignments.id, id))
+      .limit(1);
 
-    return assignment || undefined;
+    return assignment || null;
   }
 
   async assignFormToSite(assignment: InsertSiteFormAssignment): Promise<SiteFormAssignment> {
