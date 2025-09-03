@@ -25,6 +25,7 @@ import { SiteDisclaimers } from "@/pages/site-disclaimers";
 import { SiteDisclaimerRedirect } from "@/pages/site-disclaimer-redirect";
 import { CollectiveHome } from "@/pages/collective-home";
 import BlogPostView from "@/pages/blog-post-view";
+import BuilderLab from "@/pages/BuilderLab";
 
 function Router() {
   return (
@@ -72,6 +73,9 @@ function Router() {
       {/* Blog post view route */}
       <Route path="/site/:siteId/blog/:postId" component={BlogPostView} />
       <Route path="/disclaimer/:disclaimerId" component={DisclaimerPage} />
+      
+      {/* Builder Lab route */}
+      <Route path="/builder" component={BuilderLab} />
       
       {/* Site directory as homepage - public */}
       <Route path="/" component={SiteDirectory} />
