@@ -34,3 +34,38 @@ Team members reported that selecting a file in the explorer occasionally renders
 - Only a subset of languages is highlighted out of the box; additional grammars require separate imports.
 - The viewer is read‑only and intended for inspection, not editing.
 
+## Team Profiles
+Each team member maintains a personal Markdown file to share status updates and contact information. These profiles help the team coordinate work and keep project context in one place, and every member is responsible for keeping their file current.
+
+### Section ownership and purpose
+
+Include the following headings in your profile and keep each one updated:
+
+- **Introduction** – brief greeting or summary of your role.
+- **Biography** – background and relevant experience.
+- **Core Skills & Tools** – technical and soft skills plus tooling expertise.
+- **Contact & Availability** – how and when to reach you.
+- **Current Assignment** – your main responsibility.
+- **Current Task Notes** – progress, decisions, or blockers for active tasks.
+- **Project Notes** – extra context, research, or references.
+- **Urgent Notes** – blockers or urgent needs. Leave this empty when nothing is pending.
+
+### File naming
+
+Name files using the pattern `<Role>_<Name>-<Surname>.md`, for example `Product_Manager-Ava_Wu.md`.
+
+### Creative expression
+
+Feel free to personalize your profile—use lists, emojis, images, or other Markdown styling—as long as the required headings remain intact and the file stays lightweight and readable.
+
+### Editing guidelines
+
+- Update sections as work progresses and remove or clear items that are complete.
+- Keep **Urgent Notes** empty when no urgent items remain.
+- Commit updates with descriptive messages.
+- Team leads may suggest edits for consistency; peer review is encouraged.
+
+### Updating your profile
+
+Open your Markdown file, edit the relevant sections with current information, then save and commit the changes. Repeat whenever your status changes.
+
