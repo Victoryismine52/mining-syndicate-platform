@@ -17,6 +17,7 @@ No additional environment variables are required; the server listens on `PORT` i
 This repository includes optional tools that run separately from the main application.
 
 - **Card Builder**: `npm run card-builder` starts a local drag-and-drop card editor at `http://localhost:3100`. See [Card Builder – Use Case and Requirements](docs/card-builder-use-case-requirements.md) for details on the MVP.
-- **Code Explorer**: `npm run dev:explorer` as noted above.
+
+- **Code Explorer**: `npm run dev:explorer` as noted above. A mock repository based on the local code-explorer package is served for testing.
 
 These tools are standalone and do not affect production or the main development server.
