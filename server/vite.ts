@@ -101,12 +101,13 @@ export async function setupViteFor(
     ...viteConfig,
     configFile: false,
     root: rootDir,
+    base: route,
     server: serverOptions,
     appType: "custom",
   });
 
   app.use(route, vite.middlewares);
-  app.use(`${route}/*`, async (req, res, next) => {
+  app.use(route, async (req, res, next) => {
     try {
       const url = req.originalUrl.replace(route, "");
       const templatePath = path.resolve(rootDir, "index.html");

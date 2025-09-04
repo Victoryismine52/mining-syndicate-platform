@@ -26,7 +26,7 @@ export function CodeExplorerApp() {
 
   async function handleScan(repo: string) {
     setLoading(true);
-    const res = await fetch("/explorer/api/clone", {
+    const res = await fetch("/code-explorer/api/clone", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ repo }),

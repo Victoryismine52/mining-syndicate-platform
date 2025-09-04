@@ -6,9 +6,12 @@
   - Starts the Express API and Vite client.
   - Visit `http://localhost:5000` to view the site.
 - **Isolated Code Explorer**: `npm run dev:explorer`
-  - Launches only the Code Explorer module at `http://localhost:5000/explorer`.
+
+  - Launches only the Code Explorer module at `http://localhost:5000/code-explorer`.
   - Uses the same React, Tailwind and UI components as the main app.
   - Requires `git` and network access to import public repositories.
+  - Automatically opens your browser to the explorer page.
+
 
 No additional environment variables are required; the server listens on `PORT` if set (defaults to `5000`).
 
