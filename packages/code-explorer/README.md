@@ -2,6 +2,8 @@
 
 This document summarizes current feedback on the blank‑screen issue and outlines acceptance criteria for loading, syntax highlighting, and error handling.
 
+Documentation & Ops is part of the core team, responsible for maintaining project documentation and operational workflows.
+
 ## Blank‑screen bug
 
 Team members reported that selecting a file in the explorer occasionally renders a blank panel. No loading indicator or error message is shown, leaving users unsure if the file is empty, still loading, or if an error occurred.
@@ -67,6 +69,12 @@ Further reading: [docs/syntax-highlighting.md](docs/syntax-highlighting.md) and 
 
 ## Team Profiles
 Each team member maintains a personal Markdown file to share status updates and contact information. These profiles help the team coordinate work and keep project context in one place, and every member is responsible for keeping their file current.
+
+### Profiles
+- [Tech Lead — Jordan Rowe](Tech_Lead-Jordan_Rowe.md): Oversees architecture and technical strategy.
+- [Frontend Developer — Simon Hesher](Frontend_Developer-Simon_Hesher.md): Builds user-facing features and UI components.
+- [QA Engineer — Maria Li](QA_Engineer-Maria_Li.md): Ensures product quality through testing.
+- [Documentation & Ops — Alex Kim](Documentation_Ops-Alex_Kim.md): Maintains project documentation and operational workflows.
 
 ### Section ownership and purpose
 
