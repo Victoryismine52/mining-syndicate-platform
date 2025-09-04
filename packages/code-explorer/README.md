@@ -34,6 +34,37 @@ Team members reported that selecting a file in the explorer occasionally renders
 - Only a subset of languages is highlighted out of the box; additional grammars require separate imports.
 - The viewer is read‑only and intended for inspection, not editing.
 
+## Syntax Highlighting & Testing
+
+### `highlightCode` utility
+- Located at `src/utils/highlight.ts`.
+- Wraps Prism to return highlighted HTML and falls back to raw text if a grammar is missing or Prism throws.
+
+### Adding a Prism grammar
+1. Import the Prism component in `src/utils/highlight.ts`:
+   ```ts
+   import "prismjs/components/prism-python";
+   ```
+2. Call `highlightCode` with the language key:
+   ```ts
+   highlightCode(source, "python");
+   ```
+
+### Troubleshooting
+- **Missing grammar:** Unstyled code usually means the Prism component wasn't imported or the language key is wrong.
+- **Runtime errors:** `highlightCode` returns the original code string when Prism throws. Check console logs and your imports.
+
+### Testing
+Run unit tests to confirm highlighting behavior and file rendering:
+```bash
+npm test
+# or run only the explorer tests
+npx vitest run src/components/FileViewer.test.tsx --root packages/code-explorer
+```
+The suite covers `highlightCode` fallbacks and the `FileViewer` component. Install `@vitest/coverage-v8` and add `--coverage` to gather coverage metrics.
+
+Further reading: [docs/syntax-highlighting.md](docs/syntax-highlighting.md) and internal ops runbooks.
+
 ## Team Profiles
 Each team member maintains a personal Markdown file to share status updates and contact information. These profiles help the team coordinate work and keep project context in one place, and every member is responsible for keeping their file current.
 
