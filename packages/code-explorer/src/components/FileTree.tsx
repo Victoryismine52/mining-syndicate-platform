@@ -15,6 +15,13 @@ interface FileTreeProps {
   filter: string;
 }
 
+/**
+ * Type: Helper function
+ * Location: packages/code-explorer/src/components/FileTree.tsx > matchesFilter
+ * Description: Checks if a tree node or its descendants match the search filter.
+ * Notes: Recursively examines child nodes.
+ * EditCounter: 1
+ */
 function matchesFilter(node: TreeNode, filter: string): boolean {
   if (!filter) return true;
   const lower = filter.toLowerCase();
@@ -22,6 +29,13 @@ function matchesFilter(node: TreeNode, filter: string): boolean {
   return node.children?.some((c) => matchesFilter(c, filter)) ?? false;
 }
 
+/**
+ * Type: Helper function
+ * Location: packages/code-explorer/src/components/FileTree.tsx > fileColor
+ * Description: Returns a Tailwind text color class based on file extension.
+ * Notes: Used for syntax-aware coloring in the tree.
+ * EditCounter: 1
+ */
 function fileColor(name: string): string {
   if (/\.(ts|tsx|js|jsx)$/.test(name)) return "text-blue-500";
   if (/\.json$/.test(name)) return "text-green-500";
@@ -29,6 +43,13 @@ function fileColor(name: string): string {
   return "";
 }
 
+/**
+ * Type: React component
+ * Location: packages/code-explorer/src/components/FileTree.tsx > FileTree
+ * Description: Renders a collapsible file tree with selectable nodes.
+ * Notes: Highlights selected path and applies search filtering.
+ * EditCounter: 1
+ */
 export function FileTree({ node, selected, onSelect, filter }: FileTreeProps) {
   const [open, setOpen] = useState(true);
   const isDir = !!node.children;
