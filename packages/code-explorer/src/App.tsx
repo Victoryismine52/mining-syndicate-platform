@@ -22,6 +22,7 @@ import { FileViewer } from "./components/FileViewer";
   "tags": ["ui", "app"],
   "location": "src/App",
   "notes": "Maintains UI state for repository scanning, file viewing and tree collapse."
+
 }
 */
 export function CodeExplorerApp() {
@@ -35,6 +36,7 @@ export function CodeExplorerApp() {
   const [filter, setFilter] = useState("");
   const [status, setStatus] = useState("");
   const [collapseKey, setCollapseKey] = useState(0);
+
 
   /**
   {

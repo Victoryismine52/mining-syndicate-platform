@@ -54,6 +54,7 @@ describe("import workflow", () => {
         { name: "README.md", path: "/repo/README.md" },
       ],
     };
+
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce({ ok: true, json: async () => tree })
