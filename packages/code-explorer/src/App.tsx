@@ -15,12 +15,15 @@ import { FileTree, TreeNode } from "./components/FileTree";
 import { FileViewer } from "./components/FileViewer";
 
 /**
- * Type: React component
- * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp
- * Description: Entry component for the Code Explorer, managing home and explorer screens.
- * Notes: Maintains UI state for repository scanning and file viewing.
- * EditCounter: 1
- */
+{
+  "friendlyName": "Code Explorer App",
+  "description": "Entry component for the Code Explorer, managing home and explorer screens.",
+  "editCount": 2,
+  "tags": ["ui", "app"],
+  "location": "src/App",
+  "notes": "Maintains UI state for repository scanning and file viewing."
+}
+*/
 export function CodeExplorerApp() {
   const [screen, setScreen] = useState<"home" | "explorer">("home");
   const [tree, setTree] = useState<TreeNode | null>(null);
@@ -30,34 +33,49 @@ export function CodeExplorerApp() {
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
+  const [status, setStatus] = useState("");
 
   /**
-   * Type: Async function
-   * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp > handleScan
-   * Description: Calls backend to clone the repo and build the file tree, then switches to explorer view.
-   * Notes: Updates loading state while request is in flight.
-   * EditCounter: 1
-   */
+  {
+    "friendlyName": "handle repository scan",
+    "description": "Clones the repository and builds the file tree before switching to explorer view.",
+    "editCount": 2,
+    "tags": ["data", "repo"],
+    "location": "src/App > handleScan",
+    "notes": "Sets status messages for import progress and handles failure states."
+  }
+  */
   async function handleScan(repo: string) {
+    setStatus("Import started");
     setLoading(true);
-    const res = await fetch("/code-explorer/api/clone", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ repo }),
-    });
-    const data = await res.json();
-    setTree(data);
-    setLoading(false);
-    setScreen("explorer");
+    try {
+      const res = await fetch("/code-explorer/api/clone", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repo }),
+      });
+      if (!res.ok) throw new Error("clone failed");
+      const data = await res.json();
+      setTree(data);
+      setStatus("");
+      setScreen("explorer");
+    } catch {
+      setStatus("Import failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
   /**
-   * Type: Function
-   * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp > handleImport
-   * Description: Validates user-entered GitHub URL and triggers repository scan.
-   * Notes: Displays error message for invalid URLs.
-   * EditCounter: 1
-   */
+  {
+    "friendlyName": "handle import action",
+    "description": "Validates user-entered GitHub URL and triggers repository scan.",
+    "editCount": 2,
+    "tags": ["user-input", "repo"],
+    "location": "src/App > handleImport",
+    "notes": "Closes the dialog and clears previous errors before scanning."
+  }
+  */
   function handleImport() {
     if (!/^https:\/\/github.com\/.+/.test(repoUrl)) {
       setError("Please enter a valid GitHub URL");
@@ -70,7 +88,7 @@ export function CodeExplorerApp() {
 
   if (screen === "home") {
     return (
-      <div className="p-6 flex justify-center">
+      <div className="p-6 flex flex-col items-center">
         <div className="grid gap-6 md:grid-cols-3">
           <ActionCard
             icon={Folder}
@@ -97,6 +115,11 @@ export function CodeExplorerApp() {
             }}
           />
         </div>
+        {status && (
+          <p className={`mt-4 text-sm ${status.includes("failed") ? "text-red-500" : ""}`}>
+            {status}
+          </p>
+        )}
         <Dialog open={showImport} onOpenChange={setShowImport}>
           <DialogContent>
             <DialogHeader>
