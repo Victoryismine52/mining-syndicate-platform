@@ -26,3 +26,10 @@ This repository includes optional tools that run separately from the main applic
 - **Code Explorer**: `npm run dev:explorer` as noted above. A mock repository based on the local code-explorer package is served for testing.
 
 These tools are standalone and do not affect production or the main development server.
+
+## Testing
+
+- Run all unit and integration tests with `npm test`.
+- To interact with the Code Explorer during development, start it via `npm run dev:explorer`.
+
+Both commands work in standard Node environments and on Replit.

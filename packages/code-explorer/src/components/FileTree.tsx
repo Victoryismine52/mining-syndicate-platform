@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronRight, ChevronDown, Folder, FileText } from "lucide-react";
 import clsx from "clsx";
 
@@ -13,6 +13,8 @@ interface FileTreeProps {
   selected?: string | null;
   onSelect: (path: string) => void;
   filter: string;
+  collapseKey?: number;
+  isRoot?: boolean;
 }
 
 /**
@@ -44,15 +46,28 @@ function fileColor(name: string): string {
 }
 
 /**
- * Type: React component
- * Location: packages/code-explorer/src/components/FileTree.tsx > FileTree
- * Description: Renders a collapsible file tree with selectable nodes.
- * Notes: Highlights selected path and applies search filtering.
- * EditCounter: 1
- */
-export function FileTree({ node, selected, onSelect, filter }: FileTreeProps) {
-  const [open, setOpen] = useState(true);
+{
+  "friendlyName": "file tree",
+  "description": "Renders a collapsible file tree with selectable nodes.",
+  "editCount": 2,
+  "tags": ["ui", "tree"],
+  "location": "src/components/FileTree",
+  "notes": "Highlights selected path, supports search filtering and collapse-all."
+}
+*/
+export function FileTree({
+  node,
+  selected,
+  onSelect,
+  filter,
+  collapseKey = 0,
+  isRoot = false,
+}: FileTreeProps) {
+  const [open, setOpen] = useState(isRoot);
   const isDir = !!node.children;
+  useEffect(() => {
+    if (isDir) setOpen(isRoot);
+  }, [collapseKey, isDir, isRoot]);
   if (!matchesFilter(node, filter)) return null;
   return (
     <div className="ml-2">
@@ -89,6 +104,7 @@ export function FileTree({ node, selected, onSelect, filter }: FileTreeProps) {
               selected={selected}
               onSelect={onSelect}
               filter={filter}
+              collapseKey={collapseKey}
             />
           ))}
         </div>
