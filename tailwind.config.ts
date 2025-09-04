@@ -5,8 +5,8 @@ export default {
   content: [
     "./client/index.html",
     "./client/src/**/*.{js,jsx,ts,tsx}",
-    "./client/explorer/**/*.{html,js,jsx,ts,tsx}",
-    "./packages/code-explorer/src/**/*.{js,jsx,ts,tsx}"
+    "./packages/code-explorer/index.html",
+    "./packages/code-explorer/src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
