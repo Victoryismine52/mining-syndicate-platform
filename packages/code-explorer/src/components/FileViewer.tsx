@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Prism from "prismjs";
 import { highlightCode } from "../utils/highlight";
 import { Button } from "@/components/ui/button";
 
@@ -8,12 +7,15 @@ interface Props {
 }
 
 /**
- * Type: React component
- * Location: packages/code-explorer/src/components/FileViewer.tsx > FileViewer
- * Description: Fetches and displays highlighted source code with line numbers.
- * Notes: Provides copy and fullscreen controls for the current file.
- * EditCounter: 2
- */
+{
+  "friendlyName": "file viewer",
+  "description": "Fetches and displays highlighted source code with line numbers.",
+  "editCount": 3,
+  "tags": ["ui", "code"],
+  "location": "src/components/FileViewer",
+  "notes": "Provides copy and fullscreen controls for the current file."
+}
+*/
 export function FileViewer({ path }: Props) {
   const [code, setCode] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
@@ -33,10 +35,6 @@ export function FileViewer({ path }: Props) {
     }
     if (path) load();
   }, [path]);
-
-  useEffect(() => {
-    Prism.highlightAll();
-  }, [code]);
 
   const lines = code.split("\n");
 
