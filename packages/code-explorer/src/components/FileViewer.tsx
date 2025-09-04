@@ -1,31 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Prism from "prismjs";
-import "prismjs/components/prism-typescript";
-import "prismjs/components/prism-javascript";
-import "prismjs/components/prism-jsx";
-import "prismjs/components/prism-tsx";
+import { highlightCode } from "../utils/highlight";
 import { Button } from "@/components/ui/button";
 
 interface Props {
   path: string;
-}
-
-/**
-{
-  "friendlyName": "highlight code",
-  "description": "Safely highlights source code using Prism, falling back to plain text on failure.",
-  "editCount": 1,
-  "tags": ["utility", "syntax"],
-  "location": "src/components/FileViewer > highlightCode",
-  "notes": "Prevents runtime crashes when a grammar is missing by catching Prism errors."
-}
-*/
-function highlightCode(code: string): string {
-  try {
-    return Prism.highlight(code, Prism.languages.tsx, "tsx");
-  } catch {
-    return code;
-  }
 }
 
 /**
