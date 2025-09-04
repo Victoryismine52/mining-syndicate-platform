@@ -14,7 +14,7 @@ export function FileViewer({ path }: Props) {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch(`/explorer/api/file?path=${encodeURIComponent(path)}`);
+      const res = await fetch(`/code-explorer/api/file?path=${encodeURIComponent(path)}`);
       const text = await res.text();
       setCode(text);
     }
