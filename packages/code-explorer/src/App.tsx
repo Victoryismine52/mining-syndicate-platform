@@ -11,32 +11,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-
-interface TreeNode {
-  name: string;
-  path: string;
-  children?: TreeNode[];
-}
-
-function FileTree({ node }: { node: TreeNode }) {
-  if (!node.children) return null;
-  return (
-    <ul className="ml-4">
-      {node.children.map((child) => (
-        <li key={child.path}>
-          {child.children ? (
-            <>
-              <span className="font-semibold">{child.name}</span>
-              <FileTree node={child} />
-            </>
-          ) : (
-            <span>{child.name}</span>
-          )}
-        </li>
-      ))}
-    </ul>
-  );
-}
+import { FileTree, TreeNode } from "./components/FileTree";
+import { FileViewer } from "./components/FileViewer";
 
 export function CodeExplorerApp() {
   const [screen, setScreen] = useState<"home" | "explorer">("home");
@@ -45,6 +21,8 @@ export function CodeExplorerApp() {
   const [showImport, setShowImport] = useState(false);
   const [repoUrl, setRepoUrl] = useState("");
   const [error, setError] = useState("");
+  const [selected, setSelected] = useState<string | null>(null);
+  const [filter, setFilter] = useState("");
 
   async function handleScan(repo: string) {
     setLoading(true);
@@ -119,14 +97,35 @@ export function CodeExplorerApp() {
     );
   }
 
-  return (
-    <div className="p-4">
-      <Button variant="outline" className="mb-4" onClick={() => setScreen("home")}>
-        Back
-      </Button>
-      {loading && <p>Cloning...</p>}
-      {tree ? <FileTree node={tree} /> : <p className="text-sm text-muted-foreground">No file loaded.</p>}
-    </div>
-  );
+  if (screen === "explorer") {
+    const relative = selected && tree ? selected.replace(tree.path + "/", "") : null;
+    return (
+      <div className="flex h-screen">
+        <div className="w-64 border-r p-2 flex flex-col">
+          <Button variant="outline" size="sm" className="mb-2" onClick={() => setScreen("home")}>Back</Button>
+          <Input
+            placeholder="Search..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="mb-2"
+          />
+          {loading && <p className="text-sm">Cloning...</p>}
+          {tree && <FileTree node={tree} selected={selected} onSelect={setSelected} filter={filter} />}
+        </div>
+        <div className="flex-1 p-4 overflow-auto">
+          {selected ? (
+            <>
+              <div className="text-sm text-muted-foreground mb-2">{relative}</div>
+              <FileViewer path={selected} />
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Select a file to view</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return <div />;
 }
 
