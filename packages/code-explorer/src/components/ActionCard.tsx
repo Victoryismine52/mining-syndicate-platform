@@ -10,6 +10,13 @@ interface ActionCardProps {
   onClick: () => void;
 }
 
+/**
+ * Type: React component
+ * Location: packages/code-explorer/src/components/ActionCard.tsx > ActionCard
+ * Description: Displays a clickable card used on the explorer landing page.
+ * Notes: Renders provided icon, title and call-to-action button.
+ * EditCounter: 1
+ */
 export function ActionCard({ icon: Icon, title, description, cta, onClick }: ActionCardProps) {
   return (
     <Card className="w-full max-w-sm transition-shadow hover:shadow-md">

@@ -14,6 +14,13 @@ import {
 import { FileTree, TreeNode } from "./components/FileTree";
 import { FileViewer } from "./components/FileViewer";
 
+/**
+ * Type: React component
+ * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp
+ * Description: Entry component for the Code Explorer, managing home and explorer screens.
+ * Notes: Maintains UI state for repository scanning and file viewing.
+ * EditCounter: 1
+ */
 export function CodeExplorerApp() {
   const [screen, setScreen] = useState<"home" | "explorer">("home");
   const [tree, setTree] = useState<TreeNode | null>(null);
@@ -24,6 +31,13 @@ export function CodeExplorerApp() {
   const [selected, setSelected] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
 
+  /**
+   * Type: Async function
+   * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp > handleScan
+   * Description: Calls backend to clone the repo and build the file tree, then switches to explorer view.
+   * Notes: Updates loading state while request is in flight.
+   * EditCounter: 1
+   */
   async function handleScan(repo: string) {
     setLoading(true);
     const res = await fetch("/code-explorer/api/clone", {
@@ -37,6 +51,13 @@ export function CodeExplorerApp() {
     setScreen("explorer");
   }
 
+  /**
+   * Type: Function
+   * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp > handleImport
+   * Description: Validates user-entered GitHub URL and triggers repository scan.
+   * Notes: Displays error message for invalid URLs.
+   * EditCounter: 1
+   */
   function handleImport() {
     if (!/^https:\/\/github.com\/.+/.test(repoUrl)) {
       setError("Please enter a valid GitHub URL");

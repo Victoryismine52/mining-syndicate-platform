@@ -8,11 +8,25 @@ interface Props {
   path: string;
 }
 
+/**
+ * Type: React component
+ * Location: packages/code-explorer/src/components/FileViewer.tsx > FileViewer
+ * Description: Fetches and displays highlighted source code with line numbers.
+ * Notes: Provides copy and fullscreen controls for the current file.
+ * EditCounter: 1
+ */
 export function FileViewer({ path }: Props) {
   const [code, setCode] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
 
   useEffect(() => {
+    /**
+     * Type: Async helper function
+     * Location: packages/code-explorer/src/components/FileViewer.tsx > useEffect load
+     * Description: Retrieves file contents from the backend for the specified path.
+     * Notes: Updates local state once the content is loaded.
+     * EditCounter: 1
+     */
     async function load() {
       const res = await fetch(`/code-explorer/api/file?path=${encodeURIComponent(path)}`);
       const text = await res.text();
