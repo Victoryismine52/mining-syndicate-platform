@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Prism from "prismjs";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-jsx";
+import "prismjs/components/prism-tsx";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -9,11 +11,29 @@ interface Props {
 }
 
 /**
+{
+  "friendlyName": "highlight code",
+  "description": "Safely highlights source code using Prism, falling back to plain text on failure.",
+  "editCount": 1,
+  "tags": ["utility", "syntax"],
+  "location": "src/components/FileViewer > highlightCode",
+  "notes": "Prevents runtime crashes when a grammar is missing by catching Prism errors."
+}
+*/
+function highlightCode(code: string): string {
+  try {
+    return Prism.highlight(code, Prism.languages.tsx, "tsx");
+  } catch {
+    return code;
+  }
+}
+
+/**
  * Type: React component
  * Location: packages/code-explorer/src/components/FileViewer.tsx > FileViewer
  * Description: Fetches and displays highlighted source code with line numbers.
  * Notes: Provides copy and fullscreen controls for the current file.
- * EditCounter: 1
+ * EditCounter: 2
  */
 export function FileViewer({ path }: Props) {
   const [code, setCode] = useState("");
@@ -62,7 +82,7 @@ export function FileViewer({ path }: Props) {
               <div key={i}>{i + 1}</div>
             ))}
           </code>
-          <code className="pl-4" dangerouslySetInnerHTML={{ __html: Prism.highlight(code, Prism.languages.tsx, "tsx") }} />
+          <code className="pl-4" dangerouslySetInnerHTML={{ __html: highlightCode(code) }} />
         </pre>
       </div>
     </div>

@@ -12,6 +12,8 @@ vi.mock("prismjs", () => ({
 }));
 vi.mock("prismjs/components/prism-typescript", () => ({}));
 vi.mock("prismjs/components/prism-javascript", () => ({}));
+vi.mock("prismjs/components/prism-jsx", () => ({}));
+vi.mock("prismjs/components/prism-tsx", () => ({}));
 vi.mock("@/components/ui/button", () => ({
   Button: (props: any) => <button {...props} />,
 }));
