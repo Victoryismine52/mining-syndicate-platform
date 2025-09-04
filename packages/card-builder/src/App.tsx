@@ -1,110 +1,16 @@
-import React, { useState, useEffect } from "react";
-import {
-  DndContext,
-  useDraggable,
-  useDroppable,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-  arrayMove,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import React, { useState } from "react";
+import { CardEditor, CardConfig, elementLibrary } from "./Editor";
+import { ActionCard } from "./components/ActionCard";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, Edit } from "lucide-react";
 
-// ---- Data element library -------------------------------------------------
-type DisplayMode = "display" | "input" | "edit";
-
-export type ElementDefinition = {
+interface StoredCard extends CardConfig {
   id: string;
-  label: string;
-  type: "text" | "number" | "image" | "button";
-  displayModes: DisplayMode[];
-  defaultProps: Record<string, any>;
-  validation?: Record<string, any>;
-};
-
-const elementLibrary: ElementDefinition[] = [
-  {
-    id: "title",
-    label: "Title",
-    type: "text",
-    displayModes: ["display"],
-    defaultProps: { label: "Sample Title" },
-    validation: { required: true },
-  },
-  {
-    id: "description",
-    label: "Description",
-    type: "text",
-    displayModes: ["display"],
-    defaultProps: { label: "Sample description" },
-  },
-  {
-    id: "image",
-    label: "Image",
-    type: "image",
-    displayModes: ["display"],
-    defaultProps: {
-      src: "https://via.placeholder.com/300x100?text=Image",
-      alt: "sample image",
-    },
-  },
-  {
-    id: "input",
-    label: "Input Field",
-    type: "text",
-    displayModes: ["input"],
-    defaultProps: { label: "Field", placeholder: "Enter text" },
-    validation: { required: false },
-  },
-  {
-    id: "button",
-    label: "Button",
-    type: "button",
-    displayModes: ["display"],
-    defaultProps: { label: "Click" },
-  },
-];
-
-// ---- Palette item ---------------------------------------------------------
-function PaletteItem({ def }: { def: ElementDefinition }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: def.id,
-    data: { from: "palette" },
-  });
-  const style = {
-    transform: CSS.Translate.toString(transform),
-  };
-  return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      style={style}
-      className="border p-2 mb-2 cursor-move bg-gray-200 text-sm"
-    >
-      {def.label}
-    </div>
-  );
+  name: string;
 }
 
-// ---- Card canvas ----------------------------------------------------------
-function CardCanvas({
-  theme,
-  shadow,
-  lighting,
-  animation,
-  children,
-}: {
-  theme: string;
-  shadow: string;
-  lighting: string;
-  animation: string;
-  children: React.ReactNode;
-}) {
-  const { setNodeRef } = useDroppable({ id: "card" });
+function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<CardConfig, "elements"> & { children: React.ReactNode }) {
   const themeClass =
     theme === "dark"
       ? "bg-gray-900 text-white"
@@ -126,402 +32,125 @@ function CardCanvas({
       ? "transition-transform hover:scale-105"
       : "";
   return (
-    <div
-      ref={setNodeRef}
-      className={`w-96 min-h-[15rem] border p-4 flex flex-col gap-2 ${themeClass} ${shadowClass} ${lightingClass} ${animationClass}`}
-    >
+    <div className={`w-64 min-h-[10rem] border p-4 flex flex-col gap-2 ${themeClass} ${shadowClass} ${lightingClass} ${animationClass}`}>
       {children}
     </div>
   );
 }
 
-// ---- Card item ------------------------------------------------------------
-type ElementInstance = {
-  id: string;
-  elementId: string;
-  displayMode: DisplayMode;
-  props: Record<string, any>;
-};
-
-function CardItem({
-  item,
-  onRemove,
-  onSelect,
-  selected,
-}: {
-  item: ElementInstance;
-  onRemove: (id: string) => void;
-  onSelect: (id: string) => void;
-  selected: boolean;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: item.id, data: { from: "card" } });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-  const def = elementLibrary.find((d) => d.id === item.elementId)!;
+function PreviewCard({ card }: { card: StoredCard }) {
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={() => onSelect(item.id)}
-      className={`relative border p-2 bg-white text-black cursor-move ${
-        selected ? "ring-2 ring-blue-400" : ""
-      }`}
+    <PreviewCanvas
+      theme={card.theme}
+      shadow={card.shadow}
+      lighting={card.lighting}
+      animation={card.animation}
     >
-      <button
-        onClick={() => onRemove(item.id)}
-        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
-      >
-        ×
-      </button>
-      {def.type === "text" && item.displayMode !== "input" && (
-        <div>{item.props.label || def.defaultProps.label}</div>
-      )}
-      {def.type === "text" && item.displayMode === "input" && (
-        <div>
-          <label className="block mb-1">
-            {item.props.label || def.defaultProps.label}
-          </label>
-          <input
-            className="border px-1"
-            placeholder={
-              item.props.placeholder || def.defaultProps.placeholder
-            }
-          />
-        </div>
-      )}
-      {def.type === "number" && (
-        <div>{item.props.value ?? 0}</div>
-      )}
-      {def.type === "image" && (
-        <img
-          src={item.props.src || def.defaultProps.src}
-          alt={item.props.alt || def.defaultProps.alt}
-          className="w-full h-24 object-cover"
-        />
-      )}
-      {def.type === "button" && (
-        <button className="px-2 py-1 border">
-          {item.props.label || def.defaultProps.label}
-        </button>
-      )}
-    </div>
+      {card.elements.map((el) => {
+        const def = elementLibrary.find((d) => d.id === el.elementId);
+        if (!def) return null;
+        if (def.type === "text" && el.displayMode !== "input") {
+          return <div key={el.id}>{el.props.label || def.defaultProps.label}</div>;
+        }
+        if (def.type === "text" && el.displayMode === "input") {
+          return (
+            <div key={el.id}>
+              <label className="block mb-1">
+                {el.props.label || def.defaultProps.label}
+              </label>
+              <input
+                className="border px-1"
+                placeholder={el.props.placeholder || def.defaultProps.placeholder}
+              />
+            </div>
+          );
+        }
+        if (def.type === "image") {
+          return (
+            <img
+              key={el.id}
+              src={el.props.src || def.defaultProps.src}
+              alt={el.props.alt || def.defaultProps.alt}
+              className="w-full h-24 object-cover"
+            />
+          );
+        }
+        if (def.type === "button") {
+          return (
+            <button key={el.id} className="px-2 py-1 border">
+              {el.props.label || def.defaultProps.label}
+            </button>
+          );
+        }
+        return null;
+      })}
+    </PreviewCanvas>
   );
 }
 
-// ---- Code serialization helpers -----------------------------------------
-function buildConfig({
-  elements,
-  theme,
-  shadow,
-  lighting,
-  animation,
-}: {
-  elements: ElementInstance[];
-  theme: string;
-  shadow: string;
-  lighting: string;
-  animation: string;
-}) {
-  return {
-    theme,
-    shadow,
-    lighting,
-    animation,
-    elements: elements.map((el) => ({
-      id: el.id,
-      elementId: el.elementId,
-      displayMode: el.displayMode,
-      props: el.props,
-    })),
-  };
-}
-
-function parseConfig(json: string): {
-  elements: ElementInstance[];
-  theme: string;
-  shadow: string;
-  lighting: string;
-  animation: string;
-} | null {
-  try {
-    const obj = JSON.parse(json);
-    if (!obj || typeof obj !== "object") return null;
-    const elements: ElementInstance[] = Array.isArray(obj.elements)
-      ? obj.elements
-          .map((el: any) => {
-            const def = elementLibrary.find((d) => d.id === el.elementId);
-            if (!def) return null;
-            const mode: DisplayMode = def.displayModes.includes(el.displayMode)
-              ? el.displayMode
-              : def.displayModes[0];
-            return {
-              id: el.id || Date.now().toString(),
-              elementId: def.id,
-              displayMode: mode,
-              props: el.props || {},
-            };
-          })
-          .filter(Boolean)
-      : [];
-    return {
-      elements,
-      theme: obj.theme || "light",
-      shadow: obj.shadow || "none",
-      lighting: obj.lighting || "none",
-      animation: obj.animation || "none",
-    };
-  } catch (e) {
-    return null;
-  }
-}
-
-// ---- Main app ------------------------------------------------------------
 export function CardBuilderApp() {
-  const [elements, setElements] = useState<ElementInstance[]>([]);
-  const [theme, setTheme] = useState("light");
-  const [shadow, setShadow] = useState("none");
-  const [lighting, setLighting] = useState("none");
-  const [animation, setAnimation] = useState("none");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [showCode, setShowCode] = useState(false);
-  const [code, setCode] = useState("{}");
+  const [cards, setCards] = useState<StoredCard[]>(() => {
+    const raw = localStorage.getItem("cards");
+    return raw ? JSON.parse(raw) : [];
+  });
+  const [editing, setEditing] = useState<StoredCard | null>(null);
 
-  useEffect(() => {
-    setCode(JSON.stringify(buildConfig({ elements, theme, shadow, lighting, animation }), null, 2));
-  }, [elements, theme, shadow, lighting, animation]);
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { over, active } = event;
-    if (!over) return;
-
-    // dropping from palette onto card
-    if (active.data.current?.from === "palette" && over.id === "card") {
-      const def = elementLibrary.find((d) => d.id === active.id);
-      if (!def) return;
-      let mode: DisplayMode = def.displayModes[0];
-      if (def.displayModes.length > 1) {
-        const input = window.prompt(
-          `Display mode (${def.displayModes.join(",")}):`,
-          def.displayModes[0],
-        );
-        if (input && def.displayModes.includes(input as DisplayMode)) {
-          mode = input as DisplayMode;
-        }
-      }
-      const instance: ElementInstance = {
-        id: Date.now().toString(),
-        elementId: def.id,
-        displayMode: mode,
-        props: { ...def.defaultProps },
-      };
-      setElements((els) => [...els, instance]);
-      return;
-    }
-
-    // reorder within card
-    if (active.data.current?.from === "card" && over.id !== "card") {
-      const oldIndex = elements.findIndex((el) => el.id === active.id);
-      const newIndex = elements.findIndex((el) => el.id === over.id);
-      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        setElements((els) => arrayMove(els, oldIndex, newIndex));
-      }
-    }
+  const saveCard = (config: CardConfig) => {
+    if (!editing) return;
+    const updated: StoredCard = { ...editing, ...config };
+    setCards((prev) => {
+      const list = prev.some((c) => c.id === updated.id)
+        ? prev.map((c) => (c.id === updated.id ? updated : c))
+        : [...prev, updated];
+      localStorage.setItem("cards", JSON.stringify(list));
+      return list;
+    });
+    setEditing(null);
   };
 
-  const removeElement = (id: string) => {
-    setElements((els) => els.filter((el) => el.id !== id));
-    if (selectedId === id) setSelectedId(null);
+  const startNew = () => {
+    setEditing({
+      id: Date.now().toString(),
+      name: "Untitled Card",
+      elements: [],
+      theme: "light",
+      shadow: "none",
+      lighting: "none",
+      animation: "none",
+    });
   };
 
-  const selected = elements.find((el) => el.id === selectedId) || null;
+  const handleBack = () => setEditing(null);
 
-  const updateSelected = (props: Record<string, any>) => {
-    if (!selected) return;
-    setElements((els) =>
-      els.map((el) =>
-        el.id === selected.id ? { ...el, props: { ...el.props, ...props } } : el,
-      ),
-    );
-  };
-
-  const exportJson = () => {
-    const data = JSON.stringify(
-      buildConfig({ elements, theme, shadow, lighting, animation }),
-      null,
-      2,
-    );
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "card.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const applyCode = () => {
-    const parsed = parseConfig(code);
-    if (!parsed) {
-      alert("Invalid JSON configuration");
-      return;
-    }
-    setElements(parsed.elements);
-    setTheme(parsed.theme);
-    setShadow(parsed.shadow);
-    setLighting(parsed.lighting);
-    setAnimation(parsed.animation);
-    setShowCode(false);
-  };
+  if (editing) {
+    return <CardEditor initial={editing} onSave={saveCard} onBack={handleBack} />;
+  }
 
   return (
-    <div className="p-4 space-y-4 text-sm">
-      <div className="flex gap-2 items-center flex-wrap">
-        <label>Theme:</label>
-        <select
-          value={theme}
-          onChange={(e) => setTheme(e.target.value)}
-          className="border px-2 py-1"
-        >
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="neon">Neon</option>
-        </select>
-
-        <label>Shadow:</label>
-        <select
-          value={shadow}
-          onChange={(e) => setShadow(e.target.value)}
-          className="border px-2 py-1"
-        >
-          <option value="none">None</option>
-          <option value="soft">Soft</option>
-          <option value="strong">Strong</option>
-        </select>
-
-        <label>Lighting:</label>
-        <select
-          value={lighting}
-          onChange={(e) => setLighting(e.target.value)}
-          className="border px-2 py-1"
-        >
-          <option value="none">None</option>
-          <option value="glow">Glow</option>
-          <option value="neon">Neon</option>
-        </select>
-
-        <label>Animation:</label>
-        <select
-          value={animation}
-          onChange={(e) => setAnimation(e.target.value)}
-          className="border px-2 py-1"
-        >
-          <option value="none">None</option>
-          <option value="fade">Fade In</option>
-          <option value="hover">Hover Grow</option>
-        </select>
-
-        <button
-          onClick={() => setShowCode((v) => !v)}
-          className="ml-auto border px-2 py-1"
-        >
-          {showCode ? "Design View" : "Code View"}
-        </button>
-        <button onClick={exportJson} className="border px-2 py-1">
-          Export JSON
-        </button>
+    <div className="p-8">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <ActionCard
+          icon={Plus}
+          title="Create New Card"
+          description="Start designing a fresh card"
+          cta="New Card"
+          onClick={startNew}
+        />
+        {cards.map((card) => (
+          <Card key={card.id} className="w-full max-w-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">{card.name}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <PreviewCard card={card} />
+              <Button onClick={() => setEditing(card)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
       </div>
-
-      {showCode ? (
-        <div className="flex flex-col gap-2">
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="border p-2 font-mono h-80"
-          />
-          <div>
-            <button onClick={applyCode} className="border px-2 py-1 mr-2">
-              Apply
-            </button>
-            <button onClick={() => setShowCode(false)} className="border px-2 py-1">
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : (
-        <DndContext onDragEnd={handleDragEnd}>
-          <div className="flex gap-4">
-            <div>
-              {elementLibrary.map((def) => (
-                <PaletteItem key={def.id} def={def} />
-              ))}
-            </div>
-            <CardCanvas
-              theme={theme}
-              shadow={shadow}
-              lighting={lighting}
-              animation={animation}
-            >
-              <SortableContext
-                items={elements.map((e) => e.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {elements.map((el) => (
-                  <CardItem
-                    key={el.id}
-                    item={el}
-                    onRemove={removeElement}
-                    onSelect={(id) => setSelectedId(id)}
-                    selected={selectedId === el.id}
-                  />
-                ))}
-              </SortableContext>
-            </CardCanvas>
-          </div>
-        </DndContext>
-      )}
-
-      {selected && (
-        <div className="border p-2 w-96">
-          <div className="mb-2 font-bold">Element Properties</div>
-          <div className="flex flex-col gap-2">
-            <label className="flex gap-2 items-center">
-              <span className="w-24">Label</span>
-              <input
-                className="border px-2 py-1 flex-1"
-                value={selected.props.label || ""}
-                onChange={(e) => updateSelected({ label: e.target.value })}
-              />
-            </label>
-            {selected.displayMode === "input" && (
-              <label className="flex gap-2 items-center">
-                <span className="w-24">Placeholder</span>
-                <input
-                  className="border px-2 py-1 flex-1"
-                  value={selected.props.placeholder || ""}
-                  onChange={(e) =>
-                    updateSelected({ placeholder: e.target.value })
-                  }
-                />
-              </label>
-            )}
-            {selected.elementId === "image" && (
-              <label className="flex gap-2 items-center">
-                <span className="w-24">Image URL</span>
-                <input
-                  className="border px-2 py-1 flex-1"
-                  value={selected.props.src || ""}
-                  onChange={(e) => updateSelected({ src: e.target.value })}
-                />
-              </label>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
