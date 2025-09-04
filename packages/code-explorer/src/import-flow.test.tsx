@@ -45,8 +45,16 @@ afterEach(() => {
 });
 
 describe("import workflow", () => {
-  it("notifies on start and loads tree and viewer on success", async () => {
-    const tree = { path: "/repo", name: "repo", children: [{ name: "README.md", path: "/repo/README.md" }] };
+  it("notifies on start, collapses folders, and loads viewer on success", async () => {
+    const tree = {
+      path: "/repo",
+      name: "repo",
+      children: [
+        { name: "docs", path: "/repo/docs", children: [{ name: "intro.md", path: "/repo/docs/intro.md" }] },
+        { name: "README.md", path: "/repo/README.md" },
+      ],
+    };
+
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce({ ok: true, json: async () => tree })
@@ -67,9 +75,14 @@ describe("import workflow", () => {
       expect.objectContaining({ method: "POST" })
     );
 
-    const fileNode = await screen.findByText("README.md");
+    const folderNode = await screen.findByText("docs");
+    expect(screen.queryByText("intro.md")).toBeNull();
+    fireEvent.click(folderNode);
+    const fileNode = await screen.findByText("intro.md");
     fireEvent.click(fileNode);
     await screen.findByText("file content");
+    fireEvent.click(screen.getByText("Collapse All"));
+    expect(screen.queryByText("intro.md")).toBeNull();
   });
 
   it("shows failure message when clone fails", async () => {

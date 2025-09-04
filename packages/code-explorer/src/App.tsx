@@ -18,10 +18,11 @@ import { FileViewer } from "./components/FileViewer";
 {
   "friendlyName": "Code Explorer App",
   "description": "Entry component for the Code Explorer, managing home and explorer screens.",
-  "editCount": 2,
+  "editCount": 3,
   "tags": ["ui", "app"],
   "location": "src/App",
-  "notes": "Maintains UI state for repository scanning and file viewing."
+  "notes": "Maintains UI state for repository scanning, file viewing and tree collapse."
+
 }
 */
 export function CodeExplorerApp() {
@@ -34,6 +35,8 @@ export function CodeExplorerApp() {
   const [selected, setSelected] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
   const [status, setStatus] = useState("");
+  const [collapseKey, setCollapseKey] = useState(0);
+
 
   /**
   {
@@ -84,6 +87,20 @@ export function CodeExplorerApp() {
     setShowImport(false);
     setError("");
     handleScan(repoUrl);
+  }
+
+  /**
+  {
+    "friendlyName": "collapse file tree",
+    "description": "Collapses all folders in the file tree to root level.",
+    "editCount": 1,
+    "tags": ["ui", "tree"],
+    "location": "src/App > collapseAll",
+    "notes": "Triggers FileTree components via an incrementing key."
+  }
+  */
+  function collapseAll() {
+    setCollapseKey((k) => k + 1);
   }
 
   if (screen === "home") {
@@ -147,6 +164,7 @@ export function CodeExplorerApp() {
       <div className="flex h-screen">
         <div className="w-64 border-r p-2 flex flex-col">
           <Button variant="outline" size="sm" className="mb-2" onClick={() => setScreen("home")}>Back</Button>
+          <Button variant="outline" size="sm" className="mb-2" onClick={collapseAll}>Collapse All</Button>
           <Input
             placeholder="Search..."
             value={filter}
@@ -154,7 +172,16 @@ export function CodeExplorerApp() {
             className="mb-2"
           />
           {loading && <p className="text-sm">Cloning...</p>}
-          {tree && <FileTree node={tree} selected={selected} onSelect={setSelected} filter={filter} />}
+          {tree && (
+            <FileTree
+              node={tree}
+              selected={selected}
+              onSelect={setSelected}
+              filter={filter}
+              collapseKey={collapseKey}
+              isRoot
+            />
+          )}
         </div>
         <div className="flex-1 p-4 overflow-auto">
           {selected ? (
