@@ -74,6 +74,20 @@ export function CardEditor({
     );
   }, [name, elements, theme, shadow, lighting, animation]);
 
+  const handleSave = () => {
+    const resolvedName = name.trim() || "Untitled Card";
+    setName(resolvedName);
+    const config = buildConfig({
+      name: resolvedName,
+      elements,
+      theme,
+      shadow,
+      lighting,
+      animation,
+    });
+    onSave(config);
+  };
+
   const applyCode = () => {
     const parsed = parseConfig(code);
     if (!parsed) {
@@ -147,19 +161,7 @@ export function CardEditor({
         </select>
 
         <Button onClick={onBack} variant="outline">Back</Button>
-        <Button
-          onClick={() => {
-            const config = buildConfig({
-              name: name.trim() || "Untitled Card",
-              elements,
-              theme,
-              shadow,
-              lighting,
-              animation,
-            });
-            onSave(config);
-          }}
-        >
+        <Button onClick={handleSave}>
           Save
         </Button>
         <Button onClick={() => setShowCode((v) => !v)} className="ml-auto">
