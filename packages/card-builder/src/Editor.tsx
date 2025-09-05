@@ -31,6 +31,7 @@ export function CardEditor({
   const [animation, setAnimation] = useState("none");
   const [showCode, setShowCode] = useState(false);
   const [code, setCode] = useState("{}");
+  const [codeError, setCodeError] = useState<string | null>(null);
 
   const {
     elements,
@@ -67,9 +68,11 @@ export function CardEditor({
   const applyCode = () => {
     const parsed = parseConfig(code);
     if (!parsed) {
-      alert("Invalid JSON configuration");
+      console.error("Invalid JSON configuration");
+      setCodeError("Invalid JSON configuration");
       return;
     }
+    setCodeError(null);
     setName(parsed.name);
     setElements(parsed.elements);
     setTheme(parsed.theme);
@@ -178,6 +181,9 @@ export function CardEditor({
             onChange={(e) => setCode(e.target.value)}
             className="border p-2 font-mono h-80"
           />
+          {codeError && (
+            <div className="text-red-600">{codeError}</div>
+          )}
           <div>
             <Button onClick={applyCode} className="mr-2">
               Apply
