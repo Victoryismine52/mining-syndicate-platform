@@ -13,9 +13,10 @@ For the **Card Builder**, I’m designing the invisible scaffolding: the service
 - **[2025‑09‑07]** Began prototyping the API generator.  Explored both REST and GraphQL output formats and debated their merits with Casey and Riley.  Sketched out how functions imported from Code Explorer might map onto button actions.
 - **[2025‑09‑08]** Refactored the export flow to `exportAssets`, producing both the card's JSON blueprint and an OpenAPI 3 spec via a new `exportApi` module.
 - **[2025‑09‑09]** Hardened card loading by wrapping `localStorage` parsing in `try/catch`, logging corrupt data and offering an inline reset so designers can recover without reloads.
+- **[2025‑09‑10]** Finalised the `exportApi` module and wired the editor to `exportAssets`, so a single click now yields both `card.json` and a matching OpenAPI `card.yaml`.
 
 ## What I’m Doing
-Right now I’m polishing the API generator—tuning the OpenAPI output and sketching a plugin system so different runtime targets can extend it.  After adding resilient `localStorage` parsing and inline error reporting, my next focus is hardening validation and wiring serverless deployment hooks.
+With the export pipeline humming, I’m sketching a plugin system so different runtime targets can extend the generator.  Next up is hardening validation and wiring serverless deployment hooks.
 
 ## Where I’m Headed
 
