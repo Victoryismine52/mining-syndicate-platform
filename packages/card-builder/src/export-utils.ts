@@ -68,7 +68,7 @@ export function parseConfig(json: string): CardConfig | null {
   }
 }
 
-export function exportJson(config: CardConfig) {
+export function exportAssets(config: CardConfig) {
   const data = JSON.stringify(config, null, 2);
   const jsonBlob = new Blob([data], { type: "application/json" });
   const jsonUrl = URL.createObjectURL(jsonBlob);

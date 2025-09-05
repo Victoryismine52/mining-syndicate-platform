@@ -50,6 +50,7 @@ export function generateOpenApi(config: CardConfig): string {
       title: config.name || "Card API",
       version: "1.0.0",
     },
+    servers: [{ url: "/" }],
     paths,
   };
 
