@@ -40,11 +40,11 @@ Preparing the code explorer package for beta launch and refining remaining featu
 
 ## 🕒 Product Management Log
 ### Past
-- Reviewed team status and code base; planned upcoming tasks for canvas deletion, error handling, and documentation.
-- Reviewed team profiles and test suite; scoped tasks for resolving module resolution issues and improving docs.
+- Launched discovery for the card-builder initiative and defined MVP milestones.
+- Ran design sprint and user interviews to validate card creation workflows.
 ### Current
-- Coordinating implementation of new features and ensuring cross-team communication remains smooth.
-- Coordinating fixes for failing tests and tracking research on function library architecture.
+- Driving cross-team development of card-builder and aligning integration with code explorer.
+- Prioritizing backlog for card-builder beta and tracking package dependencies.
 ### Future
-- Preparing strategy for unified editing, dependency graph tooling, and real-time collaboration in future cycles.
-- Shaping roadmap for unified editing, dependency graph tooling, and eventual real-time collaboration once core stability is achieved.
+- Planning rollout strategy and metrics for card-builder adoption.
+- Mapping long-term roadmap for advanced card templates and collaborative editing.
