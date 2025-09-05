@@ -16,7 +16,7 @@ import {
 
 export { buildConfig, parseConfig, exportAssets, type CardConfig } from "./export";
 
-const DEFAULT_NAME = "Untitled Card";
+export const DEFAULT_NAME = "Untitled Card";
 
 export function CardEditor({
   initial,
