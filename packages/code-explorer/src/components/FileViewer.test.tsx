@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 const toast = vi.fn();
@@ -24,6 +24,7 @@ beforeEach(() => {
 
 afterEach(() => {
   global.fetch = originalFetch;
+  cleanup();
 });
 
 describe("loadLanguageFromPath", () => {
@@ -75,5 +76,22 @@ describe("FileViewer", () => {
     expect(body.patch).toContain("-const a = 1;");
     expect(body.patch).toContain("+const a = 2;");
     await waitFor(() => expect(toast).toHaveBeenCalledWith({ title: "File saved" }));
+  });
+
+  it("reloads when path changes", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, text: async () => "one" })
+      .mockResolvedValueOnce({ ok: true, text: async () => "two" });
+    global.fetch = fetchMock as any;
+
+    const { rerender } = render(<FileViewer path="/repo/one.ts" />);
+    let [textarea] = await screen.findAllByTestId("editor");
+    expect((textarea as HTMLTextAreaElement).value).toBe("one");
+
+    rerender(<FileViewer path="/repo/two.ts" />);
+    [textarea] = await screen.findAllByTestId("editor");
+    await waitFor(() => expect((textarea as HTMLTextAreaElement).value).toBe("two"));
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

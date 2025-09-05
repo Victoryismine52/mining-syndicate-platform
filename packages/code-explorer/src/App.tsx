@@ -37,7 +37,8 @@ export function CodeExplorerApp() {
   const [showImport, setShowImport] = useState(false);
   const [repoUrl, setRepoUrl] = useState("");
   const [error, setError] = useState("");
-  const [selected, setSelected] = useState<string | null>(null);
+  const [tabs, setTabs] = useState<string[]>([]);
+  const [active, setActive] = useState(0);
   const [filter, setFilter] = useState("");
   const [status, setStatus] = useState("");
   const [collapseKey, setCollapseKey] = useState(0);
@@ -124,6 +125,30 @@ export function CodeExplorerApp() {
     setCollapseKey((k) => k + 1);
   }
 
+  function openTab(path: string) {
+    setTabs((prev) => {
+      const idx = prev.indexOf(path);
+      if (idx !== -1) {
+        setActive(idx);
+        return prev;
+      }
+      setActive(prev.length);
+      return [...prev, path];
+    });
+  }
+
+  function closeTab(index: number) {
+    setTabs((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      setActive((a) => {
+        if (a === index) return index > 0 ? index - 1 : 0;
+        if (a > index) return a - 1;
+        return a;
+      });
+      return next;
+    });
+  }
+
   if (screen === "home") {
     return (
       <div className="p-6 flex flex-col items-center">
@@ -180,7 +205,8 @@ export function CodeExplorerApp() {
   }
 
   if (screen === "explorer") {
-    const relative = selected && tree ? selected.replace(tree.path + "/", "") : null;
+    const activePath = tabs[active];
+    const relative = activePath && tree ? activePath.replace(tree.path + "/", "") : null;
     return (
       <div className="flex h-screen">
         <div className="w-64 border-r p-2 flex flex-col">
@@ -196,8 +222,8 @@ export function CodeExplorerApp() {
           {tree && (
             <FileTree
               node={tree}
-              selected={selected}
-              onSelect={setSelected}
+              selected={activePath}
+              onSelect={openTab}
               filter={filter}
               collapseKey={collapseKey}
               isRoot
@@ -205,11 +231,36 @@ export function CodeExplorerApp() {
           )}
         </div>
         <div className="flex-1 p-4 overflow-auto">
-          {selected ? (
+          {tabs.length ? (
             <div className="flex h-full gap-4">
               <div className="flex-1">
-                <div className="text-sm text-muted-foreground mb-2">{relative}</div>
-                <FileViewer path={selected} />
+                <div className="mb-2 flex border-b text-sm" data-testid="tab-bar">
+                  {tabs.map((t, i) => {
+                    const rel = tree ? t.replace(tree.path + "/", "") : t;
+                    return (
+                      <div
+                        key={t}
+                        className={`px-2 py-1 cursor-pointer flex items-center ${
+                          i === active ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+                        }`}
+                        onClick={() => setActive(i)}
+                      >
+                        <span>{rel}</span>
+                        <button
+                          aria-label="Close"
+                          className="ml-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            closeTab(i);
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+                {activePath && <FileViewer path={activePath} />}
               </div>
               <div className="w-1/2 border-l pl-4">
                 <CompositionCanvas
