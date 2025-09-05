@@ -13,6 +13,7 @@ For **Card Builder**, my job is to make sure that contributors can develop, test
 - **[2025‑09‑07]** Wrote GitHub Actions workflows to run tests on pull requests and to build/export cards on tagged releases.  Introduced caching layers to speed up repeated builds.  Compared the satisfaction to making a perfect lasagne.
 - **[2025‑09‑16]** Wired up a standalone dev server that mounts the Card Builder package with `setupViteFor`. Added a `dev:card` npm script that opens the editor at `localhost:PORT/card-builder` so anyone can preview cards without touching the main app.
 - **[2025‑09‑17]** Extended the Netlify preview pipeline to bundle `card.json` and `card.yaml`, so every pull request deploy serves the configuration and matching OpenAPI spec.
+- **[2025‑09‑18]** Documented the preview pipeline in detail, noting that Netlify runs `npm run build` followed by `npm run bundle:card` to emit `card.json` and `card.yaml` into `dist/` for each PR.
 
 ## What I’m Doing
 
