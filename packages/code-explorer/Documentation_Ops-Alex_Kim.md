@@ -23,7 +23,7 @@ Standardize repository documentation and automate release notes.
 ## 📝 Current Task Notes
 - Published Code Explorer runbook covering tests, save/patch flow, and viewer fallback.
 - Tracking automated release-note tooling; next step is wiring changelog script into CI.
-- Expanded runbook and onboarding docs with the function-index API and the new FunctionBrowser drag-and-drop flow.
+- Refreshed runbook and onboarding docs with sample function-index responses and step-by-step FunctionBrowser drag-and-drop flow.
 
 ## 🗂️ Project Notes
 - Reference documentation kept in `/docs`; update as features stabilize.

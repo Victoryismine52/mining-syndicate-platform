@@ -17,9 +17,16 @@
 - Update your profile whenever your assignment or availability changes and at least once per sprint.
 
 ## Function Index & UI Flow
-- The **function-index API** (`/api/functions`) provides scanned function metadata such as name, signature, path, and tags.
-- The `FunctionBrowser` panel fetches this data and supports search, filtering, and drag-and-drop.
-- Drag functions from the browser onto the `CompositionCanvas` to create nodes and wire them together.
+- `GET /api/functions` returns an array of scanned function metadata.
+  ```json
+  [
+    { "name": "add", "path": "src/math.ts", "line": 12, "tags": ["math"] }
+  ]
+  ```
+- The `FunctionBrowser` panel fetches this list and supports search, filtering, and drag-and-drop.
+  1. Open the browser and search or filter by tag.
+  2. Drag a function onto the `CompositionCanvas` to create a node.
+  3. Connect nodes to build flows.
 
 ## Testing Commands
 - Run all repository tests:
