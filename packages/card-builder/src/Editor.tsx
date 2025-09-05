@@ -15,6 +15,7 @@ import {
 } from "./export";
 
 export { buildConfig, parseConfig, exportAssets, type CardConfig } from "./export";
+export { elementLibrary };
 
 export const DEFAULT_NAME = "Untitled Card";
 
