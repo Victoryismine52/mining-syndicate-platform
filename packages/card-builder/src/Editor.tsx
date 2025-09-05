@@ -16,6 +16,8 @@ import {
 
 export { buildConfig, parseConfig, exportAssets, type CardConfig } from "./export";
 
+const DEFAULT_NAME = "Untitled Card";
+
 export function CardEditor({
   initial,
   onSave,
@@ -25,7 +27,7 @@ export function CardEditor({
   onSave: (config: CardConfig) => void;
   onBack: () => void;
 }) {
-  const [name, setName] = useState("Untitled Card");
+  const [name, setName] = useState(DEFAULT_NAME);
   const [theme, setTheme] = useState("light");
   const [shadow, setShadow] = useState("none");
   const [lighting, setLighting] = useState("none");
@@ -56,8 +58,10 @@ export function CardEditor({
     }
   }, [initial, setElements]);
 
+  const resolveName = (raw: string) => raw.trim() || DEFAULT_NAME;
+
   useEffect(() => {
-    const resolvedName = name.trim() || "Untitled Card";
+    const resolvedName = resolveName(name);
     setCode(
       JSON.stringify(
         buildConfig({
@@ -75,7 +79,7 @@ export function CardEditor({
   }, [name, elements, theme, shadow, lighting, animation]);
 
   const handleSave = () => {
-    const resolvedName = name.trim() || "Untitled Card";
+    const resolvedName = resolveName(name);
     setName(resolvedName);
     const config = buildConfig({
       name: resolvedName,
@@ -111,10 +115,11 @@ export function CardEditor({
         <label htmlFor="card-name">Card Name:</label>
         <Input
           id="card-name"
+          aria-label="card name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-48"
-          placeholder="Untitled Card"
+          placeholder={DEFAULT_NAME}
         />
         <label>Theme:</label>
         <select
@@ -170,7 +175,7 @@ export function CardEditor({
         <Button
           onClick={() => {
             const config = buildConfig({
-              name: name.trim() || "Untitled Card",
+              name: resolveName(name),
               elements,
               theme,
               shadow,
