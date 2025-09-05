@@ -37,8 +37,10 @@ export function CompositionCanvas({ nodes, connections, onUpdate }: Props) {
     const fn = e.dataTransfer.getData("text/plain");
     if (!fn) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const clientX = typeof e.clientX === "number" ? e.clientX : 0;
+    const clientY = typeof e.clientY === "number" ? e.clientY : 0;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
     const node: CompositionNode = { id: nanoid(), name: fn, x, y };
     const updated = { nodes: [...localNodes, node], connections: localConnections };
     setLocalNodes(updated.nodes);
