@@ -88,8 +88,13 @@ describe("CodeExplorerApp", () => {
 
     fireEvent.click(screen.getByText("two.ts"));
     expect(await screen.findByText("/repo/two.ts")).toBeTruthy();
-
     const tabBar = screen.getByTestId("tab-bar");
+
+    // clicking already open file from tree should switch without duplicating
+    fireEvent.click(screen.getByText("one.ts"));
+    expect(await screen.findByText("/repo/one.ts")).toBeTruthy();
+    expect(within(tabBar).getAllByLabelText("Close").length).toBe(2);
+
     fireEvent.click(within(tabBar).getByText("one.ts"));
     expect(await screen.findByText("/repo/one.ts")).toBeTruthy();
 

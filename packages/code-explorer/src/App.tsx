@@ -23,11 +23,14 @@ import {
 {
   "friendlyName": "Code Explorer App",
   "description": "Entry component for the Code Explorer, managing home and explorer screens.",
-  "editCount": 3,
+  "editCount": 4,
   "tags": ["ui", "app"],
   "location": "src/App",
-  "notes": "Maintains UI state for repository scanning, file viewing and tree collapse."
-
+  "notes": "Maintains UI state for repository scanning, file viewing, tab management and tree collapse.",
+  "state": {
+    "tabs": "array of open file paths in the order they were opened",
+    "active": "index of the currently selected tab"
+  }
 }
 */
 export function CodeExplorerApp() {
@@ -37,8 +40,8 @@ export function CodeExplorerApp() {
   const [showImport, setShowImport] = useState(false);
   const [repoUrl, setRepoUrl] = useState("");
   const [error, setError] = useState("");
-  const [tabs, setTabs] = useState<string[]>([]);
-  const [active, setActive] = useState(0);
+  const [tabs, setTabs] = useState<string[]>([]); // open file paths
+  const [active, setActive] = useState(0); // index of active tab
   const [filter, setFilter] = useState("");
   const [status, setStatus] = useState("");
   const [collapseKey, setCollapseKey] = useState(0);
