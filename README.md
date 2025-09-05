@@ -1,5 +1,7 @@
 # Mining Syndicate Platform
 
+See [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions. Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
+
 ## Development
 
 - **Full application**: `npm run dev`
@@ -29,7 +31,7 @@ These tools are standalone and do not affect production or the main development 
 
 ## Syntax Highlighting & Testing
 
-The Code Explorer renders source examples with [Prism](https://prismjs.com/).
+The Code Explorer renders source examples with [CodeMirror](https://codemirror.net/).
 Use the `highlightCode` utility to convert raw strings into HTML with the
 desired language grammar.
 
@@ -37,14 +39,14 @@ desired language grammar.
 
 - **Location:** `packages/code-explorer/src/utils/highlight.ts`
 - `highlightCode(code, language)` returns highlighted HTML.
-- If the grammar is missing or Prism throws, the original code string is
-  returned to avoid runtime errors.
+- If the grammar is missing or CodeMirror throws, the original code string is
+  returned, causing the snippet to render as plain text to avoid runtime errors.
 
-### Extending Prism grammars
+### Extending CodeMirror languages
 
-1. Import the Prism component in `highlight.ts`, e.g.:
+1. Import the CodeMirror language package in `highlight.ts`, e.g.:
    ```ts
-   import "prismjs/components/prism-python";
+   import { python } from "@codemirror/lang-python";
    ```
 2. Pass the matching language key when calling `highlightCode`:
    ```ts
@@ -55,8 +57,8 @@ desired language grammar.
 
 - Unstyled code usually means the grammar wasn't imported or the language key
   doesn't match.
-- Ensure dependencies are installed; reinstall with `npm install` if Prism
-  components are missing.
+- Ensure CodeMirror dependencies are installed; reinstall with `npm install` if
+  language packages are missing.
 - Run targeted tests to verify highlighting logic: `npx vitest packages/code-explorer/src/utils/highlight.test.ts`.
 
 ### Running tests

@@ -21,7 +21,8 @@ Alex blends technical writing with operations experience, ensuring documentation
 Standardize repository documentation and automate release notes.
 
 ## 📝 Current Task Notes
-- Drafting runbooks for code explorer deployment.
+- Published Code Explorer runbook covering tests, save/patch flow, and viewer fallback.
+- Tracking automated release-note tooling; next step is wiring changelog script into CI.
 
 ## 🗂️ Project Notes
 - Reference documentation kept in `/docs`; update as features stabilize.
@@ -33,4 +34,10 @@ Standardize repository documentation and automate release notes.
 - Next steps: archive decisions each cycle, document edge-case findings, and coordinate cross-team schedules.
 
 ## 🚨 Urgent Notes
+
+
+## 🔧 Maintenance Plan
+- Review documentation monthly for accuracy.
+- Audit CI pipelines quarterly.
+- Rotate credentials and update contact list each release.
 

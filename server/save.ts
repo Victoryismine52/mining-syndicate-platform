@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { applyPatch } from "diff";
+import * as Diff from "diff";
 
 /**
  * Applies a unified diff patch to a file on disk.
@@ -7,7 +7,7 @@ import { applyPatch } from "diff";
  */
 export async function applyPatchToFile(filePath: string, patch: string): Promise<void> {
   const original = await fs.readFile(filePath, "utf8");
-  const updated = applyPatch(original, patch);
+  const updated = Diff.applyPatch(original, patch);
   if (updated === false) {
     throw new Error("Patch failed");
   }

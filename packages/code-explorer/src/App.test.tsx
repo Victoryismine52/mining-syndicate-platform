@@ -1,9 +1,9 @@
 /* @vitest-environment jsdom */
 import React from "react";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { CodeExplorerApp } from "./App";
-vi.mock("./components/FileViewer", () => ({ FileViewer: () => <div>viewer</div> }));
+vi.mock("./components/FileViewer", () => ({ FileViewer: ({ path }: any) => <div>{path}</div> }));
 vi.mock("./components/CompositionCanvas", () => ({ CompositionCanvas: () => <div /> }));
 
 vi.mock("prismjs", () => ({
@@ -61,6 +61,47 @@ describe("CodeExplorerApp", () => {
 
     // error path: invalid URL message
     expect(await screen.findByText("Please enter a valid GitHub URL")).toBeTruthy();
+  });
+
+  it("manages file tabs", async () => {
+    const tree = {
+      name: "repo",
+      path: "/repo",
+      children: [
+        { name: "one.ts", path: "/repo/one.ts" },
+        { name: "two.ts", path: "/repo/two.ts" },
+      ],
+    };
+    (global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => tree });
+
+    render(<CodeExplorerApp />);
+    fireEvent.click(screen.getAllByText("Import")[0]);
+    fireEvent.change(screen.getByPlaceholderText("https://github.com/user/repo"), {
+      target: { value: "https://github.com/user/repo" },
+    });
+    fireEvent.click(screen.getAllByText("Import")[1]);
+
+    await screen.findByText("one.ts");
+
+    fireEvent.click(screen.getByText("one.ts"));
+    expect(await screen.findByText("/repo/one.ts")).toBeTruthy();
+
+    fireEvent.click(screen.getByText("two.ts"));
+    expect(await screen.findByText("/repo/two.ts")).toBeTruthy();
+    const tabBar = screen.getByTestId("tab-bar");
+
+    // clicking already open file from tree should switch without duplicating
+    fireEvent.click(screen.getByText("one.ts"));
+    expect(await screen.findByText("/repo/one.ts")).toBeTruthy();
+    expect(within(tabBar).getAllByLabelText("Close").length).toBe(2);
+
+    fireEvent.click(within(tabBar).getByText("one.ts"));
+    expect(await screen.findByText("/repo/one.ts")).toBeTruthy();
+
+    const closeBtns = within(tabBar).getAllByLabelText("Close");
+    fireEvent.click(closeBtns[1]);
+    expect(within(tabBar).getAllByLabelText("Close").length).toBe(1);
+    expect(await screen.findByText("/repo/one.ts")).toBeTruthy();
   });
 });
 
