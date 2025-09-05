@@ -14,7 +14,7 @@ For the **Card Builder**, I’m designing the invisible scaffolding: the service
 
 ## What I’m Doing
 
-Currently I’m writing the logic that analyses a card’s schema and produces a corresponding API specification.  For each input and button, I generate endpoints or mutations with appropriate parameters.  I’m also implementing a validation layer to ensure that exported cards can’t request or expose insecure data.  In the evenings I’m reading up on serverless platforms because I want our generated APIs to run anywhere.  Lastly, I’m collaborating with Bianca to embed the API generator into the build pipeline so exports are seamless.
+Currently I’m writing the logic that analyses a card’s schema and produces a corresponding API specification.  For each input and button, I generate endpoints or mutations with appropriate parameters.  I’m also implementing a validation layer to ensure that exported cards can’t request or expose insecure data.  In the evenings I’m reading up on serverless platforms because I want our generated APIs to run anywhere.  After reviewing the toolbar wireframes, I’ve mapped the export button’s actions to the generator so front-end interactions trigger the right endpoints.  Lastly, I’m collaborating with Bianca to embed the API generator into the build pipeline so exports are seamless.
 
 ## Where I’m Headed
 
