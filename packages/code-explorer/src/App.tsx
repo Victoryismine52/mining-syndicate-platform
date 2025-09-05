@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Folder, Github, FilePlus } from "lucide-react";
 import { ActionCard } from "./components/ActionCard";
 import { Button } from "@/components/ui/button";
@@ -13,14 +13,23 @@ import {
 } from "@/components/ui/dialog";
 import { FileTree, TreeNode } from "./components/FileTree";
 import { FileViewer } from "./components/FileViewer";
+import {
+  CompositionCanvas,
+  CompositionNode,
+  Edge,
+} from "./components/CompositionCanvas";
 
 /**
- * Type: React component
- * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp
- * Description: Entry component for the Code Explorer, managing home and explorer screens.
- * Notes: Maintains UI state for repository scanning and file viewing.
- * EditCounter: 1
- */
+{
+  "friendlyName": "Code Explorer App",
+  "description": "Entry component for the Code Explorer, managing home and explorer screens.",
+  "editCount": 3,
+  "tags": ["ui", "app"],
+  "location": "src/App",
+  "notes": "Maintains UI state for repository scanning, file viewing and tree collapse."
+
+}
+*/
 export function CodeExplorerApp() {
   const [screen, setScreen] = useState<"home" | "explorer">("home");
   const [tree, setTree] = useState<TreeNode | null>(null);
@@ -28,36 +37,70 @@ export function CodeExplorerApp() {
   const [showImport, setShowImport] = useState(false);
   const [repoUrl, setRepoUrl] = useState("");
   const [error, setError] = useState("");
-  const [selected, setSelected] = useState<string | null>(null);
+  const [tabs, setTabs] = useState<string[]>([]);
+  const [active, setActive] = useState(0);
   const [filter, setFilter] = useState("");
+  const [status, setStatus] = useState("");
+  const [collapseKey, setCollapseKey] = useState(0);
+  const [composition, setComposition] = useState<{
+    nodes: CompositionNode[];
+    connections: Edge[];
+  }>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("composition");
+      if (stored) return JSON.parse(stored);
+    }
+    return { nodes: [], connections: [] };
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("composition", JSON.stringify(composition));
+    }
+  }, [composition]);
+
 
   /**
-   * Type: Async function
-   * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp > handleScan
-   * Description: Calls backend to clone the repo and build the file tree, then switches to explorer view.
-   * Notes: Updates loading state while request is in flight.
-   * EditCounter: 1
-   */
+  {
+    "friendlyName": "handle repository scan",
+    "description": "Clones the repository and builds the file tree before switching to explorer view.",
+    "editCount": 2,
+    "tags": ["data", "repo"],
+    "location": "src/App > handleScan",
+    "notes": "Sets status messages for import progress and handles failure states."
+  }
+  */
   async function handleScan(repo: string) {
+    setStatus("Import started");
     setLoading(true);
-    const res = await fetch("/code-explorer/api/clone", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ repo }),
-    });
-    const data = await res.json();
-    setTree(data);
-    setLoading(false);
-    setScreen("explorer");
+    try {
+      const res = await fetch("/code-explorer/api/clone", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repo }),
+      });
+      if (!res.ok) throw new Error("clone failed");
+      const data = await res.json();
+      setTree(data);
+      setStatus("");
+      setScreen("explorer");
+    } catch {
+      setStatus("Import failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
   /**
-   * Type: Function
-   * Location: packages/code-explorer/src/App.tsx > CodeExplorerApp > handleImport
-   * Description: Validates user-entered GitHub URL and triggers repository scan.
-   * Notes: Displays error message for invalid URLs.
-   * EditCounter: 1
-   */
+  {
+    "friendlyName": "handle import action",
+    "description": "Validates user-entered GitHub URL and triggers repository scan.",
+    "editCount": 2,
+    "tags": ["user-input", "repo"],
+    "location": "src/App > handleImport",
+    "notes": "Closes the dialog and clears previous errors before scanning."
+  }
+  */
   function handleImport() {
     if (!/^https:\/\/github.com\/.+/.test(repoUrl)) {
       setError("Please enter a valid GitHub URL");
@@ -68,9 +111,47 @@ export function CodeExplorerApp() {
     handleScan(repoUrl);
   }
 
+  /**
+  {
+    "friendlyName": "collapse file tree",
+    "description": "Collapses all folders in the file tree to root level.",
+    "editCount": 1,
+    "tags": ["ui", "tree"],
+    "location": "src/App > collapseAll",
+    "notes": "Triggers FileTree components via an incrementing key."
+  }
+  */
+  function collapseAll() {
+    setCollapseKey((k) => k + 1);
+  }
+
+  function openTab(path: string) {
+    setTabs((prev) => {
+      const idx = prev.indexOf(path);
+      if (idx !== -1) {
+        setActive(idx);
+        return prev;
+      }
+      setActive(prev.length);
+      return [...prev, path];
+    });
+  }
+
+  function closeTab(index: number) {
+    setTabs((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      setActive((a) => {
+        if (a === index) return index > 0 ? index - 1 : 0;
+        if (a > index) return a - 1;
+        return a;
+      });
+      return next;
+    });
+  }
+
   if (screen === "home") {
     return (
-      <div className="p-6 flex justify-center">
+      <div className="p-6 flex flex-col items-center">
         <div className="grid gap-6 md:grid-cols-3">
           <ActionCard
             icon={Folder}
@@ -97,6 +178,11 @@ export function CodeExplorerApp() {
             }}
           />
         </div>
+        {status && (
+          <p className={`mt-4 text-sm ${status.includes("failed") ? "text-red-500" : ""}`}>
+            {status}
+          </p>
+        )}
         <Dialog open={showImport} onOpenChange={setShowImport}>
           <DialogContent>
             <DialogHeader>
@@ -119,11 +205,13 @@ export function CodeExplorerApp() {
   }
 
   if (screen === "explorer") {
-    const relative = selected && tree ? selected.replace(tree.path + "/", "") : null;
+    const activePath = tabs[active];
+    const relative = activePath && tree ? activePath.replace(tree.path + "/", "") : null;
     return (
       <div className="flex h-screen">
         <div className="w-64 border-r p-2 flex flex-col">
           <Button variant="outline" size="sm" className="mb-2" onClick={() => setScreen("home")}>Back</Button>
+          <Button variant="outline" size="sm" className="mb-2" onClick={collapseAll}>Collapse All</Button>
           <Input
             placeholder="Search..."
             value={filter}
@@ -131,14 +219,58 @@ export function CodeExplorerApp() {
             className="mb-2"
           />
           {loading && <p className="text-sm">Cloning...</p>}
-          {tree && <FileTree node={tree} selected={selected} onSelect={setSelected} filter={filter} />}
+          {tree && (
+            <FileTree
+              node={tree}
+              selected={activePath}
+              onSelect={openTab}
+              filter={filter}
+              collapseKey={collapseKey}
+              isRoot
+            />
+          )}
         </div>
         <div className="flex-1 p-4 overflow-auto">
-          {selected ? (
-            <>
-              <div className="text-sm text-muted-foreground mb-2">{relative}</div>
-              <FileViewer path={selected} />
-            </>
+          {tabs.length ? (
+            <div className="flex h-full gap-4">
+              <div className="flex-1">
+                <div className="mb-2 flex border-b text-sm" data-testid="tab-bar">
+                  {tabs.map((t, i) => {
+                    const rel = tree ? t.replace(tree.path + "/", "") : t;
+                    return (
+                      <div
+                        key={t}
+                        className={`px-2 py-1 cursor-pointer flex items-center ${
+                          i === active ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+                        }`}
+                        onClick={() => setActive(i)}
+                      >
+                        <span>{rel}</span>
+                        <button
+                          aria-label="Close"
+                          className="ml-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            closeTab(i);
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+                {activePath && <FileViewer path={activePath} />}
+              </div>
+              <div className="w-1/2 border-l pl-4">
+                <CompositionCanvas
+                  functions={relative ? [relative] : []}
+                  nodes={composition.nodes}
+                  connections={composition.connections}
+                  onUpdate={setComposition}
+                />
+              </div>
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground">Select a file to view</p>
           )}

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronRight, ChevronDown, Folder, FileText } from "lucide-react";
+import { List } from "react-virtualized";
 import clsx from "clsx";
 
 export interface TreeNode {
@@ -13,15 +14,20 @@ interface FileTreeProps {
   selected?: string | null;
   onSelect: (path: string) => void;
   filter: string;
+  collapseKey?: number;
+  isRoot?: boolean;
 }
 
 /**
- * Type: Helper function
- * Location: packages/code-explorer/src/components/FileTree.tsx > matchesFilter
- * Description: Checks if a tree node or its descendants match the search filter.
- * Notes: Recursively examines child nodes.
- * EditCounter: 1
- */
+{
+  "friendlyName": "matches filter",
+  "description": "Checks if a tree node or its descendants match the search filter.",
+  "editCount": 2,
+  "tags": [],
+  "location": "packages/code-explorer/src/components/FileTree.tsx > matchesFilter",
+  "notes": "Recursively examines child nodes."
+}
+*/
 function matchesFilter(node: TreeNode, filter: string): boolean {
   if (!filter) return true;
   const lower = filter.toLowerCase();
@@ -30,12 +36,15 @@ function matchesFilter(node: TreeNode, filter: string): boolean {
 }
 
 /**
- * Type: Helper function
- * Location: packages/code-explorer/src/components/FileTree.tsx > fileColor
- * Description: Returns a Tailwind text color class based on file extension.
- * Notes: Used for syntax-aware coloring in the tree.
- * EditCounter: 1
- */
+{
+  "friendlyName": "file color",
+  "description": "Returns a Tailwind text color class based on file extension.",
+  "editCount": 2,
+  "tags": [],
+  "location": "packages/code-explorer/src/components/FileTree.tsx > fileColor",
+  "notes": "Used for syntax-aware coloring in the tree."
+}
+*/
 function fileColor(name: string): string {
   if (/\.(ts|tsx|js|jsx)$/.test(name)) return "text-blue-500";
   if (/\.json$/.test(name)) return "text-green-500";
@@ -44,16 +53,32 @@ function fileColor(name: string): string {
 }
 
 /**
- * Type: React component
- * Location: packages/code-explorer/src/components/FileTree.tsx > FileTree
- * Description: Renders a collapsible file tree with selectable nodes.
- * Notes: Highlights selected path and applies search filtering.
- * EditCounter: 1
- */
-export function FileTree({ node, selected, onSelect, filter }: FileTreeProps) {
-  const [open, setOpen] = useState(true);
+{
+  "friendlyName": "file tree",
+  "description": "Renders a collapsible file tree with selectable nodes.",
+  "editCount": 2,
+  "tags": ["ui", "tree"],
+  "location": "src/components/FileTree",
+  "notes": "Highlights selected path, supports search filtering and collapse-all."
+}
+*/
+export function FileTree({
+  node,
+  selected,
+  onSelect,
+  filter,
+  collapseKey = 0,
+  isRoot = false,
+}: FileTreeProps) {
+  const [open, setOpen] = useState(isRoot);
   const isDir = !!node.children;
+  useEffect(() => {
+    if (isDir) setOpen(isRoot);
+  }, [collapseKey, isDir, isRoot]);
   if (!matchesFilter(node, filter)) return null;
+  const filteredChildren =
+    node.children?.filter((c) => matchesFilter(c, filter)) ?? [];
+  const ROW_HEIGHT = 24;
   return (
     <div className="ml-2">
       <div
@@ -82,15 +107,28 @@ export function FileTree({ node, selected, onSelect, filter }: FileTreeProps) {
       </div>
       {isDir && open && (
         <div className="ml-4">
-          {node.children?.map((child) => (
-            <FileTree
-              key={child.path}
-              node={child}
-              selected={selected}
-              onSelect={onSelect}
-              filter={filter}
-            />
-          ))}
+          <List
+            width={300}
+            height={Math.min(300, filteredChildren.length * ROW_HEIGHT)}
+            rowCount={filteredChildren.length}
+            rowHeight={ROW_HEIGHT}
+            overscanRowCount={5}
+            rowRenderer={({ index, key, style }) => {
+              const child = filteredChildren[index];
+              return (
+                <div key={key} style={style}>
+                  <FileTree
+                    key={child.path}
+                    node={child}
+                    selected={selected}
+                    onSelect={onSelect}
+                    filter={filter}
+                    collapseKey={collapseKey}
+                  />
+                </div>
+              );
+            }}
+          />
         </div>
       )}
     </div>
