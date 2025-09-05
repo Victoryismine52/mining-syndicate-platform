@@ -24,13 +24,13 @@ afterAll(() => {
   fs.rmSync(repoDir, { recursive: true, force: true });
 });
 
-describe("GET /functions", () => {
+describe("GET /code-explorer/api/functions", () => {
   it("returns function metadata", async () => {
     const app = express();
-    app.use("/functions", createFunctionsRouter(() => repoDir));
+    app.use("/code-explorer/api/functions", createFunctionsRouter(() => repoDir));
     const server = app.listen(0);
     const { port } = server.address() as any;
-    const res = await fetch(`http://localhost:${port}/functions`);
+    const res = await fetch(`http://localhost:${port}/code-explorer/api/functions`);
     const data = await res.json();
     server.close();
     expect(res.status).toBe(200);
@@ -40,12 +40,26 @@ describe("GET /functions", () => {
     ]);
   });
 
-  it("returns 400 when repository is not loaded", async () => {
+  it("filters by tag", async () => {
     const app = express();
-    app.use("/functions", createFunctionsRouter(() => null));
+    app.use("/code-explorer/api/functions", createFunctionsRouter(() => repoDir));
     const server = app.listen(0);
     const { port } = server.address() as any;
-    const res = await fetch(`http://localhost:${port}/functions`);
+    const res = await fetch(`http://localhost:${port}/code-explorer/api/functions?tag=util`);
+    const data = await res.json();
+    server.close();
+    expect(res.status).toBe(200);
+    expect(data).toEqual([
+      { name: "hi", signature: "hi(): any", path: "a.ts", tags: ["util"] },
+    ]);
+  });
+
+  it("returns 400 when repository is not loaded", async () => {
+    const app = express();
+    app.use("/code-explorer/api/functions", createFunctionsRouter(() => null));
+    const server = app.listen(0);
+    const { port } = server.address() as any;
+    const res = await fetch(`http://localhost:${port}/code-explorer/api/functions`);
     server.close();
     expect(res.status).toBe(400);
   });
@@ -53,10 +67,10 @@ describe("GET /functions", () => {
   it("returns 500 when scan fails", async () => {
     const app = express();
     // provide non-existent directory to trigger scan error
-    app.use("/functions", createFunctionsRouter(() => "/no/such/dir"));
+    app.use("/code-explorer/api/functions", createFunctionsRouter(() => "/no/such/dir"));
     const server = app.listen(0);
     const { port } = server.address() as any;
-    const res = await fetch(`http://localhost:${port}/functions`);
+    const res = await fetch(`http://localhost:${port}/code-explorer/api/functions`);
     server.close();
     expect(res.status).toBe(500);
   });

@@ -41,14 +41,14 @@ function parseFile(file, rootDir) {
   const sourceFile = ts.createSourceFile(file, sourceText, ts.ScriptTarget.Latest, true);
   const functions = [];
 
-  function addFunction(name, params, returnType, jsDocNode) {
+  function addFunction(name, params, returnType, jsDocNode, isAsync = false) {
     const tags = ts
       .getJSDocTags(jsDocNode)
       .filter((t) => t.tagName.getText(sourceFile) === 'tag')
       .map((t) => (t.comment ?? '').toString());
     functions.push({
       name,
-      signature: `${name}(${params}): ${returnType}`,
+      signature: `${isAsync ? 'async ' : ''}${name}(${params}): ${returnType}`,
       path: path.relative(rootDir, file),
       tags,
     });
@@ -60,7 +60,8 @@ function parseFile(file, rootDir) {
         .map((p) => p.getText(sourceFile))
         .join(', ');
       const returnType = node.type ? node.type.getText(sourceFile) : 'any';
-      addFunction(node.name.text, paramsText, returnType, node);
+      const isAsync = node.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+      addFunction(node.name.text, paramsText, returnType, node, isAsync);
     } else if (
       ts.isVariableDeclaration(node) &&
       ts.isIdentifier(node.name) &&
@@ -73,7 +74,8 @@ function parseFile(file, rootDir) {
         .map((p) => p.getText(sourceFile))
         .join(', ');
       const returnType = init.type ? init.type.getText(sourceFile) : 'any';
-      addFunction(node.name.text, paramsText, returnType, node);
+      const isAsync = init.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+      addFunction(node.name.text, paramsText, returnType, node, isAsync);
     }
     ts.forEachChild(node, visit);
   }
@@ -92,9 +94,13 @@ function parseFile(file, rootDir) {
   "notes": "Combines collectFiles and parseFile helpers."
 }
 */
-export function scan(dir) {
+export function scan(dir, options = {}) {
   const files = collectFiles(dir);
-  return files.flatMap((f) => parseFile(f, dir));
+  const results = files.flatMap((f) => parseFile(f, dir));
+  if (options.tag) {
+    return results.filter((fn) => fn.tags.includes(options.tag));
+  }
+  return results;
 }
 
 /**
