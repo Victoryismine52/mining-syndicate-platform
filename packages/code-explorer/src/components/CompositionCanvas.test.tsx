@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 import React from "react";
-import { render, screen, fireEvent, within } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { render, screen, fireEvent, within, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { CompositionCanvas, CompositionNode, Edge } from "./CompositionCanvas";
 
 function Wrapper({
@@ -25,9 +25,23 @@ function Wrapper({
 }
 
 describe("CompositionCanvas", () => {
+  afterEach(() => {
+    cleanup();
+  });
   it("places node on canvas when dropped", () => {
     render(<Wrapper />);
-    const canvas = screen.getByTestId("canvas");
+    const canvas = screen.getByTestId("canvas") as HTMLElement;
+    canvas.getBoundingClientRect = () => ({
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
 
     fireEvent.dragOver(canvas, { preventDefault: () => {} });
     fireEvent.drop(canvas, {
@@ -51,6 +65,35 @@ describe("CompositionCanvas", () => {
     fireEvent.click(screen.getByTestId("input-b"));
 
     expect(screen.getByTestId("edge-a-b")).toBeTruthy();
+  });
+
+  it("reports drop via onUpdate", () => {
+    const onUpdate = vi.fn();
+    render(
+      <CompositionCanvas nodes={[]} connections={[]} onUpdate={onUpdate} />,
+    );
+    const canvas = screen.getByTestId("canvas") as HTMLElement;
+    canvas.getBoundingClientRect = () => ({
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+    fireEvent.dragOver(canvas, { preventDefault: () => {} });
+    fireEvent.drop(canvas, {
+      dataTransfer: { getData: () => "fn" },
+      clientX: 20,
+      clientY: 25,
+    });
+
+    expect(onUpdate).toHaveBeenCalled();
+    const state = onUpdate.mock.calls[0][0];
+    expect(state.nodes[0].name).toBe("fn");
   });
 });
 
