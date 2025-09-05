@@ -19,7 +19,7 @@ export function FunctionBrowser({ onSelect }: Props) {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    fetch("/api/functions")
+    fetch("/code-explorer/api/functions")
       .then((res) => res.json())
       .then((data) => setFunctions(data))
       .catch(() => setFunctions([]));

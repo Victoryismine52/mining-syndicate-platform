@@ -36,6 +36,8 @@ drag-and-drop libraries, and dependency graph automation.
   fails to load; updated component state docs and tests.
 - Built a Function Browser component that fetches functions from the new API
   and supports drag-and-drop into the Composition Canvas; added tests.
+- Expanded Function Browser tests to cover the new `/code-explorer/api/functions`
+  endpoint and verify selection callbacks during drag events.
 
 ## 🔮 Future Designs
 - Cross-fade transitions when switching between the Function Browser, Canvas, and Code Pane.
