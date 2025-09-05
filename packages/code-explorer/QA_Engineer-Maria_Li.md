@@ -24,8 +24,9 @@ Prioritizing regression tests for large directory scans with nested symlinks and
 ## 📝 Current Task Notes
 - Added regression tests covering nested symlink directories and extensionless files in the save/patch flow.
 - Verified FileViewer falls back to raw text and emits warning toasts when syntax modules are missing or the editor crashes.
-- Implemented Playwright tests for API failure handling and drag-and-drop interactions between FunctionBrowser and CompositionCanvas.
-- Playwright validation now runs successfully, confirming drag-and-drop behavior and error handling.
+- Added unit test coverage for FunctionBrowser fetch failures to ensure a safe empty state.
+- Adjusted Playwright drag-and-drop spec to simulate network errors before mounting.
+- Playwright run in this environment fails to launch browsers; set up `npx playwright install` in CI.
 
 ## 🗂️ Project Notes
 - Completed review of recent bug reports to design targeted tests.

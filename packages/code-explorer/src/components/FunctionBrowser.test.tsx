@@ -16,6 +16,23 @@ describe("FunctionBrowser", () => {
   afterEach(() => {
     cleanup();
   });
+  it("handles API failure gracefully", async () => {
+    global.fetch = vi.fn().mockRejectedValue(new Error("fail"));
+
+    render(<FunctionBrowser />);
+
+    await waitFor(() => {
+      const items = screen
+        .queryAllByTestId(/function-/)
+        .filter(
+          (el) =>
+            !["function-browser", "function-search"].includes(
+              el.getAttribute("data-testid")!
+            ),
+        );
+      expect(items).toHaveLength(0);
+    });
+  });
   it("filters displayed functions", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>
