@@ -48,7 +48,11 @@ export async function loadLanguageFromPath(path: string): Promise<Extension[]> {
   try {
     const lang = await loaders[ext ?? ""]?.();
     return lang ? [lang] : [];
-  } catch {
+  } catch (err) {
+    console.warn(
+      `Failed to load language module for "${ext}". Rendering as plain text.`,
+      err
+    );
     return [];
   }
 }

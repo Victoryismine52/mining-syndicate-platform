@@ -23,6 +23,7 @@ Prioritizing regression tests for large directory scans with nested symlinks and
 
 ## 📝 Current Task Notes
 - Preparing test fixtures for nested symlink directories and extensionless files.
+- Added fixtures to emulate missing syntax modules and verify FileViewer warnings.
 
 ## 🗂️ Project Notes
 - Completed review of recent bug reports to design targeted tests.
