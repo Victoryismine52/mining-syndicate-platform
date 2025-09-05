@@ -39,12 +39,14 @@ function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<Ca
 
 function PreviewCard({ card }: { card: StoredCard }) {
   return (
-    <PreviewCanvas
-      theme={card.theme}
-      shadow={card.shadow}
-      lighting={card.lighting}
-      animation={card.animation}
-    >
+    <div className="flex flex-col items-center gap-2">
+      <div className="font-semibold">{card.name}</div>
+      <PreviewCanvas
+        theme={card.theme}
+        shadow={card.shadow}
+        lighting={card.lighting}
+        animation={card.animation}
+      >
       {card.elements.map((el) => {
         const def = elementLibrary.find((d) => d.id === el.elementId);
         if (!def) return null;
@@ -83,7 +85,8 @@ function PreviewCard({ card }: { card: StoredCard }) {
         }
         return null;
       })}
-    </PreviewCanvas>
+      </PreviewCanvas>
+    </div>
   );
 }
 
