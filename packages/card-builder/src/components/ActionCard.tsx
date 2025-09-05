@@ -10,6 +10,16 @@ interface ActionCardProps {
   onClick: () => void;
 }
 
+/**
+{
+  "friendlyName": "action card",
+  "description": "Reusable card component with icon, description and call-to-action.",
+  "editCount": 1,
+  "tags": ["ui", "card"],
+  "location": "packages/card-builder/src/components/ActionCard.tsx > ActionCard",
+  "notes": "Triggers provided onClick handler when button is pressed."
+}
+*/
 export function ActionCard({ icon: Icon, title, description, cta, onClick }: ActionCardProps) {
   return (
     <Card className="w-full max-w-sm transition-shadow hover:shadow-md">

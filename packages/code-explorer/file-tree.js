@@ -2,12 +2,15 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * Type: Recursive utility function
- * Location: packages/code-explorer/file-tree.js > buildFileTree
- * Description: Builds an object representing the directory structure of a path.
- * Notes: Skips .git and node_modules folders during traversal.
- * EditCounter: 1
- */
+{
+  "friendlyName": "build file tree",
+  "description": "Builds an object representing the directory structure of a path.",
+  "editCount": 2,
+  "tags": [],
+  "location": "packages/code-explorer/file-tree.js > buildFileTree",
+  "notes": "Skips .git and node_modules folders during traversal."
+}
+*/
 export function buildFileTree(dir) {
   const name = path.basename(dir);
   const item = { name, path: dir };

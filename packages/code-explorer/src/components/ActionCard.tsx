@@ -11,12 +11,15 @@ interface ActionCardProps {
 }
 
 /**
- * Type: React component
- * Location: packages/code-explorer/src/components/ActionCard.tsx > ActionCard
- * Description: Displays a clickable card used on the explorer landing page.
- * Notes: Renders provided icon, title and call-to-action button.
- * EditCounter: 1
- */
+{
+  "friendlyName": "action card",
+  "description": "Displays a clickable card used on the explorer landing page.",
+  "editCount": 2,
+  "tags": ["ui", "card"],
+  "location": "packages/code-explorer/src/components/ActionCard.tsx > ActionCard",
+  "notes": "Renders provided icon, title and call-to-action button."
+}
+*/
 export function ActionCard({ icon: Icon, title, description, cta, onClick }: ActionCardProps) {
   return (
     <Card className="w-full max-w-sm transition-shadow hover:shadow-md">

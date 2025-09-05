@@ -18,12 +18,15 @@ interface FileTreeProps {
 }
 
 /**
- * Type: Helper function
- * Location: packages/code-explorer/src/components/FileTree.tsx > matchesFilter
- * Description: Checks if a tree node or its descendants match the search filter.
- * Notes: Recursively examines child nodes.
- * EditCounter: 1
- */
+{
+  "friendlyName": "matches filter",
+  "description": "Checks if a tree node or its descendants match the search filter.",
+  "editCount": 2,
+  "tags": [],
+  "location": "packages/code-explorer/src/components/FileTree.tsx > matchesFilter",
+  "notes": "Recursively examines child nodes."
+}
+*/
 function matchesFilter(node: TreeNode, filter: string): boolean {
   if (!filter) return true;
   const lower = filter.toLowerCase();
@@ -32,12 +35,15 @@ function matchesFilter(node: TreeNode, filter: string): boolean {
 }
 
 /**
- * Type: Helper function
- * Location: packages/code-explorer/src/components/FileTree.tsx > fileColor
- * Description: Returns a Tailwind text color class based on file extension.
- * Notes: Used for syntax-aware coloring in the tree.
- * EditCounter: 1
- */
+{
+  "friendlyName": "file color",
+  "description": "Returns a Tailwind text color class based on file extension.",
+  "editCount": 2,
+  "tags": [],
+  "location": "packages/code-explorer/src/components/FileTree.tsx > fileColor",
+  "notes": "Used for syntax-aware coloring in the tree."
+}
+*/
 function fileColor(name: string): string {
   if (/\.(ts|tsx|js|jsx)$/.test(name)) return "text-blue-500";
   if (/\.json$/.test(name)) return "text-green-500";
