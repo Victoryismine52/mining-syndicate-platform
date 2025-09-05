@@ -25,17 +25,18 @@
 - Code highlighting uses Prism grammars.
 - When a language definition is missing or Prism throws, `highlightCode` returns the original string so the viewer renders plain text instead of crashing.
 
-## Function Index & UI Flow
-- The **function-index API** at `GET /api/functions` returns metadata for each repository function. The index is generated at startup by `server/function-index.ts`.
-- Response shape:
+## Function Index & `FunctionBrowser` Flow
+- `GET /api/functions` exposes the prebuilt **function index** generated at startup by `server/function-index.ts`. Each entry includes a function's name, path, line number, and optional tags.
+- Sample response:
   ```json
   [
     { "name": "add", "path": "src/math.ts", "line": 12, "tags": ["math"] }
   ]
   ```
-- The `FunctionBrowser` panel consumes this endpoint and lets users search or filter for functions.
-  - Open the browser, search or filter by tag, and drag a function onto the `CompositionCanvas`.
-  - Dropping the function creates a node and begins a new flow.
+- The **FunctionBrowser** panel queries this endpoint and supports search, filtering, and drag-and-drop:
+  1. Open the browser from the explorer sidebar.
+  2. Search or filter by tag to locate a function.
+  3. Drag the function onto the `CompositionCanvas` to create a node and start a new flow.
 
 ## Release Notes Automation
 - Changelog generation script: `node packages/code-explorer/scripts/generate-changelog.js CHANGELOG.md`.
