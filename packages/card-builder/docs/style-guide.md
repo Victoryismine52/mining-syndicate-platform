@@ -10,6 +10,14 @@
 - Use `camelCase` for function names and `PascalCase` for components.
 - File names are `kebab-case.md`.
 
+## Headings
+- Use sentence case for all headings.
+- Keep sections short; if a heading has only one sentence, consider folding it into the parent section.
+
+## Links
+- Use descriptive text like `[Exporting Cards](exporting-cards.md)` instead of bare URLs.
+- Prefer relative paths when linking to other docs in this package.
+
 ## Code Blocks
 - Annotate code fences with the language: ```` ```ts```` or ```` ```json````.
 - Keep examples focused and no wider than 80 characters.
