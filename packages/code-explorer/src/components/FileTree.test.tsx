@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 import React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeAll } from "vitest";
 import { FileTree, TreeNode } from "./FileTree";
 
 vi.mock("lucide-react", () => ({
@@ -25,6 +25,18 @@ const tree: TreeNode = {
 };
 
 afterEach(() => cleanup());
+// react-virtualized relies on layout measurements, which are zeroed in JSDOM.
+// Provide fixed offsets so the virtualized List can compute its dimensions.
+beforeAll(() => {
+  Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+    configurable: true,
+    value: 500,
+  });
+  Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+    configurable: true,
+    value: 500,
+  });
+});
 
 describe("FileTree", () => {
   it("renders directories and files", () => {
@@ -78,7 +90,8 @@ describe("FileTree", () => {
     const { rerender } = render(
       <FileTree node={large} selected={null} onSelect={onSelect} filter="" isRoot />
     );
-    expect(screen.getAllByTestId("file-text").length).toBeLessThan(50);
+    // Only a subset of rows should be rendered due to virtualization.
+    expect(screen.getAllByTestId("file-text").length).toBeLessThanOrEqual(25);
     expect(screen.queryByText("file999.txt")).toBeNull();
     rerender(
       <FileTree node={large} selected={null} onSelect={onSelect} filter="file999" isRoot />
