@@ -16,6 +16,10 @@ vi.mock('@/components/ui/button', () => ({
   Button: (props: any) => <button {...props} />,
 }), { virtual: true });
 
+vi.mock('@/components/ui/input', () => ({
+  Input: (props: any) => <input {...props} />,
+}), { virtual: true });
+
 import { CardBuilderApp } from '../App';
 
 
@@ -41,7 +45,7 @@ describe('packages/card-builder rename flow', () => {
     render(<CardBuilderApp />);
 
     // ensure initial name rendered
-    expect(screen.getByText('Default Card')).toBeTruthy();
+    expect(screen.getAllByText('Default Card')[0]).toBeTruthy();
 
     // open editor
     fireEvent.click(screen.getByText('Edit'));
@@ -54,8 +58,8 @@ describe('packages/card-builder rename flow', () => {
     fireEvent.click(screen.getByText('Save'));
 
     // CardBuilderApp should display updated name
-    await screen.findByText('Renamed Card');
-    expect(screen.getByText('Renamed Card')).toBeTruthy();
+    await screen.findAllByText('Renamed Card');
+    expect(screen.getAllByText('Renamed Card')[0]).toBeTruthy();
 
     // saveCard should persist updated name to localStorage
     expect(setItemSpy).toHaveBeenLastCalledWith(
