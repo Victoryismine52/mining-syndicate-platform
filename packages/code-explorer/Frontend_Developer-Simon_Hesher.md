@@ -19,12 +19,19 @@ Simon specializes in transforming technical requirements into polished user expe
 - Timezone: UTC−05:00
 
 ## 🎯 Current Assignment
-Enhancing the code explorer's UI and UX for responsive, seamless navigation.
+Finalizing navigation updates and documentation while researching AST indexing,
+drag-and-drop libraries, and dependency graph automation.
 
 ## 📝 Current Task Notes
-- Refining navigation components for clarity and accessibility.
-- Collaborating with design on theme updates to improve readability.
-- Documenting prop and state requirements for upcoming explorer components.
+- Archive feature decisions and interview findings for future cycles.
+- Document component props/state and ensure UI changes follow design and
+  accessibility standards.
+- Capture research outcomes for AST indexing, drag-and-drop libraries,
+  multi-file patch algorithms, and dependency graph automation.
+- Coordinate release timelines with the server team to minimize integration
+  delays.
+- Expand regression testing guidance for large directory scans with nested
+  symlinks and files without extensions.
 
 ## 🔮 Future Designs
 - Cross-fade transitions when switching between the Function Browser, Canvas, and Code Pane.
