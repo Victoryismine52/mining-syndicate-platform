@@ -19,14 +19,15 @@ Maria brings a detail-oriented mindset shaped by years of testing complex web ap
 - Timezone: UTC+08:00
 
 ## 🎯 Current Assignment
-Expanding regression test suites for the code explorer package.
+Prioritizing regression tests for large directory scans with nested symlinks and files without extensions.
 
 ## 📝 Current Task Notes
-- Reviewing recent bug reports to design targeted tests.
+- Preparing test fixtures for nested symlink directories and extensionless files.
 
 ## 🗂️ Project Notes
-- Intermittent failure when scanning large directories; reproduction requires nested symlinks.
-- Syntax highlighter occasionally misinterprets files without extensions.
+- Completed review of recent bug reports to design targeted tests.
+- Resolved intermittent failure when scanning large directories; required nested symlink coverage.
+- Resolved syntax highlighter misinterpreting files without extensions.
 
 ## 🚨 Urgent Notes
 
