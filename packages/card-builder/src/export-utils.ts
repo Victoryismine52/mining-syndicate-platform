@@ -2,6 +2,7 @@ import { ElementInstance, elementLibrary, DisplayMode } from "./elements";
 import { generateOpenApi } from "./exportApi";
 
 export interface CardConfig {
+  /** Human-readable card name */
   name: string;
   elements: ElementInstance[];
   theme: string;
