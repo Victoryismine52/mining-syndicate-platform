@@ -13,6 +13,8 @@ What excites me about the **Card Builder** is its promise of giving anyone the p
 - **[2025‑09‑07]** Worked with Jade to define the look and feel of our editor and wrote the first draft of the Card Builder README.  Encouraged everyone to write in their persona files as if they were keeping a travel diary.
 - **[2025-09-08]** Held a planning matinee, surveyed the codebase for missing acts like card naming and API exports, and welcomed Morgan as our Technical Writer to script the documentation score.
 
+- **[2025-09-09]** Clarified onboarding in `AGENT.md` with orientation steps, task stubs, and a reminder to log persona profile updates.
+
 ## What I’m Doing
 
 I’m orchestrating our next sprint, spotlighting three numbers: intuitive card naming, a clearer API generator and documentation that reads like sheet music.  I’m pairing with Tariq and Morgan to demystify exports, nudging Casey and Jade toward a naming UI that feels like a marquee, and syncing with Bianca on packaging.  Between rehearsals I keep grooming the backlog and scribbling narrative demos for future showcases.
