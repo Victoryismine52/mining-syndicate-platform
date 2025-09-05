@@ -216,12 +216,14 @@ function CardItem({
 
 // ---- Code serialization helpers -----------------------------------------
 export function buildConfig({
+  name,
   elements,
   theme,
   shadow,
   lighting,
   animation,
 }: {
+  name: string;
   elements: ElementInstance[];
   theme: string;
   shadow: string;
@@ -229,6 +231,7 @@ export function buildConfig({
   animation: string;
 }) {
   return {
+    name,
     theme,
     shadow,
     lighting,
@@ -243,6 +246,7 @@ export function buildConfig({
 }
 
 export function parseConfig(json: string): {
+  name: string;
   elements: ElementInstance[];
   theme: string;
   shadow: string;
@@ -270,6 +274,7 @@ export function parseConfig(json: string): {
           .filter(Boolean)
       : [];
     return {
+      name: typeof obj.name === "string" ? obj.name : "Untitled Card",
       elements,
       theme: obj.theme || "light",
       shadow: obj.shadow || "none",
@@ -283,6 +288,7 @@ export function parseConfig(json: string): {
 
 // ---- Main app ------------------------------------------------------------
 export interface CardConfig {
+  name: string;
   elements: ElementInstance[];
   theme: string;
   shadow: string;
@@ -291,6 +297,7 @@ export interface CardConfig {
 }
 
 export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; onSave: (config: CardConfig) => void; onBack: () => void; }) {
+  const [name, setName] = useState("Untitled Card");
   const [elements, setElements] = useState<ElementInstance[]>([]);
   const [theme, setTheme] = useState("light");
   const [shadow, setShadow] = useState("none");
@@ -302,6 +309,7 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
 
   useEffect(() => {
     if (initial) {
+      setName(initial.name);
       setElements(initial.elements || []);
       setTheme(initial.theme);
       setShadow(initial.shadow);
@@ -311,8 +319,14 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
   }, [initial]);
 
   useEffect(() => {
-    setCode(JSON.stringify(buildConfig({ elements, theme, shadow, lighting, animation }), null, 2));
-  }, [elements, theme, shadow, lighting, animation]);
+    setCode(
+      JSON.stringify(
+        buildConfig({ name, elements, theme, shadow, lighting, animation }),
+        null,
+        2,
+      ),
+    );
+  }, [name, elements, theme, shadow, lighting, animation]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { over, active } = event;
@@ -370,7 +384,7 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
 
   const exportJson = () => {
     const data = JSON.stringify(
-      buildConfig({ elements, theme, shadow, lighting, animation }),
+      buildConfig({ name, elements, theme, shadow, lighting, animation }),
       null,
       2,
     );
@@ -389,6 +403,7 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
       alert("Invalid JSON configuration");
       return;
     }
+    setName(parsed.name);
     setElements(parsed.elements);
     setTheme(parsed.theme);
     setShadow(parsed.shadow);
@@ -400,6 +415,12 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
   return (
     <div className="p-4 space-y-4 text-sm">
       <div className="flex gap-2 items-center flex-wrap">
+        <label>Name:</label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="border px-2 py-1"
+        />
         <label>Theme:</label>
         <select
           value={theme}
@@ -445,7 +466,15 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
         </select>
 
         <Button onClick={onBack} variant="outline">Back</Button>
-        <Button onClick={() => onSave(buildConfig({ elements, theme, shadow, lighting, animation }))}>Save</Button>
+        <Button
+          onClick={() =>
+            onSave(
+              buildConfig({ name, elements, theme, shadow, lighting, animation }),
+            )
+          }
+        >
+          Save
+        </Button>
         <Button onClick={() => setShowCode((v) => !v)} className="ml-auto">
           {showCode ? "Design View" : "Code View"}
         </Button>
