@@ -1,6 +1,12 @@
 # Mining Syndicate Platform
 
-See [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions. Consult [Exporting Cards](docs/exporting-cards.md) to download card modules with JSON or OpenAPI specs, and follow our [Documentation Style Guide](docs/style-guide.md). Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
+See our key guides:
+
+- [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions.
+- [Exporting Cards](docs/exporting-cards.md) to download card modules with `JSON` or `OpenAPI` specs.
+- [Documentation Style Guide](docs/style-guide.md) for writing tone and formatting.
+
+Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
 
 ## Development
 
