@@ -15,6 +15,7 @@ For the **Card Builder**, I’m designing the invisible scaffolding: the service
 - **[2025‑09‑09]** Hardened card loading by wrapping `localStorage` parsing in `try/catch`, logging corrupt data and offering an inline reset so designers can recover without reloads.
 - **[2025‑09‑10]** Finalised the `exportApi` module and wired the editor to `exportAssets`, so a single click now yields both `card.json` and a matching OpenAPI `card.yaml`.
 - **[2025‑09‑11]** Re-read the team `AGENT.md` to stay in sync and confirmed the export pipeline and storage safeguards are working as designed.
+- **[2025‑09‑12]** Added explicit operation IDs to the OpenAPI generator so downstream services can hook into each element's endpoint by name. Verified storage error handling stays inline and friendly.
 
 ## What I’m Doing
 With the export pipeline humming, I’m sketching a plugin system so different runtime targets can extend the generator.  Next up is hardening validation and wiring serverless deployment hooks.
