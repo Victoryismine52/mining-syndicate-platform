@@ -1,6 +1,6 @@
 # Mining Syndicate Platform
 
-See [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions. Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
+See [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions. Consult [Exporting Cards](docs/exporting-cards.md) to turn Card Builder creations into reusable modules, and follow our [Documentation Style Guide](docs/style-guide.md). Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
 
 ## Development
 
