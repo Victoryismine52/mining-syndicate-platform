@@ -11,7 +11,7 @@ test('exports assets with current card name', async ({ mount, page }) => {
   await mount(<CardEditor onSave={() => {}} onBack={() => {}} />);
   await page.locator('input').first().fill('Cross Browser Card');
 
-  const exportButton = page.getByText('Export JSON');
+  const exportButton = page.getByText('Export Assets');
   const [jsonDownload, yamlDownload] = await Promise.all([
     page.waitForEvent('download'),
     page.waitForEvent('download'),
