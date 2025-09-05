@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
+import type { Extension } from "@codemirror/state";
 import { createTwoFilesPatch } from "diff";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,16 +13,51 @@ interface Props {
 {
   "friendlyName": "file viewer",
   "description": "Fetches and displays highlighted source code with line numbers.",
-  "editCount": 3,
+  "editCount": 4,
   "tags": ["ui", "code"],
   "location": "src/components/FileViewer",
   "notes": "Provides copy and fullscreen controls for the current file."
 }
 */
+export async function loadLanguageFromPath(path: string): Promise<Extension[]> {
+  const ext = path.split(".").pop()?.toLowerCase();
+  const loaders: Record<string, () => Promise<Extension>> = {
+    js: () =>
+      import(/* @vite-ignore */ "@codemirror/lang-javascript").then((m) =>
+        m.javascript()
+      ),
+    jsx: () =>
+      import(/* @vite-ignore */ "@codemirror/lang-javascript").then((m) =>
+        m.javascript({ jsx: true })
+      ),
+    ts: () =>
+      import(/* @vite-ignore */ "@codemirror/lang-javascript").then((m) =>
+        m.javascript({ typescript: true })
+      ),
+    tsx: () =>
+      import(/* @vite-ignore */ "@codemirror/lang-javascript").then((m) =>
+        m.javascript({ jsx: true, typescript: true })
+      ),
+    json: () =>
+      import(/* @vite-ignore */ "@codemirror/lang-json").then((m) => m.json()),
+    css: () =>
+      import(/* @vite-ignore */ "@codemirror/lang-css").then((m) => m.css()),
+    html: () =>
+      import(/* @vite-ignore */ "@codemirror/lang-html").then((m) => m.html()),
+  };
+  try {
+    const lang = await loaders[ext ?? ""]?.();
+    return lang ? [lang] : [];
+  } catch {
+    return [];
+  }
+}
+
 export function FileViewer({ path }: Props) {
   const [code, setCode] = useState("");
   const [original, setOriginal] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
+  const [extensions, setExtensions] = useState<Extension[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -43,6 +78,10 @@ export function FileViewer({ path }: Props) {
       setOriginal(text);
     }
     if (path) load();
+  }, [path]);
+
+  useEffect(() => {
+    loadLanguageFromPath(path).then(setExtensions);
   }, [path]);
 
   async function handleSave() {
@@ -81,7 +120,7 @@ export function FileViewer({ path }: Props) {
         <CodeMirror
           value={code}
           height="100%"
-          extensions={[javascript({ jsx: true, typescript: true })]}
+          extensions={extensions}
           onChange={(value) => setCode(value)}
         />
       </div>

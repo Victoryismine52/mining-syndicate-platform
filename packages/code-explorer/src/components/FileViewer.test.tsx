@@ -2,7 +2,6 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { FileViewer } from "./FileViewer";
 
 const toast = vi.fn();
 
@@ -14,14 +13,33 @@ vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast }),
 }));
 
+import { FileViewer, loadLanguageFromPath } from "./FileViewer";
+import { javascript } from "@codemirror/lang-javascript";
+
 const originalFetch = global.fetch;
 
 beforeEach(() => {
-  vi.restoreAllMocks();
+  vi.clearAllMocks();
 });
 
 afterEach(() => {
   global.fetch = originalFetch;
+});
+
+describe("loadLanguageFromPath", () => {
+  it("loads javascript module for ts files", async () => {
+    javascript.mockClear();
+    const exts = await loadLanguageFromPath("/repo/file.ts");
+    expect(javascript).toHaveBeenCalled();
+    expect(exts).toHaveLength(1);
+  });
+
+  it("falls back to plain text for unknown extensions", async () => {
+    javascript.mockClear();
+    const exts = await loadLanguageFromPath("/repo/file.unknown");
+    expect(javascript).not.toHaveBeenCalled();
+    expect(exts).toEqual([]);
+  });
 });
 
 describe("FileViewer", () => {
