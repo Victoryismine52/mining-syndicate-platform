@@ -7,7 +7,7 @@ import { CardEditor } from '../Editor';
 // card and exporting assets behaves the same everywhere. The Playwright config
 // already defines Chromium, Firefox and WebKit projects so this single test
 // will execute in each browser.
-test('exports assets with current card name', async ({ mount, page }) => {
+test('exports card.json and card.yaml with current card name', async ({ mount, page }) => {
   await mount(<CardEditor onSave={() => {}} onBack={() => {}} />);
   await page.locator('input').first().fill('Cross Browser Card');
 
