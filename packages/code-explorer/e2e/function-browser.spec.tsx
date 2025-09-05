@@ -21,6 +21,14 @@ test('handles API failure gracefully', async ({ mount, page }) => {
     await expect(component.locator('[data-testid^="function-"]')).toHaveCount(0);
   });
 
+  test('shows empty list when API returns 404', async ({ mount, page }) => {
+    await page.route('**/api/functions', route =>
+      route.fulfill({ status: 404, body: 'not found' })
+    );
+    const component = await mount(<FunctionBrowser />);
+    await expect(component.locator('[data-testid^="function-"]')).toHaveCount(0);
+  });
+
   test('drags function to composition canvas', async ({ mount, page }) => {
     await page.route('**/api/functions', route =>
       route.fulfill({
@@ -91,6 +99,41 @@ test('handles API failure gracefully', async ({ mount, page }) => {
     await bar.dragTo(canvas);
     await expect(component.getByText('foo')).toBeVisible();
     await expect(component.getByText('bar')).toBeVisible();
+  });
+
+  test('drags same function twice to canvas', async ({ mount, page }) => {
+    await page.route('**/api/functions', route =>
+      route.fulfill({
+        status: 200,
+        body: JSON.stringify([
+          { name: 'foo', signature: '', path: 'a.ts', tags: [] }
+        ])
+      })
+    );
+
+    const Wrapper = () => {
+      const [state, setState] = React.useState({
+        nodes: [] as CompositionNode[],
+        connections: [] as Edge[],
+      });
+      return (
+        <div className="flex">
+          <FunctionBrowser />
+          <CompositionCanvas
+            nodes={state.nodes}
+            connections={state.connections}
+            onUpdate={setState}
+          />
+        </div>
+      );
+    };
+
+    const component = await mount(<Wrapper />);
+    const fn = component.locator('[data-testid="function-foo"]');
+    const canvas = component.locator('[data-testid="canvas"]');
+    await fn.dragTo(canvas);
+    await fn.dragTo(canvas);
+    await expect(component.locator('[data-testid="canvas"] >> text=foo')).toHaveCount(2);
   });
 });
 

@@ -33,6 +33,26 @@ describe("FunctionBrowser", () => {
       expect(items).toHaveLength(0);
     });
   });
+
+  it("shows empty list when API returns error status", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () => Promise.reject(new Error("server error")),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    await waitFor(() => {
+      const items = screen
+        .queryAllByTestId(/function-/)
+        .filter(
+          (el) =>
+            !["function-browser", "function-search"].includes(
+              el.getAttribute("data-testid")!,
+            ),
+        );
+      expect(items).toHaveLength(0);
+    });
+  });
   it("filters displayed functions", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>
