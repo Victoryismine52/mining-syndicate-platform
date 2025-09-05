@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronRight, ChevronDown, Folder, FileText } from "lucide-react";
+import { List } from "react-virtualized";
 import clsx from "clsx";
 
 export interface TreeNode {
@@ -75,6 +76,9 @@ export function FileTree({
     if (isDir) setOpen(isRoot);
   }, [collapseKey, isDir, isRoot]);
   if (!matchesFilter(node, filter)) return null;
+  const filteredChildren =
+    node.children?.filter((c) => matchesFilter(c, filter)) ?? [];
+  const ROW_HEIGHT = 24;
   return (
     <div className="ml-2">
       <div
@@ -103,16 +107,28 @@ export function FileTree({
       </div>
       {isDir && open && (
         <div className="ml-4">
-          {node.children?.map((child) => (
-            <FileTree
-              key={child.path}
-              node={child}
-              selected={selected}
-              onSelect={onSelect}
-              filter={filter}
-              collapseKey={collapseKey}
-            />
-          ))}
+          <List
+            width={300}
+            height={Math.min(300, filteredChildren.length * ROW_HEIGHT)}
+            rowCount={filteredChildren.length}
+            rowHeight={ROW_HEIGHT}
+            overscanRowCount={5}
+            rowRenderer={({ index, key, style }) => {
+              const child = filteredChildren[index];
+              return (
+                <div key={key} style={style}>
+                  <FileTree
+                    key={child.path}
+                    node={child}
+                    selected={selected}
+                    onSelect={onSelect}
+                    filter={filter}
+                    collapseKey={collapseKey}
+                  />
+                </div>
+              );
+            }}
+          />
         </div>
       )}
     </div>

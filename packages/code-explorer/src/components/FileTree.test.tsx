@@ -64,5 +64,28 @@ describe("FileTree", () => {
     );
     expect(screen.queryByText("index.ts")).toBeNull();
   });
+
+  it("virtualizes large trees and preserves filtering and selection", () => {
+    const large: TreeNode = {
+      name: "root",
+      path: "/root",
+      children: Array.from({ length: 1000 }, (_, i) => ({
+        name: `file${i}.txt`,
+        path: `/root/file${i}.txt`,
+      })),
+    };
+    const onSelect = vi.fn();
+    const { rerender } = render(
+      <FileTree node={large} selected={null} onSelect={onSelect} filter="" isRoot />
+    );
+    expect(screen.getAllByTestId("file-text").length).toBeLessThan(50);
+    expect(screen.queryByText("file999.txt")).toBeNull();
+    rerender(
+      <FileTree node={large} selected={null} onSelect={onSelect} filter="file999" isRoot />
+    );
+    const target = screen.getByText("file999.txt");
+    fireEvent.click(target);
+    expect(onSelect).toHaveBeenCalledWith("/root/file999.txt");
+  });
 });
 
