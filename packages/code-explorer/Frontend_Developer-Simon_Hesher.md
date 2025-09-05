@@ -34,6 +34,8 @@ drag-and-drop libraries, and dependency graph automation.
   symlinks and files without extensions.
 - Implemented a plain-text fallback in FileViewer when CodeMirror or a grammar
   fails to load; updated component state docs and tests.
+- Built a Function Browser component that fetches functions from the new API
+  and supports drag-and-drop into the Composition Canvas; added tests.
 
 ## 🔮 Future Designs
 - Cross-fade transitions when switching between the Function Browser, Canvas, and Code Pane.

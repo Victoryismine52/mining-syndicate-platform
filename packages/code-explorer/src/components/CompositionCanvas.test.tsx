@@ -5,11 +5,9 @@ import { describe, it, expect } from "vitest";
 import { CompositionCanvas, CompositionNode, Edge } from "./CompositionCanvas";
 
 function Wrapper({
-  functions = [],
   initialNodes = [],
   initialConnections = [],
 }: {
-  functions?: string[];
   initialNodes?: CompositionNode[];
   initialConnections?: Edge[];
 }) {
@@ -19,7 +17,6 @@ function Wrapper({
   });
   return (
     <CompositionCanvas
-      functions={functions}
       nodes={state.nodes}
       connections={state.connections}
       onUpdate={setState}
@@ -29,15 +26,9 @@ function Wrapper({
 
 describe("CompositionCanvas", () => {
   it("places node on canvas when dropped", () => {
-    render(<Wrapper functions={["fn"]} />);
-    const palette = screen.getByTestId("palette-fn");
+    render(<Wrapper />);
     const canvas = screen.getByTestId("canvas");
 
-    fireEvent.dragStart(palette, {
-      dataTransfer: {
-        setData: () => {},
-      },
-    });
     fireEvent.dragOver(canvas, { preventDefault: () => {} });
     fireEvent.drop(canvas, {
       dataTransfer: { getData: () => "fn" },
@@ -54,13 +45,7 @@ describe("CompositionCanvas", () => {
       { id: "a", name: "A", x: 0, y: 0 },
       { id: "b", name: "B", x: 150, y: 0 },
     ];
-    render(
-      <Wrapper
-        functions={[]}
-        initialNodes={nodes}
-        initialConnections={[]}
-      />
-    );
+    render(<Wrapper initialNodes={nodes} initialConnections={[]} />);
 
     fireEvent.click(screen.getByTestId("output-a"));
     fireEvent.click(screen.getByTestId("input-b"));

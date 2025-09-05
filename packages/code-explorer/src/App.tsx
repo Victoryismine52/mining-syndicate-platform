@@ -18,6 +18,7 @@ import {
   CompositionNode,
   Edge,
 } from "./components/CompositionCanvas";
+import { FunctionBrowser } from "./components/FunctionBrowser";
 
 /**
 {
@@ -209,7 +210,6 @@ export function CodeExplorerApp() {
 
   if (screen === "explorer") {
     const activePath = tabs[active];
-    const relative = activePath && tree ? activePath.replace(tree.path + "/", "") : null;
     return (
       <div className="flex h-screen">
         <div className="w-64 border-r p-2 flex flex-col">
@@ -265,9 +265,9 @@ export function CodeExplorerApp() {
                 </div>
                 {activePath && <FileViewer path={activePath} />}
               </div>
-              <div className="w-1/2 border-l pl-4">
+              <div className="w-1/2 border-l pl-4 flex">
+                <FunctionBrowser />
                 <CompositionCanvas
-                  functions={relative ? [relative] : []}
                   nodes={composition.nodes}
                   connections={composition.connections}
                   onUpdate={setComposition}
