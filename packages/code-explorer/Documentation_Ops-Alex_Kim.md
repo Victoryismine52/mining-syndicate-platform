@@ -25,6 +25,12 @@ Standardize repository documentation and automate release notes.
 
 ## 🗂️ Project Notes
 - Reference documentation kept in `/docs`; update as features stabilize.
+- Recent team check-in:
+  - **Product:** user interviews underway and acceptance criteria being finalized; align release timelines across server and frontend teams.
+  - **Tech Lead:** initial architecture drafted; research needed for AST indexing, drag-and-drop libraries, diff/patch algorithms, and automated dependency graphs.
+  - **Frontend:** refining navigation components, collaborating on theme readability, and documenting component props and state.
+  - **QA:** expanding regression suites; investigate failures when scanning nested symlinks and highlighting files without extensions.
+- Next steps: archive decisions each cycle, document edge-case findings, and coordinate cross-team schedules.
 
 ## 🚨 Urgent Notes
 
