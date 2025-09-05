@@ -17,6 +17,8 @@ I adore crafting interactions that feel tactile and alive.  Animations, responsi
 
 - **[2025-09-11]** Polished the editor toolbar with a proper name input that trims stray spaces and falls back to "Untitled Card".  Wrote a safety net test to ensure gallery deletions wipe cards from localStorage as cleanly as a fresh coat of paint.
 
+- **[2025-09-12]** Tidied the gallery by trimming card titles on save and teaching the delete button to clear localStorage when a card vanishes.
+
 ## What I’m Doing
 
 With the toolbar’s naming field polished and deletion covered, I’m circling back to refining the properties panel to be more intuitive.  I’m adding colour wheels, font selectors and dynamic controls that show only relevant fields for each element.  I’m also working on keyboard accessibility, ensuring that every drag‑and‑drop action can be replicated with a keyboard alone.  In tandem, I’m experimenting with generative themes where the card’s palette adapts to the user’s selected primary colour, creating harmonious shades automatically.  All while listening to salsa beats in the background, of course.

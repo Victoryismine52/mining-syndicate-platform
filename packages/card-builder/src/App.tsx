@@ -107,6 +107,14 @@ export function CardBuilderApp() {
   const [error, setError] = useState<string | null>(initialError);
   const [editing, setEditing] = useState<StoredCard | null>(null);
 
+  const persistCards = (list: StoredCard[]) => {
+    if (list.length) {
+      localStorage.setItem("cards", JSON.stringify(list));
+    } else {
+      localStorage.removeItem("cards");
+    }
+  };
+
   const resetStorage = () => {
     localStorage.removeItem("cards");
     setCards([]);
@@ -117,7 +125,7 @@ export function CardBuilderApp() {
     if (!window.confirm("Delete this card?")) return;
     setCards((prev) => {
       const list = prev.filter((c) => c.id !== id);
-      localStorage.setItem("cards", JSON.stringify(list));
+      persistCards(list);
       return list;
     });
   };
@@ -129,7 +137,7 @@ export function CardBuilderApp() {
       const list = prev.some((c) => c.id === updated.id)
         ? prev.map((c) => (c.id === updated.id ? updated : c))
         : [...prev, updated];
-      localStorage.setItem("cards", JSON.stringify(list));
+      persistCards(list);
       return list;
     });
     setEditing(null);
