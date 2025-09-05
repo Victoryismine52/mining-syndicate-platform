@@ -16,14 +16,14 @@
 - Profiles include sections for Introduction, Biography, Core Skills & Tools, Contact & Availability, Current Assignment, Current Task Notes, Project Notes, and Urgent Notes (leave empty when nothing is pressing).
 - Update your profile whenever your assignment or availability changes and at least once per sprint.
 
-## Function Index & UI Flow
-- `GET /api/functions` returns an array of scanned function metadata.
+## Function Index & `FunctionBrowser` Flow
+- `GET /api/functions` returns the prebuilt function index generated at startup by `server/function-index.ts`.
   ```json
   [
     { "name": "add", "path": "src/math.ts", "line": 12, "tags": ["math"] }
   ]
   ```
-- The `FunctionBrowser` panel fetches this list and supports search, filtering, and drag-and-drop.
+- The `FunctionBrowser` panel fetches this list and supports search, filtering, and drag-and-drop:
   1. Open the browser and search or filter by tag.
   2. Drag a function onto the `CompositionCanvas` to create a node.
   3. Connect nodes to build flows.
