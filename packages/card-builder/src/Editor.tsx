@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { DndContext } from "@dnd-kit/core";
 import { Palette } from "./components/Palette";
 import { CardCanvas } from "./components/CardCanvas";
@@ -56,9 +57,17 @@ export function CardEditor({
   }, [initial, setElements]);
 
   useEffect(() => {
+    const resolvedName = name.trim() || "Untitled Card";
     setCode(
       JSON.stringify(
-        buildConfig({ name, elements, theme, shadow, lighting, animation }),
+        buildConfig({
+          name: resolvedName,
+          elements,
+          theme,
+          shadow,
+          lighting,
+          animation,
+        }),
         null,
         2,
       ),
@@ -85,11 +94,13 @@ export function CardEditor({
   return (
     <div className="p-4 space-y-4 text-sm">
       <div className="flex gap-2 items-center flex-wrap">
-        <label>Card Name:</label>
-        <input
+        <label htmlFor="card-name">Card Name:</label>
+        <Input
+          id="card-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border px-2 py-1"
+          className="w-48"
+          placeholder="Untitled Card"
         />
         <label>Theme:</label>
         <select
@@ -137,18 +148,17 @@ export function CardEditor({
 
         <Button onClick={onBack} variant="outline">Back</Button>
         <Button
-          onClick={() =>
-            onSave(
-              buildConfig({
-                name,
-                elements,
-                theme,
-                shadow,
-                lighting,
-                animation,
-              }),
-            )
-          }
+          onClick={() => {
+            const config = buildConfig({
+              name: name.trim() || "Untitled Card",
+              elements,
+              theme,
+              shadow,
+              lighting,
+              animation,
+            });
+            onSave(config);
+          }}
         >
           Save
         </Button>
@@ -156,18 +166,17 @@ export function CardEditor({
           {showCode ? "Design View" : "Code View"}
         </Button>
         <Button
-          onClick={() =>
-            exportAssets(
-              buildConfig({
-                name,
-                elements,
-                theme,
-                shadow,
-                lighting,
-                animation,
-              }),
-            )
-          }
+          onClick={() => {
+            const config = buildConfig({
+              name: name.trim() || "Untitled Card",
+              elements,
+              theme,
+              shadow,
+              lighting,
+              animation,
+            });
+            exportAssets(config);
+          }}
           variant="secondary"
         >
           Export Assets

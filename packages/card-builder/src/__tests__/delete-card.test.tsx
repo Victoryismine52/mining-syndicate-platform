@@ -1,0 +1,54 @@
+// @vitest-environment jsdom
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('@/components/ui/card', () => ({
+  Card: (props: any) => <div {...props} />,
+  CardHeader: (props: any) => <div {...props} />,
+  CardTitle: (props: any) => <div {...props} />,
+  CardDescription: (props: any) => <div {...props} />,
+  CardContent: (props: any) => <div {...props} />,
+}), { virtual: true });
+
+vi.mock('@/components/ui/button', () => ({
+  Button: (props: any) => <button {...props} />,
+}), { virtual: true });
+
+vi.mock('@/components/ui/input', () => ({
+  Input: (props: any) => <input {...props} />,
+}), { virtual: true });
+
+import { CardBuilderApp } from '../App';
+
+describe('packages/card-builder delete flow', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('removes card from state and localStorage', () => {
+    const initialCard = {
+      id: '1',
+      name: 'Sample',
+      elements: [],
+      theme: 'light',
+      shadow: 'none',
+      lighting: 'none',
+      animation: 'none',
+    };
+    localStorage.setItem('cards', JSON.stringify([initialCard]));
+
+    render(<CardBuilderApp />);
+
+    expect(screen.getAllByText('Sample')[0]).toBeTruthy();
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    fireEvent.click(screen.getByText('Delete'));
+
+    expect(screen.queryByText('Sample')).toBeNull();
+    expect(localStorage.getItem('cards')).toBe(JSON.stringify([]));
+
+    confirmSpy.mockRestore();
+  });
+});
