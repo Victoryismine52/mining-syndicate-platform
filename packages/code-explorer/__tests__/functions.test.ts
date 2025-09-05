@@ -16,6 +16,10 @@ beforeAll(() => {
       "function hi(){}",
       "/** @tag edge */",
       "const bye = () => {}",
+      "/** @tag async */",
+      "async function asyncDecl(){}",
+      "/** @tag async */",
+      "const asyncArrow = async () => {}",
       "/** @tag gen */",
       "function* gen(){}",
     ].join("\n"),
@@ -39,6 +43,8 @@ describe("GET /code-explorer/api/functions", () => {
     expect(data).toEqual([
       { name: "hi", signature: "hi(): any", path: "a.ts", tags: ["util"] },
       { name: "bye", signature: "bye(): any", path: "a.ts", tags: ["edge"] },
+      { name: "asyncDecl", signature: "async asyncDecl(): any", path: "a.ts", tags: ["async"] },
+      { name: "asyncArrow", signature: "async asyncArrow(): any", path: "a.ts", tags: ["async"] },
       { name: "gen", signature: "*gen(): any", path: "a.ts", tags: ["gen"] },
     ]);
   });
