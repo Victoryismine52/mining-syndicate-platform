@@ -1,6 +1,12 @@
 /* @vitest-environment jsdom */
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  cleanup,
+} from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 const toast = vi.fn();
@@ -24,6 +30,7 @@ beforeEach(() => {
 
 afterEach(() => {
   global.fetch = originalFetch;
+  cleanup();
 });
 
 describe("loadLanguageFromPath", () => {
@@ -75,5 +82,50 @@ describe("FileViewer", () => {
     expect(body.patch).toContain("-const a = 1;");
     expect(body.patch).toContain("+const a = 2;");
     await waitFor(() => expect(toast).toHaveBeenCalledWith({ title: "File saved" }));
+  });
+
+  it("supports keyboard shortcuts for save and fullscreen", async () => {
+    const source = "const a = 1;";
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, text: async () => source })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+    global.fetch = fetchMock as any;
+
+    render(<FileViewer path="/repo/test.ts" />);
+    const [textarea] = await screen.findAllByTestId("editor");
+    fireEvent.change(textarea, { target: { value: "const a = 2;" } });
+
+    fireEvent.keyDown(window, { key: "s", ctrlKey: true });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/code-explorer/api/save",
+      expect.objectContaining({ method: "POST" })
+    );
+    await waitFor(() => expect(toast).toHaveBeenCalledWith({ title: "File saved" }));
+
+    fireEvent.keyDown(window, { key: "Enter", ctrlKey: true });
+    expect(await screen.findByText("Exit")).toBeTruthy();
+  });
+
+  it("announces shortcuts and allows override", async () => {
+    const source = "const a = 1;";
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => source });
+    global.fetch = fetchMock as any;
+
+    const blocker = (e: KeyboardEvent) => e.preventDefault();
+    window.addEventListener("keydown", blocker);
+
+    render(<FileViewer path="/repo/test.ts" />);
+    const [saveBtn] = await screen.findAllByText("Save");
+    const [fsBtn] = await screen.findAllByText("Full screen");
+
+    expect(saveBtn.getAttribute("aria-keyshortcuts")).toContain("Ctrl+S");
+    expect(fsBtn.getAttribute("aria-keyshortcuts")).toContain("Ctrl+Enter");
+
+    fireEvent.keyDown(window, { key: "s", ctrlKey: true });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener("keydown", blocker);
   });
 });
