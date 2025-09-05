@@ -1,4 +1,4 @@
-import type { CardConfig } from "./Editor";
+import type { CardConfig } from "./export-helpers";
 
 // Convert a CardConfig into an OpenAPI 3.0 YAML document.
 // Each interactive element gets a minimal POST endpoint so consumers
