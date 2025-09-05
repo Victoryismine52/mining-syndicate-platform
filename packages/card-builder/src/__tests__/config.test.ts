@@ -1,3 +1,6 @@
+// Unit tests for the card builder's configuration utilities. These ensure that
+// a card's name survives a round trip through `buildConfig`/`parseConfig` and
+// that the OpenAPI export contains expected metadata.
 import { describe, it, expect } from 'vitest';
 import { buildConfig, parseConfig } from '../Editor';
 import generateOpenApi from '../exportApi';
