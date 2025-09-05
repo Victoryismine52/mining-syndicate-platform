@@ -7,10 +7,9 @@ import { Plus, Edit } from "lucide-react";
 
 interface StoredCard extends CardConfig {
   id: string;
-  name: string;
 }
 
-function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<CardConfig, "elements"> & { children: React.ReactNode }) {
+function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<CardConfig, "elements" | "name"> & { children: React.ReactNode }) {
   const themeClass =
     theme === "dark"
       ? "bg-gray-900 text-white"
