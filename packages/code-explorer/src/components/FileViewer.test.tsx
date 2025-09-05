@@ -128,4 +128,26 @@ describe("FileViewer", () => {
 
     window.removeEventListener("keydown", blocker);
   });
+
+  it("renders raw code when CodeMirror fails to load", async () => {
+    const source = "const a = 1;";
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, text: async () => source });
+    global.fetch = fetchMock as any;
+
+    vi.resetModules();
+    vi.doMock("@uiw/react-codemirror", () => {
+      throw new Error("failed import");
+    });
+
+    const { FileViewer: FallbackViewer } = await import("./FileViewer");
+
+    render(<FallbackViewer path="/repo/test.ts" />);
+    const pre = await screen.findByTestId("raw-code");
+    expect(pre.textContent).toBe(source);
+
+    vi.unmock("@uiw/react-codemirror");
+    vi.resetModules();
+  });
 });

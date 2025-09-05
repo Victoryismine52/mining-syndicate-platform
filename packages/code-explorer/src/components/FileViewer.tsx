@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import CodeMirror from "@uiw/react-codemirror";
 import type { Extension } from "@codemirror/state";
 import { createTwoFilesPatch } from "diff";
 import { Button } from "@/components/ui/button";
@@ -62,7 +61,22 @@ export function FileViewer({ path }: Props) {
   const [original, setOriginal] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
   const [extensions, setExtensions] = useState<Extension[]>([]);
+  const [CodeMirror, setCodeMirror] = useState<React.ComponentType<any> | null>(
+    null
+  );
   const { toast } = useToast();
+
+  useEffect(() => {
+    import("@uiw/react-codemirror")
+      .then((m) => setCodeMirror(() => m.default))
+      .catch((err) => {
+        console.warn(
+          "Failed to load CodeMirror. Rendering plain text instead.",
+          err
+        );
+        setCodeMirror(null);
+      });
+  }, []);
 
   useEffect(() => {
     /**
@@ -150,12 +164,22 @@ export function FileViewer({ path }: Props) {
         </Button>
       </div>
       <div className="overflow-auto h-full border rounded">
-        <CodeMirror
-          value={code}
-          height="100%"
-          extensions={extensions}
-          onChange={(value) => setCode(value)}
-        />
+        {CodeMirror ? (
+          <CodeMirror
+            value={code}
+            height="100%"
+            extensions={extensions}
+            onChange={(value: any) =>
+              setCode(
+                typeof value === "string" ? value : value?.target?.value ?? ""
+              )
+            }
+          />
+        ) : (
+          <pre className="p-2" data-testid="raw-code">
+            {code}
+          </pre>
+        )}
       </div>
     </div>
   );
