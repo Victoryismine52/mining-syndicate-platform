@@ -10,6 +10,7 @@ Consistency keeps our guides accessible and easy to maintain. Follow these conve
 - Start each page with an H1 title.
 - Use sentence case for headings.
 - Wrap commands and code samples in fenced blocks.
+- Mention file formats in uppercase (`JSON`, `OpenAPI`).
 
 ## Cross-links
-- Connect related topics. For export instructions, see [Exporting Cards](./exporting-cards.md).
+- Connect related topics. For export steps and JSON/OpenAPI downloads, see [Exporting Cards](./exporting-cards.md).
