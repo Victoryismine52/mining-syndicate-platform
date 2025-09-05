@@ -20,6 +20,12 @@ describe('card builder config', () => {
     expect(parsed?.name).toBe('My Card');
   });
 
+  it('assigns default name when missing', () => {
+    const json = JSON.stringify({ elements: [], ...base });
+    const parsed = parseConfig(json);
+    expect(parsed?.name).toBe('Untitled Card');
+  });
+
   it('generates OpenAPI YAML with card name and button path', () => {
     const cfg = buildConfig({
       name: 'My Card',
