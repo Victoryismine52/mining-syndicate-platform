@@ -148,4 +148,32 @@ describe("FunctionBrowser", () => {
       expect(screen.getByText("bar")).toBeTruthy();
     });
   });
+
+  it("requests functions from explorer API endpoint", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () => Promise.resolve([]),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    expect(global.fetch).toHaveBeenCalledWith("/code-explorer/api/functions");
+  });
+
+  it("invokes onSelect when dragging", async () => {
+    const onSelect = vi.fn();
+    const fn = { name: "foo", signature: "", path: "a.ts", tags: [] };
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () => Promise.resolve([fn]),
+    } as any);
+
+    render(<FunctionBrowser onSelect={onSelect} />);
+
+    const item = await screen.findByTestId("function-foo");
+    fireEvent.dragStart(item, {
+      dataTransfer: { setData: () => {} },
+    });
+
+    expect(onSelect).toHaveBeenCalledWith(fn);
+  });
 });
