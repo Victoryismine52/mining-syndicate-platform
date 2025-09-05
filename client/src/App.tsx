@@ -28,6 +28,7 @@ import BlogPostView from "@/pages/blog-post-view";
 import BuilderLab from "@/pages/BuilderLab";
 import { CardBuilderApp } from "../../packages/card-builder";
 import { CodeExplorerApp } from "../../packages/code-explorer";
+import FunctionSearchPage from "@/pages/function-search";
 
 function Router() {
   return (
@@ -79,6 +80,7 @@ function Router() {
       {/* Standalone tools routes */}
       <Route path="/card-builder" component={CardBuilderApp} />
       <Route path="/code-explorer" component={CodeExplorerApp} />
+      <Route path="/functions" component={FunctionSearchPage} />
 
       {/* Builder Lab route */}
       <Route path="/builder" component={BuilderLab} />

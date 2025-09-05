@@ -8,6 +8,7 @@ import { insertLeadSchema } from "@shared/schema";
 import { insertSiteLeadSchema } from "@shared/site-schema";
 import { createHubSpotContact, submitToHubSpotForm, testHubSpotConnection, type HubSpotContact } from "./hubspot";
 import { registerSiteRoutes } from "./site-routes";
+import { functionIndex } from "./function-index";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log('Registering routes...');
@@ -505,6 +506,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       next(error);
     }
+  });
+
+  app.get("/api/functions", (_req, res) => {
+    res.json(functionIndex);
   });
 
   // Register multi-site routes
