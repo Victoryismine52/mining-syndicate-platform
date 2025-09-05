@@ -40,5 +40,6 @@ Current profiles:
 - [Frontend Developer — Simon Hesher](Frontend_Developer-Simon_Hesher.md)
 - [QA Engineer — Maria Li](QA_Engineer-Maria_Li.md)
 - [Documentation & Ops — Alex Kim](Documentation_Ops-Alex_Kim.md)
+- [Product Manager — Ava Wu](Product_Manager-Ava_Wu.md)
 
 These documents help the team coordinate work and keep project context in one place. Team members are responsible for keeping their profiles up to date.

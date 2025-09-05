@@ -41,7 +41,10 @@ Preparing the code explorer package for beta launch and refining remaining featu
 ## 🕒 Product Management Log
 ### Past
 - Reviewed team status and code base; planned upcoming tasks for canvas deletion, error handling, and documentation.
+- Reviewed team profiles and test suite; scoped tasks for resolving module resolution issues and improving docs.
 ### Current
 - Coordinating implementation of new features and ensuring cross-team communication remains smooth.
+- Coordinating fixes for failing tests and tracking research on function library architecture.
 ### Future
 - Preparing strategy for unified editing, dependency graph tooling, and real-time collaboration in future cycles.
+- Shaping roadmap for unified editing, dependency graph tooling, and eventual real-time collaboration once core stability is achieved.
