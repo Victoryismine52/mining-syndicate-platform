@@ -1,12 +1,19 @@
 # Documentation Process Resources
 
-## Reference Locations
-- Project documentation lives in `/packages/code-explorer/docs`.
+## Profile Sections
+Every profile includes the following headings:
+- Introduction
+- Biography
+- Core Skills & Tools
+- Contact & Availability
+- Current Assignment
+- Current Task Notes
+- Project Notes
+- Urgent Notes (leave empty when nothing is pressing)
 
-## Process Updates
-- Archive feature decisions and interview findings for future cycles.
-- Coordinate release timelines with server and frontend teams to minimize integration delays.
-- Capture research outcomes for AST indexing, drag-and-drop libraries, multi-file patch algorithms, and dependency graph automation.
-- Document component prop/state requirements and ensure UI changes follow the design system and accessibility standards.
-- Expand regression testing guidance to cover large directory scans with nested symlinks and files without extensions.
+## Naming Conventions
+Profile files live in `packages/code-explorer` and follow the pattern `<Role>_<Name>-<Surname>.md`.
+Examples: `Tech_Lead-Jordan_Rowe.md` or `QA_Engineer-Maria_Li.md`.
 
+## Update Cadence
+Update your profile whenever your assignment or availability changes and at least once per sprint. Remove or clear items that are no longer relevant and ensure **Urgent Notes** remain empty when there is nothing pressing.
