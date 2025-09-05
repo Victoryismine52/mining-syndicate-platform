@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Prism from "prismjs";
-import "prismjs/components/prism-typescript";
-import "prismjs/components/prism-javascript";
 import { Button } from "@/components/ui/button";
+import { highlightCode } from "../utils/highlight";
 
 interface Props {
   path: string;
@@ -13,7 +11,7 @@ interface Props {
  * Location: packages/code-explorer/src/components/FileViewer.tsx > FileViewer
  * Description: Fetches and displays highlighted source code with line numbers.
  * Notes: Provides copy and fullscreen controls for the current file.
- * EditCounter: 1
+ * EditCounter: 3
  */
 export function FileViewer({ path }: Props) {
   const [code, setCode] = useState("");
@@ -34,10 +32,6 @@ export function FileViewer({ path }: Props) {
     }
     if (path) load();
   }, [path]);
-
-  useEffect(() => {
-    Prism.highlightAll();
-  }, [code]);
 
   const lines = code.split("\n");
 
@@ -62,7 +56,10 @@ export function FileViewer({ path }: Props) {
               <div key={i}>{i + 1}</div>
             ))}
           </code>
-          <code className="pl-4" dangerouslySetInnerHTML={{ __html: Prism.highlight(code, Prism.languages.tsx, "tsx") }} />
+          <code
+            className="pl-4"
+            dangerouslySetInnerHTML={{ __html: highlightCode(code, path.split(".").pop() || "") }}
+          />
         </pre>
       </div>
     </div>
