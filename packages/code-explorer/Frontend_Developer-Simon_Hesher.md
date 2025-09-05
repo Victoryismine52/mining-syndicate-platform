@@ -32,6 +32,8 @@ drag-and-drop libraries, and dependency graph automation.
   delays.
 - Expand regression testing guidance for large directory scans with nested
   symlinks and files without extensions.
+- Implemented a plain-text fallback in FileViewer when CodeMirror or a grammar
+  fails to load; updated component state docs and tests.
 
 ## 🔮 Future Designs
 - Cross-fade transitions when switching between the Function Browser, Canvas, and Code Pane.
