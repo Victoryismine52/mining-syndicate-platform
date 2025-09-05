@@ -3,7 +3,7 @@ import { CardEditor, CardConfig, elementLibrary } from "./Editor";
 import { ActionCard } from "./components/ActionCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit } from "lucide-react";
+import { Plus, Edit, Trash } from "lucide-react";
 
 interface StoredCard extends CardConfig {
   id: string;
@@ -97,6 +97,15 @@ export function CardBuilderApp() {
   });
   const [editing, setEditing] = useState<StoredCard | null>(null);
 
+  const deleteCard = (id: string) => {
+    if (!window.confirm("Delete this card?")) return;
+    setCards((prev) => {
+      const list = prev.filter((c) => c.id !== id);
+      localStorage.setItem("cards", JSON.stringify(list));
+      return list;
+    });
+  };
+
   const saveCard = (config: CardConfig) => {
     if (!editing) return;
     const updated: StoredCard = { ...editing, ...config };
@@ -145,10 +154,19 @@ export function CardBuilderApp() {
             </CardHeader>
             <CardContent className="space-y-4">
               <PreviewCard card={card} />
-              <Button onClick={() => setEditing(card)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setEditing(card)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteCard(card.id)}
+                >
+                  <Trash className="mr-2 h-4 w-4" />
+                  Delete
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
