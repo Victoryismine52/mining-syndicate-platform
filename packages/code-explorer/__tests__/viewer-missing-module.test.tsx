@@ -7,33 +7,31 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("@/components/ui/button", () => ({
   Button: (props: any) => <button {...props} />,
 }));
+const toast = vi.fn();
 vi.mock("@/hooks/use-toast", () => ({
-  useToast: () => ({ toast: vi.fn() }),
+  useToast: () => ({ toast }),
 }));
 
-// Import fixture that mocks missing language module
-import "./fixtures/missingLang";
+// Import fixture that mocks missing editor and language modules
+import "./fixtures/missingModules";
 
 import { FileViewer } from "../src/components/FileViewer";
 
 describe("FileViewer missing language module", () => {
-  it("renders raw text and warns when module is missing", async () => {
+  it("renders raw text and emits a warning toast when module is missing", async () => {
     const source = "const a = 1;";
     const originalFetch = global.fetch;
     global.fetch = vi
       .fn()
       .mockResolvedValue({ ok: true, text: async () => source }) as any;
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     render(<FileViewer path="/repo/test.ts" />);
 
-    const textarea = await screen.findByTestId("editor");
-    expect((textarea as HTMLTextAreaElement).value).toBe(source);
-    expect(textarea.getAttribute("extensions")).toBeNull();
+    const pre = await screen.findByTestId("raw-code");
+    expect(pre.textContent).toBe(source);
 
-    await waitFor(() => expect(warn).toHaveBeenCalled());
+    await waitFor(() => expect(toast).toHaveBeenCalled());
 
-    warn.mockRestore();
     global.fetch = originalFetch;
   });
 });

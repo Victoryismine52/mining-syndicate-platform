@@ -91,9 +91,10 @@ export function FileViewer({ path }: Props) {
           "Failed to load CodeMirror. Rendering plain text instead.",
           err
         );
+        toast({ title: "Editor failed to load", variant: "destructive" });
         setCodeMirror(null);
       });
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     /**
@@ -125,9 +126,13 @@ export function FileViewer({ path }: Props) {
       } else {
         setLangFailed(true);
         setExtensions([]);
+        toast({
+          title: "Syntax highlighting unavailable",
+          variant: "destructive",
+        });
       }
     });
-  }, [path]);
+  }, [path, toast]);
 
   const handleSave = useCallback(async () => {
     const patch = createTwoFilesPatch(path, path, original, code);
