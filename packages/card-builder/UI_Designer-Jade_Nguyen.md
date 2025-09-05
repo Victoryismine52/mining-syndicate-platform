@@ -13,11 +13,11 @@ At the **Card Builder**, my mission is to make the editor feel like a studio whe
 - **[2025‑09‑07]** Collaborated with Casey to implement the first version of the theme switcher.  We tested neon, retro and solarised palettes.  Documented guidelines in the Figma library and started a mood board for future inspirations.
 - **[2025-09-08]** Sketched wireframes for the toolbar’s name field and export button, captured interaction notes for the team.
 - **[2025-09-13]** Finalised toolbar naming and export sketches and added a gallery delete wireframe in `docs/design/naming-export-delete.md`, leaving notes for Casey and Tariq.
+- **[2025-09-14]** Refined those wireframes with disabled Export states and backend sync details. Shared the updated interaction notes with Casey and Tariq.
 
 ## What I’m Doing
 
-With the wireframes captured, I'm shaping a clickable prototype for naming, export and gallery deletion.
-I’m pairing with Casey to finesse responsive layout and looping in Tariq to validate export payloads.
+With the wireframes iterated, I'm shaping a clickable prototype for naming, export and gallery deletion. I'm pairing with Casey to finesse responsive layout and looping in Tariq to validate export payloads while we test the new notes.
 
 ## Where I’m Headed
 
