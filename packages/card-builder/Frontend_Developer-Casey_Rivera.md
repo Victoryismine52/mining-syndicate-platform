@@ -24,6 +24,7 @@ I adore crafting interactions that feel tactile and alive.  Animations, responsi
 
 - **[2025-09-15]** Restored the element library export so the card builder boots without a blank screen, letting creators dive back into design.
 
+
 ## What I’m Doing
 
 With card titles now flowing from the toolbar to localStorage and the gallery, I'm circling back to refine the properties panel. I'm adding colour wheels, font selectors and dynamic controls that surface only the fields a creator needs. The salsa playlist stays on loop as I tune keyboard accessibility so every gesture has a key‑press twin.
