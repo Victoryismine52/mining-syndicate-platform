@@ -1,5 +1,7 @@
 # Mining Syndicate Platform
 
+See [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions.
+
 ## Development
 
 - **Full application**: `npm run dev`
