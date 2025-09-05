@@ -12,10 +12,11 @@ For **Card Builder**, my job is to make sure that contributors can develop, test
 - **[2025‑09‑06]** Containerised the editor and backend services using Docker Compose.  Added hot reload support so code changes update live.  Helped Casey and Tariq get their local setups working smoothly.
 - **[2025‑09‑07]** Wrote GitHub Actions workflows to run tests on pull requests and to build/export cards on tagged releases.  Introduced caching layers to speed up repeated builds.  Compared the satisfaction to making a perfect lasagne.
 - **[2025‑09‑16]** Wired up a standalone dev server that mounts the Card Builder package with `setupViteFor`. Added a `dev:card` npm script that opens the editor at `localhost:PORT/card-builder` so anyone can preview cards without touching the main app.
+- **[2025‑09‑17]** Extended the Netlify preview pipeline to bundle `card.json` and `card.yaml`, so every pull request deploy serves the configuration and matching OpenAPI spec.
 
 ## What I’m Doing
 
-Fresh off the new dev server, I’m refining the packaging pipeline that turns a designed card into a distributable artefact.  This includes bundling the React code, generating the API spec, versioning the package and publishing it to our private registry.  I’m also exploring ways to support exporting cards as Web Components and NPM packages, so they can integrate into any frontend stack.  Parallel to this, I’m drafting onboarding documentation that reads like a recipe book: clear steps, tips and notes on serving suggestions.  Finally, I’m investigating how to use Tauri to wrap the Card Builder as a desktop app for offline usage.
+With preview deployments now automatically bundling `card.json` and `card.yaml`, I’m refining the packaging pipeline that turns a designed card into a distributable artefact. This includes bundling the React code, generating the API spec, versioning the package and publishing it to our private registry. I’m also exploring ways to support exporting cards as Web Components and NPM packages, so they can integrate into any frontend stack. Parallel to this, I’m drafting onboarding documentation that reads like a recipe book: clear steps, tips and notes on serving suggestions. Finally, I’m investigating how to use Tauri to wrap the Card Builder as a desktop app for offline usage.
 
 ## Where I’m Headed
 

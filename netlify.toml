@@ -3,5 +3,5 @@
   publish = "dist"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "npm run build && npm run bundle:card"
   publish = "dist"
