@@ -27,9 +27,43 @@ This repository includes optional tools that run separately from the main applic
 
 These tools are standalone and do not affect production or the main development server.
 
-## Testing
+## Syntax Highlighting & Testing
 
-- Run all unit and integration tests with `npm test`.
-- To interact with the Code Explorer during development, start it via `npm run dev:explorer`.
+The Code Explorer renders source examples with [Prism](https://prismjs.com/).
+Use the `highlightCode` utility to convert raw strings into HTML with the
+desired language grammar.
 
-Both commands work in standard Node environments and on Replit.
+### `highlightCode` utility
+
+- **Location:** `packages/code-explorer/src/utils/highlight.ts`
+- `highlightCode(code, language)` returns highlighted HTML.
+- If the grammar is missing or Prism throws, the original code string is
+  returned to avoid runtime errors.
+
+### Extending Prism grammars
+
+1. Import the Prism component in `highlight.ts`, e.g.:
+   ```ts
+   import "prismjs/components/prism-python";
+   ```
+2. Pass the matching language key when calling `highlightCode`:
+   ```ts
+   highlightCode(source, "python");
+   ```
+
+### Troubleshooting
+
+- Unstyled code usually means the grammar wasn't imported or the language key
+  doesn't match.
+- Ensure dependencies are installed; reinstall with `npm install` if Prism
+  components are missing.
+- Run targeted tests to verify highlighting logic: `npx vitest packages/code-explorer/src/utils/highlight.test.ts`.
+
+### Running tests
+
+- `npm test` – run the full unit and integration test suite.
+- `npx vitest packages/code-explorer/src/utils/highlight.test.ts` – execute only
+  the `highlightCode` tests (replace the path to target other files as needed).
+
+Both commands work in standard Node environments and on Replit. To interact with
+the Code Explorer during development, start it via `npm run dev:explorer`.
