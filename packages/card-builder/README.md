@@ -62,6 +62,7 @@ Our current Card Builder crew consists of the following personas:
 | QA Engineer | `QA_Engineer-Santiago_Morales.md` |
 | DevOps Engineer | `DevOps_Engineer-Bianca_Rossi.md` |
 | Technical Writer | `Technical_Writer-Morgan_Lee.md` |
+| Accessibility Specialist | `Accessibility_Specialist-Logan_Patel.md` |
 
 If you identify a missing discipline (like a content strategist or animation specialist), invent a new persona!  Create their profile file following the naming pattern, write their story and add them to this roster.
 
