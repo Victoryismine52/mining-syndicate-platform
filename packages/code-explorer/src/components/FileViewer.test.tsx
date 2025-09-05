@@ -38,6 +38,7 @@ describe("loadLanguageFromPath", () => {
     javascript.mockClear();
     const exts = await loadLanguageFromPath("/repo/file.ts");
     expect(javascript).toHaveBeenCalled();
+    expect(exts).not.toBeNull();
     expect(exts).toHaveLength(1);
   });
 
@@ -45,7 +46,7 @@ describe("loadLanguageFromPath", () => {
     javascript.mockClear();
     const exts = await loadLanguageFromPath("/repo/file.unknown");
     expect(javascript).not.toHaveBeenCalled();
-    expect(exts).toEqual([]);
+    expect(exts).toBeNull();
   });
 });
 
@@ -149,5 +150,15 @@ describe("FileViewer", () => {
 
     vi.unmock("@uiw/react-codemirror");
     vi.resetModules();
+  });
+
+  it("renders raw code when language module is missing", async () => {
+    const source = "const a = 1;";
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => source });
+    global.fetch = fetchMock as any;
+
+    render(<FileViewer path="/repo/test.unknown" />);
+    const pre = await screen.findByTestId("raw-code");
+    expect(pre.textContent).toBe(source);
   });
 });

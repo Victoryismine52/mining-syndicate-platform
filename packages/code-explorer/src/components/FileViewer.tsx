@@ -18,7 +18,9 @@ interface Props {
   "notes": "Provides copy and fullscreen controls for the current file."
 }
 */
-export async function loadLanguageFromPath(path: string): Promise<Extension[]> {
+export async function loadLanguageFromPath(
+  path: string
+): Promise<Extension[] | null> {
   const ext = path.split(".").pop()?.toLowerCase();
   const loaders: Record<string, () => Promise<Extension>> = {
     js: () =>
@@ -44,15 +46,22 @@ export async function loadLanguageFromPath(path: string): Promise<Extension[]> {
     html: () =>
       import(/* @vite-ignore */ "@codemirror/lang-html").then((m) => m.html()),
   };
+  const loader = loaders[ext ?? ""];
+  if (!loader) {
+    console.warn(
+      `No language module found for "${ext}". Rendering as plain text.`
+    );
+    return null;
+  }
   try {
-    const lang = await loaders[ext ?? ""]?.();
+    const lang = await loader();
     return lang ? [lang] : [];
   } catch (err) {
     console.warn(
       `Failed to load language module for "${ext}". Rendering as plain text.`,
       err
     );
-    return [];
+    return null;
   }
 }
 
@@ -61,6 +70,7 @@ export function FileViewer({ path }: Props) {
   const [original, setOriginal] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
   const [extensions, setExtensions] = useState<Extension[]>([]);
+  const [langFailed, setLangFailed] = useState(false);
   const [CodeMirror, setCodeMirror] = useState<React.ComponentType<any> | null>(
     null
   );
@@ -101,7 +111,15 @@ export function FileViewer({ path }: Props) {
   }, [path]);
 
   useEffect(() => {
-    loadLanguageFromPath(path).then(setExtensions);
+    loadLanguageFromPath(path).then((exts) => {
+      if (exts) {
+        setLangFailed(false);
+        setExtensions(exts);
+      } else {
+        setLangFailed(true);
+        setExtensions([]);
+      }
+    });
   }, [path]);
 
   const handleSave = useCallback(async () => {
@@ -164,7 +182,7 @@ export function FileViewer({ path }: Props) {
         </Button>
       </div>
       <div className="overflow-auto h-full border rounded">
-        {CodeMirror ? (
+        {CodeMirror && !langFailed ? (
           <CodeMirror
             value={code}
             height="100%"
