@@ -12,6 +12,7 @@ export function exportApi(config: CardConfig): string {
 
     if (el.elementId === "button") {
       operations.post = {
+        operationId: `handle_${el.id}`,
         summary: `Handle ${el.props.label || "button"} click`,
         responses: {
           "200": { description: "Success" },
@@ -19,6 +20,7 @@ export function exportApi(config: CardConfig): string {
       };
     } else if (el.displayMode === "input") {
       operations.post = {
+        operationId: `submit_${el.id}`,
         summary: `Submit value for ${el.props.label || "input"}`,
         requestBody: {
           required: true,
