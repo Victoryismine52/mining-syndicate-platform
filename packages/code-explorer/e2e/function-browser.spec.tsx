@@ -13,6 +13,14 @@ test('handles API failure gracefully', async ({ mount, page }) => {
     await expect(component.locator('[data-testid^="function-"]')).toHaveCount(0);
   });
 
+  test('shows empty list when API returns error status', async ({ mount, page }) => {
+    await page.route('**/api/functions', route =>
+      route.fulfill({ status: 500, body: 'server error' })
+    );
+    const component = await mount(<FunctionBrowser />);
+    await expect(component.locator('[data-testid^="function-"]')).toHaveCount(0);
+  });
+
   test('drags function to composition canvas', async ({ mount, page }) => {
     await page.route('**/api/functions', route =>
       route.fulfill({
@@ -45,6 +53,44 @@ test('handles API failure gracefully', async ({ mount, page }) => {
     const canvas = component.locator('[data-testid="canvas"]');
     await fn.dragTo(canvas);
     await expect(component.getByText('foo')).toBeVisible();
+  });
+
+  test('drags multiple functions to canvas', async ({ mount, page }) => {
+    await page.route('**/api/functions', route =>
+      route.fulfill({
+        status: 200,
+        body: JSON.stringify([
+          { name: 'foo', signature: '', path: 'a.ts', tags: [] },
+          { name: 'bar', signature: '', path: 'b.ts', tags: [] },
+        ]),
+      })
+    );
+
+    const Wrapper = () => {
+      const [state, setState] = React.useState({
+        nodes: [] as CompositionNode[],
+        connections: [] as Edge[],
+      });
+      return (
+        <div className="flex">
+          <FunctionBrowser />
+          <CompositionCanvas
+            nodes={state.nodes}
+            connections={state.connections}
+            onUpdate={setState}
+          />
+        </div>
+      );
+    };
+
+    const component = await mount(<Wrapper />);
+    const foo = component.locator('[data-testid="function-foo"]');
+    const bar = component.locator('[data-testid="function-bar"]');
+    const canvas = component.locator('[data-testid="canvas"]');
+    await foo.dragTo(canvas);
+    await bar.dragTo(canvas);
+    await expect(component.getByText('foo')).toBeVisible();
+    await expect(component.getByText('bar')).toBeVisible();
   });
 });
 
