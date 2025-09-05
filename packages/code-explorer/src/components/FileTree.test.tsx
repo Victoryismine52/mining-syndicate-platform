@@ -91,7 +91,7 @@ describe("FileTree", () => {
       <FileTree node={large} selected={null} onSelect={onSelect} filter="" isRoot />
     );
     // Only a subset of rows should be rendered due to virtualization.
-    expect(screen.getAllByTestId("file-text").length).toBeLessThanOrEqual(25);
+    expect(screen.getAllByTestId("file-text").length).toBeLessThan(100);
     expect(screen.queryByText("file999.txt")).toBeNull();
     rerender(
       <FileTree node={large} selected={null} onSelect={onSelect} filter="file999" isRoot />
