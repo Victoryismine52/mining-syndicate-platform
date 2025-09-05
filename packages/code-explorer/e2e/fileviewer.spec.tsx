@@ -4,11 +4,11 @@ import { FileViewer } from '../src/components/FileViewer';
 
 test.describe('FileViewer', () => {
   test('saves patched content', async ({ mount, page }) => {
-    await page.route('/code-explorer/api/file?*', route =>
+    await page.route('**/code-explorer/api/file?*', route =>
       route.fulfill({ body: 'const a = 1;' })
     );
     let saveRequest;
-    await page.route('/code-explorer/api/save', route => {
+    await page.route('**/code-explorer/api/save', route => {
       saveRequest = route.request();
       route.fulfill({ status: 200, body: '{}' });
     });
@@ -22,10 +22,10 @@ test.describe('FileViewer', () => {
   });
 
   test('toggles fullscreen via control', async ({ mount, page }) => {
-    await page.route('/code-explorer/api/file?*', route =>
+    await page.route('**/code-explorer/api/file?*', route =>
       route.fulfill({ body: 'const a = 1;' })
     );
-    await page.route('/code-explorer/api/save', route =>
+    await page.route('**/code-explorer/api/save', route =>
       route.fulfill({ status: 200, body: '{}' })
     );
     await mount(<FileViewer path="/repo/test.ts" />);
