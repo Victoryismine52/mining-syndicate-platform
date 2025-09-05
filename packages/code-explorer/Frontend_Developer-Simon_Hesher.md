@@ -38,6 +38,8 @@ drag-and-drop libraries, and dependency graph automation.
   and supports drag-and-drop into the Composition Canvas; added tests.
 - Expanded Function Browser tests to cover the new `/code-explorer/api/functions`
   endpoint and verify selection callbacks during drag events.
+- Added case-insensitive filtering and canvas integration tests covering
+  function selection and drop events.
 
 ## 🔮 Future Designs
 - Cross-fade transitions when switching between the Function Browser, Canvas, and Code Pane.
