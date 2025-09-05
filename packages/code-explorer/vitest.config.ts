@@ -29,5 +29,6 @@ export default defineConfig({
   },
   test: {
     setupFiles: path.resolve(__dirname, "./test-setup.tsx"),
+    exclude: ["e2e/**"],
   },
 });
