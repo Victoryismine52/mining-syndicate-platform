@@ -13,13 +13,15 @@ I adore crafting interactions that feel tactile and alive.  Animations, responsi
 - **[2025‑09‑07]** Built the first version of the preview mode, toggling between design and presentation views.  Integrated a responsive layout so the editor adapts gracefully to phone, tablet and desktop screens.
 - **[2025-09-08]** Threaded a new card-name field through the editor, save flow and preview so every card wears its title proudly.  Felt like giving each creation its own signature.
 - **[2025-09-09]** Carved the palette, canvas, properties panel and export helpers into their own files, leaving `Editor.tsx` as a slim conductor.
+- **[2025-09-10]** Added a delete control beside each saved card so creators can sweep away drafts with a quick confirmation.
 
 ## What I’m Doing
 
-Now that the editor’s pieces live in their own files, I’m circling back to refining the properties panel to be more intuitive.  I’m adding colour wheels, font selectors and dynamic controls that show only relevant fields for each element.  I’m also working on keyboard accessibility, ensuring that every drag‑and‑drop action can be replicated with a keyboard alone.  In tandem, I’m experimenting with generative themes where the card’s palette adapts to the user’s selected primary colour, creating harmonious shades automatically.  All while listening to salsa beats in the background, of course.
+With card deletion handled, I’m circling back to refining the properties panel to be more intuitive.  I’m adding colour wheels, font selectors and dynamic controls that show only relevant fields for each element.  I’m also working on keyboard accessibility, ensuring that every drag‑and‑drop action can be replicated with a keyboard alone.  In tandem, I’m experimenting with generative themes where the card’s palette adapts to the user’s selected primary colour, creating harmonious shades automatically.  All while listening to salsa beats in the background, of course.
 
 ## Where I’m Headed
 
 - Implement multi‑card linking in the UI, including a flowchart view where users can see how their cards connect.  I imagine lines that curve gracefully like choreographed dancers.
 - Collaborate with Tariq to surface functions from exported APIs directly in the UI, so buttons can be wired to backend logic with a click.
 - Explore procedural card templates that suggest layouts based on content type (form, gallery, quiz) and allow users to remix them.  It’s like providing starter dance routines that users can improvise on.
+- Add undo and redo capabilities so creators can step through their moves like rehearsed choreography.
