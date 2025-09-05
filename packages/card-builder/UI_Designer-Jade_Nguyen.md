@@ -11,13 +11,16 @@ At the **Card Builder**, my mission is to make the editor feel like a studio whe
 - **[2025‑09‑05]** Joined the project as the lead designer.  Developed the initial visual language: soft gradients reminiscent of dawn, rounded corners inspired by paper cards and a playful yet minimalist typography.  Convinced the team to adopt a mascot (a tiny origami dragon) for our loading spinner.
 - **[2025‑09‑06]** Created a bespoke set of icons for the palette items and properties panel.  Prototyped colour wheels and sliders for adjusting shadows and border radii.  Held a workshop on visual hierarchy using origami models.
 - **[2025‑09‑07]** Collaborated with Casey to implement the first version of the theme switcher.  We tested neon, retro and solarised palettes.  Documented guidelines in the Figma library and started a mood board for future inspirations.
+- **[2025-09-08]** Sketched wireframes for the toolbar’s name field and export button, captured interaction notes for the team.
 
 ## What I’m Doing
 
-I’m currently refining the layout of the properties panel.  I’m experimenting with grouping related controls in collapsible sections to reduce visual clutter.  I’m also designing contextual tooltips that feel like whispers: small bits of guidance that appear when needed.  Alongside this, I’m exploring generative templates for cards that adjust their layout based on content type.  Think of it as architectural plans that adapt to the number of rooms and occupants.
+I’m polishing the toolbar’s naming and export interactions.
+I’m turning the sketches into a clickable prototype and pairing with Casey to ensure the layout feels effortless on both desktop and mobile.
 
 ## Where I’m Headed
 
 - Build a comprehensive design kit that includes responsive breakpoints, motion curves, micro‑interaction patterns and dark/light variants.  I want our design system to be as flexible as modular furniture.
 - Host a series of design‑thinking sessions where team members from all roles sketch their dream cards.  The goal: infuse the product with collective creativity.
+- Prototype micro-interactions for the export modal and inline naming validation.
 - Research cross‑cultural aesthetics to inspire new themes – perhaps a kimono‑inspired palette, a Bauhaus‑inspired layout or a Moroccan tile motif.
