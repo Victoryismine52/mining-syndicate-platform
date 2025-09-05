@@ -20,7 +20,8 @@ export function createFunctionsRouter(getRepoDir: () => string | null) {
       return res.status(400).json({ error: "Repository not loaded" });
     }
     try {
-      const data = scan(dir);
+      const tag = typeof req.query.tag === "string" ? req.query.tag : undefined;
+      const data = scan(dir, tag ? { tag } : {});
       res.json(data);
     } catch (err: any) {
       res.status(500).json({ error: err.message });

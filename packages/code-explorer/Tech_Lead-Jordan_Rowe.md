@@ -70,7 +70,7 @@ Coordinating integration of code exploration features while aligning documentati
 
 
 ## 🔄 Status
-- **Past:** Finalized initial AST index design and integrated CodeMirror editors.
-- **Current:** Implemented an AST-driven parser and surfacing results via `/code-explorer/api/functions` with expanded tests.
+- **Past:** Delivered an initial AST parser and `/code-explorer/api/functions` endpoint.
+- **Current:** Added async/arrow function support with tag filtering and exercised the API through unit tests.
 - **Future:** Investigate incremental parsing and broaden coverage for class methods and default exports.
 

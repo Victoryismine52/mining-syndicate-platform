@@ -14,6 +14,7 @@ beforeAll(() => {
       "/** @tag util */",
       "function decl(a: number, b: number): number { return a + b; }",
       "const arrow = (x: string) => x;",
+      "const asyncArrow = async () => {};",
       "export default function () {}",
     ].join("\n"),
   );
@@ -38,6 +39,24 @@ describe("scan", () => {
         signature: "arrow(x: string): any",
         path: "sample.ts",
         tags: [],
+      },
+      {
+        name: "asyncArrow",
+        signature: "async asyncArrow(): any",
+        path: "sample.ts",
+        tags: [],
+      },
+    ]);
+  });
+
+  it("filters by tag", () => {
+    const result = scan(dir, { tag: "util" });
+    expect(result).toEqual([
+      {
+        name: "decl",
+        signature: "decl(a: number, b: number): number",
+        path: "sample.ts",
+        tags: ["util"],
       },
     ]);
   });
