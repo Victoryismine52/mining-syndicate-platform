@@ -130,32 +130,62 @@ describe("FileViewer", () => {
     window.removeEventListener("keydown", blocker);
   });
 
-  it("renders raw code when CodeMirror fails to load", async () => {
-    const source = "const a = 1;";
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue({ ok: true, text: async () => source });
-    global.fetch = fetchMock as any;
+    it("renders raw code when CodeMirror fails to load", async () => {
+      const source = "const a = 1;";
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue({ ok: true, text: async () => source });
+      global.fetch = fetchMock as any;
 
-    vi.resetModules();
-    vi.doMock("@uiw/react-codemirror", () => {
-      throw new Error("failed import");
+      vi.resetModules();
+      vi.doMock("@uiw/react-codemirror", () => {
+        throw new Error("failed import");
+      });
+
+      const { FileViewer: FallbackViewer } = await import("./FileViewer");
+
+      render(<FallbackViewer path="/repo/test.ts" />);
+      const pre = await screen.findByTestId("raw-code");
+      expect(pre.textContent).toBe(source);
+
+      vi.unmock("@uiw/react-codemirror");
+      vi.resetModules();
     });
 
-    const { FileViewer: FallbackViewer } = await import("./FileViewer");
+    it("renders raw code when CodeMirror throws during render", async () => {
+      const source = "const a = 1;";
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue({ ok: true, text: async () => source });
+      global.fetch = fetchMock as any;
 
-    render(<FallbackViewer path="/repo/test.ts" />);
-    const pre = await screen.findByTestId("raw-code");
-    expect(pre.textContent).toBe(source);
+      vi.resetModules();
+      vi.doMock("@uiw/react-codemirror", () => ({
+        default: () => {
+          throw new Error("render error");
+        },
+      }));
 
-    vi.unmock("@uiw/react-codemirror");
-    vi.resetModules();
-  });
+      const { FileViewer: CrashViewer } = await import("./FileViewer");
 
-  it("renders raw code when language module is missing", async () => {
-    const source = "const a = 1;";
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => source });
-    global.fetch = fetchMock as any;
+      render(<CrashViewer path="/repo/test.ts" />);
+      const pre = await screen.findByTestId("raw-code");
+      expect(pre.textContent).toBe(source);
+      await waitFor(() =>
+        expect(toast).toHaveBeenCalledWith({
+          title: "Editor failed to load",
+          variant: "destructive",
+        })
+      );
+
+      vi.unmock("@uiw/react-codemirror");
+      vi.resetModules();
+    });
+
+    it("renders raw code when language module is missing", async () => {
+      const source = "const a = 1;";
+      const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => source });
+      global.fetch = fetchMock as any;
 
     render(<FileViewer path="/repo/test.unknown" />);
     const pre = await screen.findByTestId("raw-code");

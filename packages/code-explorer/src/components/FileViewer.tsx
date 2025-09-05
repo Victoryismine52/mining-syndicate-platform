@@ -21,7 +21,10 @@ interface Props {
   "state": {
     "code": "current editor content",
     "original": "last loaded file content",
-    "fullscreen": "whether the editor fills the screen"
+    "fullscreen": "whether the editor fills the screen",
+    "extensions": "language extensions for CodeMirror",
+    "langFailed": "true when syntax highlighting can't load",
+    "editorError": "true when the editor component crashes"
   }
 }
 */
@@ -72,12 +75,32 @@ export async function loadLanguageFromPath(
   }
 }
 
+class EditorErrorBoundary extends React.Component<{
+  onError: (error: Error) => void;
+  children: React.ReactNode;
+}, { hasError: boolean }> {
+  constructor(props: { onError: (error: Error) => void; children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error) {
+    this.props.onError(error);
+  }
+  render() {
+    return this.state.hasError ? null : this.props.children;
+  }
+}
+
 export function FileViewer({ path }: Props) {
   const [code, setCode] = useState("");
   const [original, setOriginal] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
   const [extensions, setExtensions] = useState<Extension[]>([]);
   const [langFailed, setLangFailed] = useState(false);
+  const [editorError, setEditorError] = useState(false);
   const [CodeMirror, setCodeMirror] = useState<React.ComponentType<any> | null>(
     null
   );
@@ -95,6 +118,19 @@ export function FileViewer({ path }: Props) {
         setCodeMirror(null);
       });
   }, [toast]);
+
+  useEffect(() => {
+    setEditorError(false);
+  }, [CodeMirror, path]);
+
+  const handleEditorError = useCallback(
+    (err: Error) => {
+      console.warn("CodeMirror crashed. Rendering plain text instead.", err);
+      toast({ title: "Editor failed to load", variant: "destructive" });
+      setEditorError(true);
+    },
+    [toast]
+  );
 
   useEffect(() => {
     /**
@@ -193,25 +229,27 @@ export function FileViewer({ path }: Props) {
           {fullscreen ? "Exit" : "Full screen"}
         </Button>
       </div>
-      <div className="overflow-auto h-full border rounded">
-        {CodeMirror && !langFailed ? (
-          <CodeMirror
-            value={code}
-            height="100%"
-            extensions={extensions}
-            onChange={(value: any) =>
-              setCode(
-                typeof value === "string" ? value : value?.target?.value ?? ""
-              )
-            }
-          />
-        ) : (
-          <pre className="p-2" data-testid="raw-code">
-            {code}
-          </pre>
-        )}
+        <div className="overflow-auto h-full border rounded">
+          {CodeMirror && !langFailed && !editorError ? (
+            <EditorErrorBoundary onError={handleEditorError}>
+              <CodeMirror
+                value={code}
+                height="100%"
+                extensions={extensions}
+                onChange={(value: any) =>
+                  setCode(
+                    typeof value === "string" ? value : value?.target?.value ?? ""
+                  )
+                }
+              />
+            </EditorErrorBoundary>
+          ) : (
+            <pre className="p-2" data-testid="raw-code">
+              {code}
+            </pre>
+          )}
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
