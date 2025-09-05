@@ -25,6 +25,11 @@
 - Code highlighting uses Prism grammars.
 - When a language definition is missing or Prism throws, `highlightCode` returns the original string so the viewer renders plain text instead of crashing.
 
+## Function Index & UI Flow
+- The server exposes `/api/functions`, returning metadata about repository functions built from `server/function-index.ts`.
+- `FunctionBrowser` fetches this endpoint and lets users search for functions.
+- Drag functions from the browser onto the `CompositionCanvas` to compose flows.
+
 ## Release Notes Automation
 - Changelog generation script: `node packages/code-explorer/scripts/generate-changelog.js CHANGELOG.md`.
 - Next steps:

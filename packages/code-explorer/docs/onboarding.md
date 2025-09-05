@@ -16,6 +16,11 @@
 - Profiles include sections for Introduction, Biography, Core Skills & Tools, Contact & Availability, Current Assignment, Current Task Notes, Project Notes, and Urgent Notes (leave empty when nothing is pressing).
 - Update your profile whenever your assignment or availability changes and at least once per sprint.
 
+## Function Index & UI Flow
+- `/api/functions` returns scanned function metadata (name, signature, path, tags).
+- The `FunctionBrowser` UI loads this endpoint and supports search and drag-and-drop.
+- Drop functions onto the `CompositionCanvas` to start wiring nodes together.
+
 ## Testing Commands
 - Run all repository tests:
   ```bash
