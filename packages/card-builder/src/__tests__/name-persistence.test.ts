@@ -23,5 +23,20 @@ describe('config name persistence', () => {
     const parsed = parseConfig('{}');
     expect(parsed?.name).toBe('Untitled Card');
   });
+
+  it('preserves special characters in card name', () => {
+    const cfg: CardConfig = {
+      name: 'Nombre: Café & Música!',
+      elements: [],
+      theme: 'light',
+      shadow: 'none',
+      lighting: 'none',
+      animation: 'none',
+    };
+
+    const built = buildConfig(cfg);
+    const parsed = parseConfig(JSON.stringify(built));
+    expect(parsed?.name).toBe('Nombre: Café & Música!');
+  });
 });
 
