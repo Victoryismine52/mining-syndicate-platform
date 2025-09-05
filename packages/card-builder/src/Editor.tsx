@@ -11,9 +11,9 @@ import {
   parseConfig,
   exportJson,
   CardConfig,
-} from "./export-helpers";
+} from "./export-utils";
 
-export { buildConfig, parseConfig, exportJson, type CardConfig } from "./export-helpers";
+export { buildConfig, parseConfig, exportJson, type CardConfig } from "./export-utils";
 
 export function CardEditor({
   initial,
