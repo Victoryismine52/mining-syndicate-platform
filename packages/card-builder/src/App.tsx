@@ -91,11 +91,27 @@ function PreviewCard({ card }: { card: StoredCard }) {
 }
 
 export function CardBuilderApp() {
-  const [cards, setCards] = useState<StoredCard[]>(() => {
-    const raw = localStorage.getItem("cards");
-    return raw ? JSON.parse(raw) : [];
-  });
+  const stored = localStorage.getItem("cards");
+  let initialCards: StoredCard[] = [];
+  let initialError: string | null = null;
+  if (stored) {
+    try {
+      initialCards = JSON.parse(stored);
+    } catch (err) {
+      console.error("Failed to parse stored cards", err);
+      initialError = "Stored cards are corrupted. You can reset.";
+    }
+  }
+
+  const [cards, setCards] = useState<StoredCard[]>(initialCards);
+  const [error, setError] = useState<string | null>(initialError);
   const [editing, setEditing] = useState<StoredCard | null>(null);
+
+  const resetStorage = () => {
+    localStorage.removeItem("cards");
+    setCards([]);
+    setError(null);
+  };
 
   const deleteCard = (id: string) => {
     if (!window.confirm("Delete this card?")) return;
@@ -139,6 +155,14 @@ export function CardBuilderApp() {
 
   return (
     <div className="p-8">
+      {error && (
+        <div className="mb-4 p-2 border border-red-500 text-red-700">
+          {error}
+          <Button variant="outline" className="ml-2" onClick={resetStorage}>
+            Reset
+          </Button>
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <ActionCard
           icon={Plus}
