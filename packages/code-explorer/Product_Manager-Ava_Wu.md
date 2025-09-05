@@ -42,9 +42,12 @@ Preparing the code explorer package for beta launch and refining remaining featu
 ### Past
 - Launched discovery for the card-builder initiative and defined MVP milestones.
 - Ran design sprint and user interviews to validate card creation workflows.
+- Assigned work for the function library and canvas integration to move Code Explorer toward beta.
 ### Current
 - Driving cross-team development of card-builder and aligning integration with code explorer.
 - Prioritizing backlog for card-builder beta and tracking package dependencies.
+- Coordinating function indexing API, UI wiring, and test coverage across teams.
 ### Future
 - Planning rollout strategy and metrics for card-builder adoption.
 - Mapping long-term roadmap for advanced card templates and collaborative editing.
+- Extending vision to multi-file patching and automated dependency conflict alerts.
