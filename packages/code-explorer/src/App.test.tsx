@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { CodeExplorerApp } from "./App";
 vi.mock("./components/FileViewer", () => ({ FileViewer: ({ path }: any) => <div>{path}</div> }));
 vi.mock("./components/CompositionCanvas", () => ({ CompositionCanvas: () => <div /> }));
+vi.mock("./components/FunctionBrowser", () => ({ FunctionBrowser: () => <div /> }));
 
 vi.mock("prismjs", () => ({
   default: { highlightAll: vi.fn(), highlight: (code: string) => code, languages: { tsx: {} } },
