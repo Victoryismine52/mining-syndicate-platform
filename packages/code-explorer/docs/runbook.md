@@ -26,9 +26,9 @@
 - When a language definition is missing or Prism throws, `highlightCode` returns the original string so the viewer renders plain text instead of crashing.
 
 ## Function Index & UI Flow
-- The server exposes `/api/functions`, returning metadata about repository functions built from `server/function-index.ts`.
-- `FunctionBrowser` fetches this endpoint and lets users search for functions.
-- Drag functions from the browser onto the `CompositionCanvas` to compose flows.
+- The **function-index API** at `GET /api/functions` returns metadata for each repository function, generated from `server/function-index.ts`.
+- The `FunctionBrowser` panel consumes this endpoint and lets users search or filter for functions.
+- Drag a function from the browser onto the `CompositionCanvas` to create a node and start composing flows.
 
 ## Release Notes Automation
 - Changelog generation script: `node packages/code-explorer/scripts/generate-changelog.js CHANGELOG.md`.

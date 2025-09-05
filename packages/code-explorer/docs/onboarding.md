@@ -17,9 +17,9 @@
 - Update your profile whenever your assignment or availability changes and at least once per sprint.
 
 ## Function Index & UI Flow
-- `/api/functions` returns scanned function metadata (name, signature, path, tags).
-- The `FunctionBrowser` UI loads this endpoint and supports search and drag-and-drop.
-- Drop functions onto the `CompositionCanvas` to start wiring nodes together.
+- The **function-index API** (`/api/functions`) provides scanned function metadata such as name, signature, path, and tags.
+- The `FunctionBrowser` panel fetches this data and supports search, filtering, and drag-and-drop.
+- Drag functions from the browser onto the `CompositionCanvas` to create nodes and wire them together.
 
 ## Testing Commands
 - Run all repository tests:
