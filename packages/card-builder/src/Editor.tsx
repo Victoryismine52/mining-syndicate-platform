@@ -383,7 +383,7 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
     );
   };
 
-  const exportJson = () => {
+  const exportAssets = () => {
     const config = buildConfig({
       name,
       elements,
@@ -495,8 +495,8 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
         <Button onClick={() => setShowCode((v) => !v)} className="ml-auto">
           {showCode ? "Design View" : "Code View"}
         </Button>
-        <Button onClick={exportJson} variant="secondary">
-          Export JSON
+        <Button onClick={exportAssets} variant="secondary">
+          Export Assets
         </Button>
       </div>
 
