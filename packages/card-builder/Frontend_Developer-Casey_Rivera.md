@@ -18,14 +18,16 @@ I adore crafting interactions that feel tactile and alive.  Animations, responsi
 - **[2025-09-11]** Polished the editor toolbar with a proper name input that trims stray spaces and falls back to "Untitled Card".  Wrote a safety net test to ensure gallery deletions wipe cards from localStorage as cleanly as a fresh coat of paint.
 
 - **[2025-09-12]** Tidied the gallery by trimming card titles on save and teaching the delete button to clear localStorage when a card vanishes.
+- **[2025-09-13]** Threaded a reliable card name through the toolbar, save flow and localStorage. Added a gallery delete control that cleans state and storage in one sweep.
 
 ## What I’m Doing
 
-With the toolbar’s naming field polished and deletion covered, I’m circling back to refining the properties panel to be more intuitive.  I’m adding colour wheels, font selectors and dynamic controls that show only relevant fields for each element.  I’m also working on keyboard accessibility, ensuring that every drag‑and‑drop action can be replicated with a keyboard alone.  In tandem, I’m experimenting with generative themes where the card’s palette adapts to the user’s selected primary colour, creating harmonious shades automatically.  All while listening to salsa beats in the background, of course.
+With card titles now flowing from the toolbar to localStorage and the gallery, I'm circling back to refine the properties panel. I'm adding colour wheels, font selectors and dynamic controls that surface only the fields a creator needs. The salsa playlist stays on loop as I tune keyboard accessibility so every gesture has a key‑press twin.
 
 ## Where I’m Headed
 
-- Implement multi‑card linking in the UI, including a flowchart view where users can see how their cards connect.  I imagine lines that curve gracefully like choreographed dancers.
-- Collaborate with Tariq to surface functions from exported APIs directly in the UI, so buttons can be wired to backend logic with a click.
-- Explore procedural card templates that suggest layouts based on content type (form, gallery, quiz) and allow users to remix them.  It’s like providing starter dance routines that users can improvise on.
-- Add undo and redo capabilities so creators can step through their moves like rehearsed choreography.
+- Casey Rivera: Read AGENT.md
+- Casey Rivera: Implement multi‑card linking in the UI, including a flowchart view where users can see how their cards connect. I imagine lines that curve gracefully like choreographed dancers.
+- Casey Rivera: Collaborate with Tariq to surface functions from exported APIs directly in the UI, so buttons can be wired to backend logic with a click.
+- Casey Rivera: Explore procedural card templates that suggest layouts based on content type (form, gallery, quiz) and allow users to remix them. It’s like providing starter dance routines that users can improvise on.
+- Casey Rivera: Add undo and redo capabilities so creators can step through their moves like rehearsed choreography.

@@ -9,6 +9,8 @@ interface StoredCard extends CardConfig {
   id: string;
 }
 
+const DEFAULT_NAME = "Untitled Card";
+
 function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<CardConfig, "elements" | "name"> & { children: React.ReactNode }) {
   const themeClass =
     theme === "dark"
@@ -132,7 +134,11 @@ export function CardBuilderApp() {
 
   const saveCard = (config: CardConfig) => {
     if (!editing) return;
-    const updated: StoredCard = { ...editing, ...config };
+    const updated: StoredCard = {
+      ...editing,
+      ...config,
+      name: config.name.trim() || DEFAULT_NAME,
+    };
     setCards((prev) => {
       const list = prev.some((c) => c.id === updated.id)
         ? prev.map((c) => (c.id === updated.id ? updated : c))
@@ -146,7 +152,7 @@ export function CardBuilderApp() {
   const startNew = () => {
     setEditing({
       id: Date.now().toString(),
-      name: "Untitled Card",
+      name: DEFAULT_NAME,
       elements: [],
       theme: "light",
       shadow: "none",
