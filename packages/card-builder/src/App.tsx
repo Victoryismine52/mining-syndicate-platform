@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CardEditor, CardConfig, elementLibrary } from "./Editor";
+import { CardEditor, CardConfig, elementLibrary, DEFAULT_NAME } from "./Editor";
 import { ActionCard } from "./components/ActionCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,6 @@ import { Plus, Edit, Trash } from "lucide-react";
 interface StoredCard extends CardConfig {
   id: string;
 }
-
-const DEFAULT_NAME = "Untitled Card";
 
 function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<CardConfig, "elements" | "name"> & { children: React.ReactNode }) {
   const themeClass =

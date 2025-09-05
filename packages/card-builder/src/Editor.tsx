@@ -15,8 +15,9 @@ import {
 } from "./export";
 
 export { buildConfig, parseConfig, exportAssets, type CardConfig } from "./export";
+export { elementLibrary };
 
-const DEFAULT_NAME = "Untitled Card";
+export const DEFAULT_NAME = "Untitled Card";
 
 export function CardEditor({
   initial,
