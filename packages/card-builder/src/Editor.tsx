@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DndContext } from "@dnd-kit/core";
-import { Palette } from "./palette";
-import { CardCanvas } from "./canvas";
-import { PropertiesPanel } from "./properties-panel";
+import { Palette } from "./components/Palette";
+import { CardCanvas } from "./components/CardCanvas";
+import { PropertiesPanel } from "./components/PropertiesPanel";
 import { elementLibrary } from "./elements";
 import { useDragAndDrop } from "./hooks/useDragAndDrop";
 import {
@@ -11,9 +11,9 @@ import {
   parseConfig,
   exportAssets,
   CardConfig,
-} from "./export-utils";
+} from "./export";
 
-export { buildConfig, parseConfig, exportAssets, type CardConfig } from "./export-utils";
+export { buildConfig, parseConfig, exportAssets, type CardConfig } from "./export";
 
 export function CardEditor({
   initial,
