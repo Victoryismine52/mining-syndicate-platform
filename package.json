@@ -11,7 +11,8 @@
     "check": "tsc",
     "test": "vitest run",
     "test:playwright": "playwright test",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "pre-commit": "node scripts/check-persona-updates.js"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.1",
