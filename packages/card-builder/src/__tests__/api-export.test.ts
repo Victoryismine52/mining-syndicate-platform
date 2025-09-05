@@ -8,7 +8,7 @@ vi.mock('../export/openapi', () => ({
 import { exportAssets, type CardConfig } from '../export';
 import { generateOpenApi } from '../export';
 
-describe('exportAssets', () => {
+describe('API export', () => {
   it('generates JSON and YAML downloads using card name', () => {
     const cfg: CardConfig = {
       name: 'Unit Test Card',

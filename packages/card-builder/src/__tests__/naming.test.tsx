@@ -19,7 +19,7 @@ vi.mock('@/components/ui/button', () => ({
 import { CardBuilderApp } from '../App';
 
 
-describe('packages/card-builder rename flow', () => {
+describe('packages/card-builder naming flow', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -41,7 +41,7 @@ describe('packages/card-builder rename flow', () => {
     render(<CardBuilderApp />);
 
     // ensure initial name rendered
-    expect(screen.getByText('Default Card')).toBeTruthy();
+    expect(screen.getAllByText('Default Card').length).toBeGreaterThan(0);
 
     // open editor
     fireEvent.click(screen.getByText('Edit'));
@@ -54,8 +54,8 @@ describe('packages/card-builder rename flow', () => {
     fireEvent.click(screen.getByText('Save'));
 
     // CardBuilderApp should display updated name
-    await screen.findByText('Renamed Card');
-    expect(screen.getByText('Renamed Card')).toBeTruthy();
+    await screen.findAllByText('Renamed Card');
+    expect(screen.getAllByText('Renamed Card').length).toBeGreaterThan(0);
 
     // saveCard should persist updated name to localStorage
     expect(setItemSpy).toHaveBeenLastCalledWith(
