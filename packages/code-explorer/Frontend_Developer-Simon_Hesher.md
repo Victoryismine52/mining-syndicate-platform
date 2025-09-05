@@ -40,6 +40,8 @@ drag-and-drop libraries, and dependency graph automation.
   endpoint and verify selection callbacks during drag events.
 - Added case-insensitive filtering and canvas integration tests covering
   function selection and drop events.
+- Extended Function Browser tests for filter clearing, multiple selection
+  callbacks, and verifying node coordinates on canvas drops.
 
 ## 🔮 Future Designs
 - Cross-fade transitions when switching between the Function Browser, Canvas, and Code Pane.

@@ -75,6 +75,32 @@ describe("FunctionBrowser", () => {
     expect(screen.getByTestId("function-Bar")).toBeTruthy();
   });
 
+  it("shows all functions when filter is cleared", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve([
+          { name: "foo", signature: "", path: "a.ts", tags: [] },
+          { name: "bar", signature: "", path: "b.ts", tags: [] },
+        ]),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    await screen.findByTestId("function-foo");
+
+    fireEvent.change(screen.getByTestId("function-search"), {
+      target: { value: "foo" },
+    });
+    expect(screen.queryByTestId("function-bar")).toBeNull();
+
+    fireEvent.change(screen.getByTestId("function-search"), {
+      target: { value: "" },
+    });
+
+    expect(screen.getByTestId("function-foo")).toBeTruthy();
+    expect(screen.getByTestId("function-bar")).toBeTruthy();
+  });
+
   it("drags function to composition canvas", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>
@@ -247,6 +273,29 @@ describe("FunctionBrowser", () => {
     expect(onSelect).toHaveBeenCalledWith(fn);
   });
 
+  it("invokes onSelect for each dragged function", async () => {
+    const onSelect = vi.fn();
+    const data = [
+      { name: "foo", signature: "", path: "a.ts", tags: [] },
+      { name: "bar", signature: "", path: "b.ts", tags: [] },
+    ];
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () => Promise.resolve(data),
+    } as any);
+
+    render(<FunctionBrowser onSelect={onSelect} />);
+
+    const foo = await screen.findByTestId("function-foo");
+    const bar = await screen.findByTestId("function-bar");
+
+    fireEvent.dragStart(foo, { dataTransfer: { setData: () => {} } });
+    fireEvent.dragStart(bar, { dataTransfer: { setData: () => {} } });
+
+    expect(onSelect).toHaveBeenCalledTimes(2);
+    expect(onSelect).toHaveBeenNthCalledWith(1, data[0]);
+    expect(onSelect).toHaveBeenNthCalledWith(2, data[1]);
+  });
+
   it("notifies canvas when dropping a function", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>
@@ -301,5 +350,56 @@ describe("FunctionBrowser", () => {
     const state = onUpdate.mock.calls.at(-1)[0];
     expect(state.nodes.length).toBe(1);
     expect(state.nodes[0].name).toBe("foo");
+  });
+
+  it("places nodes at drop coordinates", async () => {
+    const fn = { name: "foo", signature: "", path: "a.ts", tags: [] };
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () => Promise.resolve([fn]),
+    } as any);
+
+    const onUpdate = vi.fn();
+    render(
+      <div className="flex">
+        <FunctionBrowser />
+        <CompositionCanvas
+          nodes={[]}
+          connections={[]}
+          onUpdate={onUpdate}
+        />
+      </div>,
+    );
+
+    const item = await screen.findByTestId("function-foo");
+    const canvas = screen.getByTestId("canvas") as HTMLElement;
+    canvas.getBoundingClientRect = () => ({
+      left: 10,
+      top: 20,
+      right: 110,
+      bottom: 120,
+      width: 100,
+      height: 100,
+      x: 10,
+      y: 20,
+      toJSON: () => {},
+    });
+
+    const dataTransfer: Record<string, string> = {};
+    fireEvent.dragStart(item, {
+      dataTransfer: {
+        setData: (key: string, val: string) => {
+          dataTransfer[key] = val;
+        },
+      },
+    });
+    fireEvent.dragOver(canvas, { preventDefault: () => {} });
+    fireEvent.drop(canvas, {
+      dataTransfer: { getData: (key: string) => dataTransfer[key] },
+    });
+
+    await waitFor(() => expect(onUpdate).toHaveBeenCalled());
+    const state = onUpdate.mock.calls.at(-1)[0];
+    expect(state.nodes[0].x).toBe(-10);
+    expect(state.nodes[0].y).toBe(-20);
   });
 });
