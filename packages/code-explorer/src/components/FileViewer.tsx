@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { highlightCode } from "../utils/highlight";
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { createTwoFilesPatch } from "diff";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   path: string;
@@ -18,7 +21,9 @@ interface Props {
 */
 export function FileViewer({ path }: Props) {
   const [code, setCode] = useState("");
+  const [original, setOriginal] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     /**
@@ -32,11 +37,25 @@ export function FileViewer({ path }: Props) {
       const res = await fetch(`/code-explorer/api/file?path=${encodeURIComponent(path)}`);
       const text = await res.text();
       setCode(text);
+      setOriginal(text);
     }
     if (path) load();
   }, [path]);
 
-  const lines = code.split("\n");
+  async function handleSave() {
+    const patch = createTwoFilesPatch(path, path, original, code);
+    const res = await fetch(`/code-explorer/api/save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path, patch }),
+    });
+    if (res.ok) {
+      toast({ title: "File saved" });
+      setOriginal(code);
+    } else {
+      toast({ title: "Save failed", variant: "destructive" });
+    }
+  }
 
   return (
     <div className={fullscreen ? "fixed inset-4 bg-background z-50 p-4" : "relative"}>
@@ -48,19 +67,20 @@ export function FileViewer({ path }: Props) {
         >
           Copy
         </Button>
+        <Button size="sm" variant="outline" onClick={handleSave}>
+          Save
+        </Button>
         <Button size="sm" variant="outline" onClick={() => setFullscreen((f) => !f)}>
           {fullscreen ? "Exit" : "Full screen"}
         </Button>
       </div>
       <div className="overflow-auto h-full border rounded">
-        <pre className="language-tsx text-sm flex">
-          <code className="text-right pr-4 select-none border-r">
-            {lines.map((_, i) => (
-              <div key={i}>{i + 1}</div>
-            ))}
-          </code>
-          <code className="pl-4" dangerouslySetInnerHTML={{ __html: highlightCode(code) }} />
-        </pre>
+        <CodeMirror
+          value={code}
+          height="100%"
+          extensions={[javascript({ jsx: true, typescript: true })]}
+          onChange={(value) => setCode(value)}
+        />
       </div>
     </div>
   );

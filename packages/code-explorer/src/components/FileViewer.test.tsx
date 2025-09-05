@@ -1,12 +1,17 @@
 /* @vitest-environment jsdom */
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { FileViewer } from "./FileViewer";
-import Prism from "prismjs";
+
+const toast = vi.fn();
 
 vi.mock("@/components/ui/button", () => ({
   Button: (props: any) => <button {...props} />,
+}));
+
+vi.mock("@/hooks/use-toast", () => ({
+  useToast: () => ({ toast }),
 }));
 
 const originalFetch = global.fetch;
@@ -20,27 +25,37 @@ afterEach(() => {
 });
 
 describe("FileViewer", () => {
-  it("renders fetched code with line numbers", async () => {
-    const source = "const a = 1;\nconsole.log(a);";
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue({ ok: true, text: async () => source });
+  it("renders fetched code in editor", async () => {
+    const source = "const a = 1;";
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => source });
     global.fetch = fetchMock as any;
-
-    const { container } = render(<FileViewer path="/repo/test.ts" />);
-    await screen.findByText((_, node) => node.textContent === source);
-    const lineNumbers = container.querySelectorAll("code.text-right div");
-    expect(lineNumbers.length).toBe(2);
-  });
-
-  it("renders code even when Prism lacks grammar", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => "let x = 1;" });
-    global.fetch = fetchMock as any;
-    vi.spyOn(Prism, "highlight").mockImplementationOnce(() => {
-      throw new Error("missing grammar");
-    });
 
     render(<FileViewer path="/repo/test.ts" />);
-    await screen.findByText((_, el) => el?.textContent === "let x = 1;");
+    const [textarea] = await screen.findAllByTestId("editor");
+    expect((textarea as HTMLTextAreaElement).value).toBe(source);
+  });
+
+  it("sends patch on save", async () => {
+    const source = "const a = 1;";
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, text: async () => source })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+    global.fetch = fetchMock as any;
+
+    render(<FileViewer path="/repo/test.ts" />);
+    const [textarea] = await screen.findAllByTestId("editor");
+    fireEvent.change(textarea, { target: { value: "const a = 2;" } });
+    const [saveBtn] = await screen.findAllByText("Save");
+    fireEvent.click(saveBtn);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/code-explorer/api/save",
+      expect.objectContaining({ method: "POST" })
+    );
+    const body = JSON.parse((fetchMock.mock.calls[1][1] as any).body);
+    expect(body.patch).toContain("-const a = 1;");
+    expect(body.patch).toContain("+const a = 2;");
+    await waitFor(() => expect(toast).toHaveBeenCalledWith({ title: "File saved" }));
   });
 });
