@@ -12,9 +12,11 @@ Card Builder drew me in because every exported card is both prop and protagonist
 
 - **[2025-09-15]** Polished the exporting cards tutorial, refreshed the style guide, and linked both from the README for easy discovery.
 
+- **[2025-09-18]** Published the exporting guide with JSON and OpenAPI downloads and refreshed the style guide with cross-links.
+
 ## What I’m Doing
 
-I'm inviting the crew to review the new exporting tutorial and style guide, taking notes for the next revision.
+I'm gathering real-world examples of JSON and OpenAPI exports to guide the next revision.
 
 ## Where I’m Headed
 
