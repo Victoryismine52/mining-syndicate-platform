@@ -30,22 +30,31 @@ function collectFiles(dir, files = []) {
  * Notes: Utilizes the TypeScript compiler API for analysis.
  * EditCounter: 1
  */
-function parseFile(file) {
+function parseFile(file, rootDir) {
   const sourceText = fs.readFileSync(file, 'utf8');
   const sourceFile = ts.createSourceFile(file, sourceText, ts.ScriptTarget.Latest, true);
   const functions = [];
   function visit(node) {
     if (ts.isFunctionDeclaration(node) && node.name) {
+      const paramsText = node.parameters
+        .map((p) => p.getText(sourceFile))
+        .join(', ');
+      const returnType = node.type ? node.type.getText(sourceFile) : 'any';
+      const tags = ts
+        .getJSDocTags(node)
+        .filter((t) => t.tagName.getText(sourceFile) === 'tag')
+        .map((t) => (t.comment ?? '').toString());
       functions.push({
         name: node.name.text,
-        params: node.parameters.map(p => p.name.getText()),
-        returnType: node.type ? node.type.getText() : 'any'
+        signature: `${node.name.text}(${paramsText}): ${returnType}`,
+        path: path.relative(rootDir, file),
+        tags,
       });
     }
     ts.forEachChild(node, visit);
   }
   visit(sourceFile);
-  return { file, functions };
+  return functions;
 }
 
 /**
@@ -57,5 +66,9 @@ function parseFile(file) {
  */
 export function scan(dir) {
   const files = collectFiles(dir);
-  return files.map(parseFile);
+  return files.flatMap((f) => parseFile(f, dir));
+}
+
+export function scanToJSON(dir) {
+  return JSON.stringify(scan(dir), null, 2);
 }
