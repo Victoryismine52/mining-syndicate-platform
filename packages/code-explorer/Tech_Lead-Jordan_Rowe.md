@@ -70,7 +70,7 @@ Coordinating integration of code exploration features while aligning documentati
 
 
 ## 🔄 Status
-- **Past:** Added async and arrow function support with tag filtering and exercised the API through unit tests.
-- **Current:** Extended the AST parser with generator detection and verified `/code-explorer/api/functions` through new unit tests.
+- **Past:** Converted `scan.js` utilities into the `/code-explorer/api/functions` endpoint indexing declared, arrow, and async functions with tag filtering.
+- **Current:** Expanding unit tests to cover typical and edge cases for the functions endpoint.
 - **Future:** Investigate incremental parsing and broaden coverage for class methods and default exports.
 
