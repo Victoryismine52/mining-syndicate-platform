@@ -9,7 +9,15 @@ let repoDir: string;
 
 beforeAll(() => {
   repoDir = fs.mkdtempSync(path.join(os.tmpdir(), "fn-api-"));
-  fs.writeFileSync(path.join(repoDir, "a.ts"), "function hi(){}\n");
+  fs.writeFileSync(
+    path.join(repoDir, "a.ts"),
+    [
+      "/** @tag util */",
+      "function hi(){}",
+      "/** @tag edge */",
+      "const bye = () => {}",
+    ].join("\n"),
+  );
 });
 
 afterAll(() => {
@@ -27,7 +35,8 @@ describe("GET /functions", () => {
     server.close();
     expect(res.status).toBe(200);
     expect(data).toEqual([
-      { name: "hi", signature: "hi(): any", path: "a.ts", tags: [] },
+      { name: "hi", signature: "hi(): any", path: "a.ts", tags: ["util"] },
+      { name: "bye", signature: "bye(): any", path: "a.ts", tags: ["edge"] },
     ]);
   });
 

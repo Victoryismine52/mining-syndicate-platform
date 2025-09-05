@@ -40,25 +40,44 @@ function parseFile(file, rootDir) {
   const sourceText = fs.readFileSync(file, 'utf8');
   const sourceFile = ts.createSourceFile(file, sourceText, ts.ScriptTarget.Latest, true);
   const functions = [];
+
+  function addFunction(name, params, returnType, jsDocNode) {
+    const tags = ts
+      .getJSDocTags(jsDocNode)
+      .filter((t) => t.tagName.getText(sourceFile) === 'tag')
+      .map((t) => (t.comment ?? '').toString());
+    functions.push({
+      name,
+      signature: `${name}(${params}): ${returnType}`,
+      path: path.relative(rootDir, file),
+      tags,
+    });
+  }
+
   function visit(node) {
     if (ts.isFunctionDeclaration(node) && node.name) {
       const paramsText = node.parameters
         .map((p) => p.getText(sourceFile))
         .join(', ');
       const returnType = node.type ? node.type.getText(sourceFile) : 'any';
-      const tags = ts
-        .getJSDocTags(node)
-        .filter((t) => t.tagName.getText(sourceFile) === 'tag')
-        .map((t) => (t.comment ?? '').toString());
-      functions.push({
-        name: node.name.text,
-        signature: `${node.name.text}(${paramsText}): ${returnType}`,
-        path: path.relative(rootDir, file),
-        tags,
-      });
+      addFunction(node.name.text, paramsText, returnType, node);
+    } else if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer &&
+      (ts.isFunctionExpression(node.initializer) ||
+        ts.isArrowFunction(node.initializer))
+    ) {
+      const init = node.initializer;
+      const paramsText = init.parameters
+        .map((p) => p.getText(sourceFile))
+        .join(', ');
+      const returnType = init.type ? init.type.getText(sourceFile) : 'any';
+      addFunction(node.name.text, paramsText, returnType, node);
     }
     ts.forEachChild(node, visit);
   }
+
   visit(sourceFile);
   return functions;
 }
