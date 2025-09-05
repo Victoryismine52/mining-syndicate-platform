@@ -16,6 +16,8 @@ beforeAll(() => {
       "const arrow = (x: string) => x;",
       "const asyncArrow = async () => {};",
       "export default function () {}",
+      "function* gen() {}",
+      "async function* asyncGen() {}",
     ].join("\n"),
   );
 });
@@ -43,6 +45,18 @@ describe("scan", () => {
       {
         name: "asyncArrow",
         signature: "async asyncArrow(): any",
+        path: "sample.ts",
+        tags: [],
+      },
+      {
+        name: "gen",
+        signature: "*gen(): any",
+        path: "sample.ts",
+        tags: [],
+      },
+      {
+        name: "asyncGen",
+        signature: "async *asyncGen(): any",
         path: "sample.ts",
         tags: [],
       },

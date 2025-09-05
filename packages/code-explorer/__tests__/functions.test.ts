@@ -16,6 +16,8 @@ beforeAll(() => {
       "function hi(){}",
       "/** @tag edge */",
       "const bye = () => {}",
+      "/** @tag gen */",
+      "function* gen(){}",
     ].join("\n"),
   );
 });
@@ -37,6 +39,7 @@ describe("GET /code-explorer/api/functions", () => {
     expect(data).toEqual([
       { name: "hi", signature: "hi(): any", path: "a.ts", tags: ["util"] },
       { name: "bye", signature: "bye(): any", path: "a.ts", tags: ["edge"] },
+      { name: "gen", signature: "*gen(): any", path: "a.ts", tags: ["gen"] },
     ]);
   });
 

@@ -41,14 +41,21 @@ function parseFile(file, rootDir) {
   const sourceFile = ts.createSourceFile(file, sourceText, ts.ScriptTarget.Latest, true);
   const functions = [];
 
-  function addFunction(name, params, returnType, jsDocNode, isAsync = false) {
+  function addFunction(
+    name,
+    params,
+    returnType,
+    jsDocNode,
+    isAsync = false,
+    isGenerator = false,
+  ) {
     const tags = ts
       .getJSDocTags(jsDocNode)
       .filter((t) => t.tagName.getText(sourceFile) === 'tag')
       .map((t) => (t.comment ?? '').toString());
     functions.push({
       name,
-      signature: `${isAsync ? 'async ' : ''}${name}(${params}): ${returnType}`,
+      signature: `${isAsync ? 'async ' : ''}${isGenerator ? '*' : ''}${name}(${params}): ${returnType}`,
       path: path.relative(rootDir, file),
       tags,
     });
@@ -61,7 +68,8 @@ function parseFile(file, rootDir) {
         .join(', ');
       const returnType = node.type ? node.type.getText(sourceFile) : 'any';
       const isAsync = node.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
-      addFunction(node.name.text, paramsText, returnType, node, isAsync);
+      const isGenerator = !!node.asteriskToken;
+      addFunction(node.name.text, paramsText, returnType, node, isAsync, isGenerator);
     } else if (
       ts.isVariableDeclaration(node) &&
       ts.isIdentifier(node.name) &&
@@ -75,7 +83,15 @@ function parseFile(file, rootDir) {
         .join(', ');
       const returnType = init.type ? init.type.getText(sourceFile) : 'any';
       const isAsync = init.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
-      addFunction(node.name.text, paramsText, returnType, node, isAsync);
+      const isGenerator = ts.isFunctionExpression(init) && !!init.asteriskToken;
+      addFunction(
+        node.name.text,
+        paramsText,
+        returnType,
+        node,
+        isAsync,
+        isGenerator,
+      );
     }
     ts.forEachChild(node, visit);
   }
