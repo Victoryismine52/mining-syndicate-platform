@@ -9,6 +9,7 @@ import { nanoid } from "nanoid";
 import open from "open";
 import { setupViteFor, log } from "./vite";
 import { buildFileTree } from "../packages/code-explorer/file-tree.js";
+import { applyPatchToFile } from "./save";
 
 const exec = promisify(execCb);
 
@@ -58,6 +59,29 @@ app.get("/code-explorer/api/file", async (req, res) => {
     res.type("text/plain").send(data);
   } catch (err: any) {
     res.status(500).send(err.message);
+  }
+});
+
+/**
+ * Type: Express route handler
+ * Location: server/explorer.ts > POST /code-explorer/api/save
+ * Description: Applies a unified diff patch to the specified file.
+ * Notes: Validates path against current repository root.
+ */
+app.post("/code-explorer/api/save", async (req, res) => {
+  const { path: filePath, patch } = req.body || {};
+  try {
+    if (!filePath || !patch) {
+      return res.status(400).json({ error: "path and patch are required" });
+    }
+    if (!currentRepoDir || !filePath.startsWith(currentRepoDir)) {
+      return res.status(400).json({ error: "Invalid path" });
+    }
+    await applyPatchToFile(filePath, patch);
+    res.json({ status: "ok" });
+  } catch (err: any) {
+    const status = err.message === "Patch failed" ? 400 : 500;
+    res.status(status).json({ error: err.message });
   }
 });
 
