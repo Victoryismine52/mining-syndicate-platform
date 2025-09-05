@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Folder, Github, FilePlus } from "lucide-react";
 import { ActionCard } from "./components/ActionCard";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ import {
 } from "@/components/ui/dialog";
 import { FileTree, TreeNode } from "./components/FileTree";
 import { FileViewer } from "./components/FileViewer";
+import {
+  CompositionCanvas,
+  CompositionNode,
+  Edge,
+} from "./components/CompositionCanvas";
 
 /**
 {
@@ -36,6 +41,22 @@ export function CodeExplorerApp() {
   const [filter, setFilter] = useState("");
   const [status, setStatus] = useState("");
   const [collapseKey, setCollapseKey] = useState(0);
+  const [composition, setComposition] = useState<{
+    nodes: CompositionNode[];
+    connections: Edge[];
+  }>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("composition");
+      if (stored) return JSON.parse(stored);
+    }
+    return { nodes: [], connections: [] };
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("composition", JSON.stringify(composition));
+    }
+  }, [composition]);
 
 
   /**
@@ -185,10 +206,20 @@ export function CodeExplorerApp() {
         </div>
         <div className="flex-1 p-4 overflow-auto">
           {selected ? (
-            <>
-              <div className="text-sm text-muted-foreground mb-2">{relative}</div>
-              <FileViewer path={selected} />
-            </>
+            <div className="flex h-full gap-4">
+              <div className="flex-1">
+                <div className="text-sm text-muted-foreground mb-2">{relative}</div>
+                <FileViewer path={selected} />
+              </div>
+              <div className="w-1/2 border-l pl-4">
+                <CompositionCanvas
+                  functions={relative ? [relative] : []}
+                  nodes={composition.nodes}
+                  connections={composition.connections}
+                  onUpdate={setComposition}
+                />
+              </div>
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground">Select a file to view</p>
           )}
