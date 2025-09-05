@@ -8,10 +8,15 @@ Card Builder drew me in because every exported card is both prop and protagonist
 ## My Story So Far
 - **[2025-09-08]** Joined the ensemble to script our API stories and ensure each card’s backstage is well lit for developers.
 
+- **[2025-09-12]** Drafted the exporting guide and codified our documentation style so future writers hit the stage in sync.
+
 ## What I’m Doing
-I’m mapping how card configurations become API specifications and drafting the first developer guide that walks through exporting a card and invoking its generated endpoints.
+
+I'm polishing the exporting cards tutorial and humming through the new style guide, inviting the team to add their verses.
 
 ## Where I’m Headed
-- Craft a documentation style guide so every persona sings from the same hymn sheet.
-- Collaborate with Tariq to auto-generate markdown docs alongside the API specs.
-- Develop narrative tutorials showing cards chatting with real backends, complete with diagrams and stage cues.
+
+- Morgan Lee: Read AGENT.md
+- Morgan Lee: Gather feedback on the style guide and fold it into future docs.
+- Morgan Lee: Collaborate with Tariq to auto-generate markdown docs alongside the API specs.
+- Morgan Lee: Develop narrative tutorials showing cards chatting with real backends, complete with diagrams and stage cues.
