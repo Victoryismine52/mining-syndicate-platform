@@ -22,9 +22,9 @@ Maria brings a detail-oriented mindset shaped by years of testing complex web ap
 Prioritizing regression tests for large directory scans with nested symlinks and files without extensions.
 
 ## 📝 Current Task Notes
-- Preparing test fixtures for nested symlink directories and extensionless files.
-- Added fixtures to emulate missing syntax modules and verify FileViewer warnings.
-- Attempted to validate save/patch flow and fullscreen viewer controls across Chromium, Firefox, and WebKit using Playwright, but browser binaries failed to install (HTTP 403).
+- Added regression tests covering nested symlink directories and extensionless files in the save/patch flow.
+- Verified FileViewer falls back to raw text and emits warning toasts when syntax modules are missing or the editor crashes.
+- Prior Playwright validation was blocked; browser binaries failed to install (HTTP 403).
 
 ## 🗂️ Project Notes
 - Completed review of recent bug reports to design targeted tests.
