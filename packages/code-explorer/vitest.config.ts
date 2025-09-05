@@ -25,6 +25,10 @@ export default defineConfig({
         __dirname,
         "test-stubs/lang-html.ts"
       ),
+      "react-virtualized": path.resolve(
+        __dirname,
+        "test-stubs/react-virtualized.tsx"
+      ),
     },
   },
   test: {
