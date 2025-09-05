@@ -3,7 +3,7 @@
 // that the OpenAPI export contains expected metadata.
 import { describe, it, expect } from 'vitest';
 import { buildConfig, parseConfig } from '../Editor';
-import { generateOpenApi } from '../export';
+import { exportApi } from '../export';
 
 const base = {
   theme: 'light',
@@ -39,7 +39,7 @@ describe('card builder config', () => {
       ],
       ...base,
     });
-    const yaml = generateOpenApi(cfg);
+    const yaml = exportApi(cfg);
     expect(yaml).toContain('title: "My Card"');
     expect(yaml).toContain('/element/btn1');
     expect(yaml).toContain('openapi: "3.0.0"');

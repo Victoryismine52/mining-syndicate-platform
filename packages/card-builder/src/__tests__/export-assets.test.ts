@@ -1,12 +1,11 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('../export/openapi', () => ({
-  generateOpenApi: vi.fn(() => 'openapi: "3.0.0"'),
+vi.mock('../exportApi', () => ({
+  exportApi: vi.fn(() => 'openapi: "3.0.0"'),
 }));
 
-import { exportAssets, type CardConfig } from '../export';
-import { generateOpenApi } from '../export';
+import { exportAssets, exportApi, type CardConfig } from '../export';
 
 describe('exportAssets', () => {
   it('generates JSON and YAML downloads using card name', () => {
@@ -36,7 +35,7 @@ describe('exportAssets', () => {
     exportAssets(cfg);
 
     expect(createObjectURL).toHaveBeenCalledTimes(2);
-    expect(generateOpenApi).toHaveBeenCalledWith(cfg);
+    expect(exportApi).toHaveBeenCalledWith(cfg);
     expect(anchors[0].download).toBe('card.json');
     expect(anchors[1].download).toBe('card.yaml');
     expect(anchors[0].click).toHaveBeenCalled();

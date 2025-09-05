@@ -1,5 +1,5 @@
-import { CardConfig } from "./types";
-import { generateOpenApi } from "./openapi";
+import type { CardConfig } from "./types";
+import { exportApi } from "../exportApi";
 
 export function exportAssets(config: CardConfig) {
   const data = JSON.stringify(config, null, 2);
@@ -11,7 +11,7 @@ export function exportAssets(config: CardConfig) {
   jsonLink.click();
   URL.revokeObjectURL(jsonUrl);
 
-  const yaml = generateOpenApi(config);
+  const yaml = exportApi(config);
   const yamlBlob = new Blob([yaml], { type: "application/yaml" });
   const yamlUrl = URL.createObjectURL(yamlBlob);
   const yamlLink = document.createElement("a");
