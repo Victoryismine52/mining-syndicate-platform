@@ -13,6 +13,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { generateOpenApi } from "./exportApi";
 
 // ---- Data element library -------------------------------------------------
 type DisplayMode = "display" | "input" | "edit";
@@ -383,18 +384,34 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
   };
 
   const exportJson = () => {
-    const data = JSON.stringify(
-      buildConfig({ name, elements, theme, shadow, lighting, animation }),
-      null,
-      2,
-    );
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "card.json";
-    a.click();
-    URL.revokeObjectURL(url);
+    const config = buildConfig({
+      name,
+      elements,
+      theme,
+      shadow,
+      lighting,
+      animation,
+    });
+
+    // Export configuration as JSON
+    const data = JSON.stringify(config, null, 2);
+    const jsonBlob = new Blob([data], { type: "application/json" });
+    const jsonUrl = URL.createObjectURL(jsonBlob);
+    const jsonLink = document.createElement("a");
+    jsonLink.href = jsonUrl;
+    jsonLink.download = "card.json";
+    jsonLink.click();
+    URL.revokeObjectURL(jsonUrl);
+
+    // Export OpenAPI spec as YAML
+    const yaml = generateOpenApi(config);
+    const yamlBlob = new Blob([yaml], { type: "application/yaml" });
+    const yamlUrl = URL.createObjectURL(yamlBlob);
+    const yamlLink = document.createElement("a");
+    yamlLink.href = yamlUrl;
+    yamlLink.download = "card.yaml";
+    yamlLink.click();
+    URL.revokeObjectURL(yamlUrl);
   };
 
   const applyCode = () => {
