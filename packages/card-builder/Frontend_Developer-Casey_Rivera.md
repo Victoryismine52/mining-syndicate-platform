@@ -12,10 +12,11 @@ I adore crafting interactions that feel tactile and alive.  Animations, responsi
 - **[2025‑09‑06]** Collaborated with Jade to design a theme selector that lets users switch between light, dark and neon modes.  Added subtle drop shadows and scale animations to palette items.  Taught the team a few dance moves during lunch break.
 - **[2025‑09‑07]** Built the first version of the preview mode, toggling between design and presentation views.  Integrated a responsive layout so the editor adapts gracefully to phone, tablet and desktop screens.
 - **[2025-09-08]** Threaded a new card-name field through the editor, save flow and preview so every card wears its title proudly.  Felt like giving each creation its own signature.
+- **[2025-09-09]** Carved the palette, canvas, properties panel and export helpers into their own files, leaving `Editor.tsx` as a slim conductor.
 
 ## What I’m Doing
 
-With the card-name field in place, I’m circling back to refining the properties panel to be more intuitive.  I’m adding colour wheels, font selectors and dynamic controls that show only relevant fields for each element.  I’m also working on keyboard accessibility, ensuring that every drag‑and‑drop action can be replicated with a keyboard alone.  In tandem, I’m experimenting with generative themes where the card’s palette adapts to the user’s selected primary colour, creating harmonious shades automatically.  All while listening to salsa beats in the background, of course.
+Now that the editor’s pieces live in their own files, I’m circling back to refining the properties panel to be more intuitive.  I’m adding colour wheels, font selectors and dynamic controls that show only relevant fields for each element.  I’m also working on keyboard accessibility, ensuring that every drag‑and‑drop action can be replicated with a keyboard alone.  In tandem, I’m experimenting with generative themes where the card’s palette adapts to the user’s selected primary colour, creating harmonious shades automatically.  All while listening to salsa beats in the background, of course.
 
 ## Where I’m Headed
 

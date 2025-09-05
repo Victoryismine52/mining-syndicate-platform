@@ -6,7 +6,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ElementInstance, elementLibrary } from "./elements";
+import { ElementInstance, elementLibrary } from "../elements";
 
 function CardItem({
   item,

@@ -1,5 +1,5 @@
 import React from "react";
-import { ElementInstance } from "./elements";
+import { ElementInstance } from "../elements";
 
 export function PropertiesPanel({
   selected,

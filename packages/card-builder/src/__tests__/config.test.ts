@@ -3,7 +3,7 @@
 // that the OpenAPI export contains expected metadata.
 import { describe, it, expect } from 'vitest';
 import { buildConfig, parseConfig } from '../Editor';
-import generateOpenApi from '../exportApi';
+import { generateOpenApi } from '../export';
 
 const base = {
   theme: 'light',
