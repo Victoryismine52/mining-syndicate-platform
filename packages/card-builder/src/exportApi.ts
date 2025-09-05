@@ -1,6 +1,8 @@
 import type { CardConfig } from "./Editor";
 
-// Convert a CardConfig into an OpenAPI 3.0 YAML document
+// Convert a CardConfig into an OpenAPI 3.0 YAML document.
+// Each interactive element gets a minimal POST endpoint so consumers
+// can wire up server handlers for buttons and input fields.
 export function generateOpenApi(config: CardConfig): string {
   const paths: Record<string, any> = {};
 
