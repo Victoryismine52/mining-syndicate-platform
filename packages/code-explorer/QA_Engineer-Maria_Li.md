@@ -21,6 +21,11 @@ Maria brings a detail-oriented mindset shaped by years of testing complex web ap
 ## 🎯 Current Assignment
 Prioritizing regression tests for large directory scans with nested symlinks and files without extensions.
 
+## 🔄 Status
+- **Past:** Added regression tests covering nested symlink directories and extensionless files in the save/patch flow.
+- **Current:** Extending tests for endpoint failure states and drag-and-drop between FunctionBrowser and CompositionCanvas.
+- **Future:** Automate Playwright runs in CI to validate drag-and-drop interactions across browsers.
+
 ## 📝 Current Task Notes
 - Added regression tests covering nested symlink directories and extensionless files in the save/patch flow.
 - Verified FileViewer falls back to raw text and emits warning toasts when syntax modules are missing or the editor crashes.
@@ -28,6 +33,7 @@ Prioritizing regression tests for large directory scans with nested symlinks and
 - Adjusted Playwright drag-and-drop spec to simulate network errors before mounting.
 - Playwright run in this environment fails to launch browsers; set up `npx playwright install` in CI.
 - Added Playwright tests for API 500 responses and multi-function drag-and-drop between FunctionBrowser and CompositionCanvas; unit tests and type-checks pass, Playwright tests fail to launch browsers locally.
+- Extended component and Playwright tests to cover 404 function endpoint errors and duplicate function drag-and-drop on the CompositionCanvas; unit tests and type checks pass.
 
 ## 🗂️ Project Notes
 - Completed review of recent bug reports to design targeted tests.
