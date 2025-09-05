@@ -40,4 +40,15 @@ describe("GET /functions", () => {
     server.close();
     expect(res.status).toBe(400);
   });
+
+  it("returns 500 when scan fails", async () => {
+    const app = express();
+    // provide non-existent directory to trigger scan error
+    app.use("/functions", createFunctionsRouter(() => "/no/such/dir"));
+    const server = app.listen(0);
+    const { port } = server.address() as any;
+    const res = await fetch(`http://localhost:${port}/functions`);
+    server.close();
+    expect(res.status).toBe(500);
+  });
 });

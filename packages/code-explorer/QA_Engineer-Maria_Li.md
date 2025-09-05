@@ -25,6 +25,7 @@ Prioritizing regression tests for large directory scans with nested symlinks and
 - Added regression tests covering nested symlink directories and extensionless files in the save/patch flow.
 - Verified FileViewer falls back to raw text and emits warning toasts when syntax modules are missing or the editor crashes.
 - Prior Playwright validation was blocked; browser binaries failed to install (HTTP 403).
+- Added tests for API failure states and drag-and-drop interactions between FunctionBrowser and CompositionCanvas.
 
 ## 🗂️ Project Notes
 - Completed review of recent bug reports to design targeted tests.
