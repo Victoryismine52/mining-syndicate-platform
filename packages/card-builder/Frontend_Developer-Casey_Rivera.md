@@ -14,7 +14,7 @@ I adore crafting interactions that feel tactile and alive.  Animations, responsi
 
 ## What I’m Doing
 
-Right now I’m refining the properties panel to be more intuitive.  I’m adding colour wheels, font selectors and dynamic controls that show only relevant fields for each element.  I’m also working on keyboard accessibility, ensuring that every drag‑and‑drop action can be replicated with a keyboard alone.  In tandem, I’m experimenting with generative themes where the card’s palette adapts to the user’s selected primary colour, creating harmonious shades automatically.  All while listening to salsa beats in the background, of course.
+Right now I’m refining the properties panel to be more intuitive.  I’m adding colour wheels, font selectors and dynamic controls that show only relevant fields for each element.  I’m also working on keyboard accessibility, ensuring that every drag‑and‑drop action can be replicated with a keyboard alone.  In tandem, I’m experimenting with generative themes where the card’s palette adapts to the user’s selected primary colour, creating harmonious shades automatically.  After reviewing the toolbar wireframes for the card-name field and API export button, I’m prepping the layout so those controls slot in smoothly.  All while listening to salsa beats in the background, of course.
 
 ## Where I’m Headed
 
