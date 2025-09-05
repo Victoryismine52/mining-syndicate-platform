@@ -5,7 +5,7 @@ Code Explorer is a browser-based tool for navigating project source files. It sc
 
 ## Current Features
 - Interactive file tree for browsing directories and selecting files.
-- Syntax-highlighted viewer powered by Prism with a plain-text fallback when a grammar is missing.
+- Syntax-highlighted viewer powered by CodeMirror with a plain-text fallback when a language mode is missing.
 - Inline error messages and loading indicators for failed or slow file fetches.
 - Team profile system that stores member information and project context alongside the code.
 
