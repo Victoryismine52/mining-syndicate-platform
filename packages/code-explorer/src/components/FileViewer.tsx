@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
+  /** Absolute repository path of the file to display */
   path: string;
 }
 
@@ -12,10 +13,16 @@ interface Props {
 {
   "friendlyName": "file viewer",
   "description": "Fetches and displays highlighted source code with line numbers.",
-  "editCount": 4,
+  "editCount": 5,
   "tags": ["ui", "code"],
   "location": "src/components/FileViewer",
-  "notes": "Provides copy and fullscreen controls for the current file."
+  "notes": "Provides copy and fullscreen controls for the current file.",
+  "props": { "path": "absolute repository path for the file" },
+  "state": {
+    "code": "current editor content",
+    "original": "last loaded file content",
+    "fullscreen": "whether the editor fills the screen"
+  }
 }
 */
 export async function loadLanguageFromPath(
