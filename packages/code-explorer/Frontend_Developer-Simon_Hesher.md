@@ -42,6 +42,9 @@ drag-and-drop libraries, and dependency graph automation.
   function selection and drop events.
 - Extended Function Browser tests for filter clearing, multiple selection
   callbacks, and verifying node coordinates on canvas drops.
+- Validated the Function Browser against the new endpoint with drag-and-drop
+  to the Composition Canvas, broadening tests for filtering, selection, and
+  node placement.
 
 ## 🔮 Future Designs
 - Cross-fade transitions when switching between the Function Browser, Canvas, and Code Pane.
