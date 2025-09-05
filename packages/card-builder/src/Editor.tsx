@@ -9,11 +9,11 @@ import { useDragAndDrop } from "./hooks/useDragAndDrop";
 import {
   buildConfig,
   parseConfig,
-  exportJson,
+  exportAssets,
   CardConfig,
 } from "./export-utils";
 
-export { buildConfig, parseConfig, exportJson, type CardConfig } from "./export-utils";
+export { buildConfig, parseConfig, exportAssets, type CardConfig } from "./export-utils";
 
 export function CardEditor({
   initial,
@@ -154,7 +154,7 @@ export function CardEditor({
         </Button>
         <Button
           onClick={() =>
-            exportJson(
+            exportAssets(
               buildConfig({
                 name,
                 elements,
