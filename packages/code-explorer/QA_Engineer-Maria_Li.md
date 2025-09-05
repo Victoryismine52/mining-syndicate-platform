@@ -27,6 +27,7 @@ Prioritizing regression tests for large directory scans with nested symlinks and
 - Added unit test coverage for FunctionBrowser fetch failures to ensure a safe empty state.
 - Adjusted Playwright drag-and-drop spec to simulate network errors before mounting.
 - Playwright run in this environment fails to launch browsers; set up `npx playwright install` in CI.
+- Added Playwright tests for API 500 responses and multi-function drag-and-drop between FunctionBrowser and CompositionCanvas; unit tests and type-checks pass, Playwright tests fail to launch browsers locally.
 
 ## 🗂️ Project Notes
 - Completed review of recent bug reports to design targeted tests.
