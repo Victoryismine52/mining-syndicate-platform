@@ -7,41 +7,40 @@ export function generateOpenApi(config: CardConfig): string {
   const paths: Record<string, any> = {};
 
   for (const el of config.elements) {
-    // Button elements -> POST endpoint to handle click
+    const path = `/element/${el.id}`;
+    const operations: Record<string, any> = {};
+
     if (el.elementId === "button") {
-      paths[`/element/${el.id}`] = {
-        post: {
-          summary: `Handle ${el.props.label || "button"} click`,
-          responses: {
-            "200": { description: "Success" },
-          },
+      operations.post = {
+        summary: `Handle ${el.props.label || "button"} click`,
+        responses: {
+          "200": { description: "Success" },
         },
       };
-    }
-
-    // Input display mode -> POST endpoint to submit value
-    if (el.displayMode === "input") {
-      paths[`/element/${el.id}`] = {
-        post: {
-          summary: `Submit value for ${el.props.label || "input"}`,
-          requestBody: {
-            required: true,
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    value: { type: "string" },
-                  },
+    } else if (el.displayMode === "input") {
+      operations.post = {
+        summary: `Submit value for ${el.props.label || "input"}`,
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  value: { type: "string" },
                 },
               },
             },
           },
-          responses: {
-            "200": { description: "Success" },
-          },
+        },
+        responses: {
+          "200": { description: "Success" },
         },
       };
+    }
+
+    if (Object.keys(operations).length > 0) {
+      paths[path] = operations;
     }
   }
 
