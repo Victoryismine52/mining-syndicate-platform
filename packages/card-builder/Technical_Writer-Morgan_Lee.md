@@ -10,13 +10,15 @@ Card Builder drew me in because every exported card is both prop and protagonist
 
 - **[2025-09-12]** Drafted the exporting guide and codified our documentation style so future writers hit the stage in sync.
 
+- **[2025-09-15]** Polished the exporting cards tutorial, refreshed the style guide, and linked both from the README for easy discovery.
+
 ## What I’m Doing
 
-I'm polishing the exporting cards tutorial and humming through the new style guide, inviting the team to add their verses.
+I'm inviting the crew to review the new exporting tutorial and style guide, taking notes for the next revision.
 
 ## Where I’m Headed
 
 - Morgan Lee: Read AGENT.md
-- Morgan Lee: Gather feedback on the style guide and fold it into future docs.
+- Morgan Lee: Collect team feedback on the exporting cards tutorial and style guide.
 - Morgan Lee: Collaborate with Tariq to auto-generate markdown docs alongside the API specs.
 - Morgan Lee: Develop narrative tutorials showing cards chatting with real backends, complete with diagrams and stage cues.

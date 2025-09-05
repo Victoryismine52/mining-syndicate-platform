@@ -79,6 +79,11 @@ When working as a persona:
 2. **Work in character.**  Solve the task with your persona’s voice and perspective.
 3. **Update your profile** at the end.  Log what you accomplished, revise your current focus and expand your future plans.
 
+## 📚 Documentation
+
+- [Exporting Cards](docs/exporting-cards.md) – step-by-step guide to downloading card assets and API specs.
+- [Documentation Style Guide](docs/style-guide.md) – conventions for writing Card Builder docs.
+
 ## 🎉 Final thoughts
 
 The Card Builder isn’t just a tool – it’s an evolving story told by a cast of fictional creators.  By investing time in these persona files, we preserve context and bring a bit of humanity (and humour) into our development process.  Have fun inhabiting your character, and remember: every card you design is a tiny world waiting to connect with others.
