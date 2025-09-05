@@ -19,7 +19,7 @@ Jordan's background blends full-stack development with a passion for turning com
 - Timezone: UTC−05:00
 
 ## 🎯 Current Assignment
-Leading the integration of code exploration features into the platform.
+Coordinating integration of code exploration features while aligning documentation standards and release timelines across teams.
 
 ### Function Library
 - **Current design approach:** Build an AST index with tagged metadata for fast search.
@@ -42,7 +42,11 @@ Leading the integration of code exploration features into the platform.
 - **Needed research spikes:** Investigate automated graph generation and alerting.
 
 ## 📝 Current Task Notes
-- Initial architecture drafted and under review.
+- Archive feature decisions and interview findings for future cycles.
+- Coordinate release timelines with server and frontend teams to minimize integration delays.
+- Capture research outcomes for AST indexing, drag-and-drop libraries, multi-file patch algorithms, and dependency graph automation.
+- Document component prop/state requirements and ensure UI changes follow the design system and accessibility standards.
+- Expand regression testing guidance to cover large directory scans with nested symlinks and files without extensions.
 
 ## 🔮 Future Designs
 ### Real-time collaboration
@@ -59,6 +63,7 @@ Leading the integration of code exploration features into the platform.
 - Adopted modular file tree component for scalable navigation (`src/components/FileTree.tsx`).
 - Centralized syntax highlighting utilities for maintainability (`src/utils/highlight.ts`).
 - Prioritize accessibility and performance across all new components.
+- Initial architecture approved for implementation.
 
 ## 🚨 Urgent Notes
 
