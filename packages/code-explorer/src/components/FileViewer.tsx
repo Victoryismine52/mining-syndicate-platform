@@ -72,6 +72,8 @@ export function FileViewer({ path }: Props) {
     }
     */
     async function load() {
+      setCode("");
+      setOriginal("");
       const res = await fetch(`/code-explorer/api/file?path=${encodeURIComponent(path)}`);
       const text = await res.text();
       setCode(text);
