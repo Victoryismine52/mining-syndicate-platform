@@ -51,4 +51,27 @@ describe('packages/card-builder delete flow', () => {
 
     confirmSpy.mockRestore();
   });
+
+  it('keeps card when deletion is cancelled', () => {
+    const initialCard = {
+      id: '1',
+      name: 'Sample',
+      elements: [],
+      theme: 'light',
+      shadow: 'none',
+      lighting: 'none',
+      animation: 'none',
+    };
+    localStorage.setItem('cards', JSON.stringify([initialCard]));
+
+    render(<CardBuilderApp />);
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    fireEvent.click(screen.getByText('Delete'));
+
+    expect(screen.getAllByText('Sample')[0]).toBeTruthy();
+    expect(localStorage.getItem('cards')).toBe(JSON.stringify([initialCard]));
+
+    confirmSpy.mockRestore();
+  });
 });

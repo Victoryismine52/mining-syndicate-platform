@@ -34,5 +34,20 @@ describe('exportApi', () => {
     expect(yaml).toContain('/element/input1:');
     expect(yaml).toContain('Submit value for Name');
   });
+
+  it('generates base OpenAPI when card has no interactive elements', () => {
+    const cfg: CardConfig = {
+      name: 'Static Card',
+      elements: [],
+      theme: 'light',
+      shadow: 'none',
+      lighting: 'none',
+      animation: 'none',
+    };
+
+    const yaml = exportApi(cfg);
+    expect(yaml).toContain('openapi: "3.0.0"');
+    expect(yaml).not.toContain('/element/');
+  });
 });
 
