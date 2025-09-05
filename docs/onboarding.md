@@ -30,6 +30,19 @@ This guide covers setting up the project locally, running tests, and establishin
   npx vitest path/to/testfile.ts
   ```
 
+## Function Index & `FunctionBrowser` Flow
+
+- `GET /api/functions` returns the prebuilt **function index** generated at startup by `server/function-index.ts`.
+  ```json
+  [
+    { "name": "add", "path": "src/math.ts", "line": 12, "tags": ["math"] }
+  ]
+  ```
+- The `FunctionBrowser` panel uses this endpoint to enable search, filtering, and drag-and-drop:
+  1. Open the browser from the explorer sidebar.
+  2. Search or filter to find a function.
+  3. Drag the function onto the `CompositionCanvas` to begin a new flow.
+
 ## Profile Conventions
 
 - Use your real name and preferred pronouns in documentation.
