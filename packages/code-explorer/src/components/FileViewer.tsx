@@ -27,12 +27,15 @@ export function FileViewer({ path }: Props) {
 
   useEffect(() => {
     /**
-     * Type: Async helper function
-     * Location: packages/code-explorer/src/components/FileViewer.tsx > useEffect load
-     * Description: Retrieves file contents from the backend for the specified path.
-     * Notes: Updates local state once the content is loaded.
-     * EditCounter: 1
-     */
+    {
+      "friendlyName": "load file",
+      "description": "Retrieves file contents from the backend for the specified path.",
+      "editCount": 2,
+      "tags": [],
+      "location": "packages/code-explorer/src/components/FileViewer.tsx > useEffect load",
+      "notes": "Updates local state once the content is loaded."
+    }
+    */
     async function load() {
       const res = await fetch(`/code-explorer/api/file?path=${encodeURIComponent(path)}`);
       const text = await res.text();

@@ -3,12 +3,15 @@ import path from 'path';
 import ts from 'typescript';
 
 /**
- * Type: Recursive utility function
- * Location: packages/code-explorer/scan.js > collectFiles
- * Description: Traverses directories to gather source files with JS/TS extensions.
- * Notes: Skips node_modules and hidden folders.
- * EditCounter: 1
- */
+{
+  "friendlyName": "collect files",
+  "description": "Traverses directories to gather source files with JS/TS extensions.",
+  "editCount": 2,
+  "tags": [],
+  "location": "packages/code-explorer/scan.js > collectFiles",
+  "notes": "Skips node_modules and hidden folders."
+}
+*/
 function collectFiles(dir, files = []) {
   for (const entry of fs.readdirSync(dir)) {
     const full = path.join(dir, entry);
@@ -24,12 +27,15 @@ function collectFiles(dir, files = []) {
 }
 
 /**
- * Type: Parser function
- * Location: packages/code-explorer/scan.js > parseFile
- * Description: Parses a source file to extract declared function signatures.
- * Notes: Utilizes the TypeScript compiler API for analysis.
- * EditCounter: 1
- */
+{
+  "friendlyName": "parse file",
+  "description": "Parses a source file to extract declared function signatures.",
+  "editCount": 2,
+  "tags": [],
+  "location": "packages/code-explorer/scan.js > parseFile",
+  "notes": "Utilizes the TypeScript compiler API for analysis."
+}
+*/
 function parseFile(file, rootDir) {
   const sourceText = fs.readFileSync(file, 'utf8');
   const sourceFile = ts.createSourceFile(file, sourceText, ts.ScriptTarget.Latest, true);
@@ -58,17 +64,30 @@ function parseFile(file, rootDir) {
 }
 
 /**
- * Type: Utility function
- * Location: packages/code-explorer/scan.js > scan
- * Description: Produces parsed function data for all source files in a directory.
- * Notes: Combines collectFiles and parseFile helpers.
- * EditCounter: 1
- */
+{
+  "friendlyName": "scan directory",
+  "description": "Produces parsed function data for all source files in a directory.",
+  "editCount": 2,
+  "tags": [],
+  "location": "packages/code-explorer/scan.js > scan",
+  "notes": "Combines collectFiles and parseFile helpers."
+}
+*/
 export function scan(dir) {
   const files = collectFiles(dir);
   return files.flatMap((f) => parseFile(f, dir));
 }
 
+/**
+{
+  "friendlyName": "scan to json",
+  "description": "Serializes scan results to formatted JSON.",
+  "editCount": 1,
+  "tags": [],
+  "location": "packages/code-explorer/scan.js > scanToJSON",
+  "notes": "Wraps scan with JSON.stringify."
+}
+*/
 export function scanToJSON(dir) {
   return JSON.stringify(scan(dir), null, 2);
 }

@@ -19,12 +19,15 @@ app.use(express.json());
 let currentRepoDir: string | null = null;
 
 /**
- * Type: Express route handler
- * Location: server/explorer.ts > POST /code-explorer/api/clone
- * Description: Clones a GitHub repository to a temp directory and returns its file tree.
- * Notes: Updates currentRepoDir for subsequent file fetches.
- * EditCounter: 1
- */
+{
+  "friendlyName": "clone route",
+  "description": "Clones a GitHub repository to a temp directory and returns its file tree.",
+  "editCount": 2,
+  "tags": ["express", "route"],
+  "location": "server/explorer.ts > POST /code-explorer/api/clone",
+  "notes": "Updates currentRepoDir for subsequent file fetches."
+}
+*/
 app.post("/code-explorer/api/clone", async (req, res) => {
   try {
     const repo: string = req.body.repo;
@@ -43,12 +46,15 @@ app.post("/code-explorer/api/clone", async (req, res) => {
 });
 
 /**
- * Type: Express route handler
- * Location: server/explorer.ts > GET /code-explorer/api/file
- * Description: Reads and returns the contents of a file within the cloned repository.
- * Notes: Validates that requested path resides in the current repository.
- * EditCounter: 1
- */
+{
+  "friendlyName": "get file route",
+  "description": "Reads and returns the contents of a file within the cloned repository.",
+  "editCount": 2,
+  "tags": ["express", "route"],
+  "location": "server/explorer.ts > GET /code-explorer/api/file",
+  "notes": "Validates that requested path resides in the current repository."
+}
+*/
 app.get("/code-explorer/api/file", async (req, res) => {
   const filePath = req.query.path as string | undefined;
   try {
@@ -63,11 +69,15 @@ app.get("/code-explorer/api/file", async (req, res) => {
 });
 
 /**
- * Type: Express route handler
- * Location: server/explorer.ts > POST /code-explorer/api/save
- * Description: Applies a unified diff patch to the specified file.
- * Notes: Validates path against current repository root.
- */
+{
+  "friendlyName": "save file route",
+  "description": "Applies a unified diff patch to the specified file.",
+  "editCount": 1,
+  "tags": ["express", "route"],
+  "location": "server/explorer.ts > POST /code-explorer/api/save",
+  "notes": "Validates path against current repository root."
+}
+*/
 app.post("/code-explorer/api/save", async (req, res) => {
   const { path: filePath, patch } = req.body || {};
   try {
@@ -88,12 +98,15 @@ app.post("/code-explorer/api/save", async (req, res) => {
 const server = createServer(app);
 
 /**
- * Type: Async IIFE
- * Location: server/explorer.ts > server startup
- * Description: Configures Vite middleware and starts the explorer development server.
- * Notes: Automatically opens the explorer URL in the default browser.
- * EditCounter: 1
- */
+{
+  "friendlyName": "explorer startup",
+  "description": "Configures Vite middleware and starts the explorer development server.",
+  "editCount": 2,
+  "tags": ["startup"],
+  "location": "server/explorer.ts > server startup",
+  "notes": "Automatically opens the explorer URL in the default browser."
+}
+*/
 (async () => {
   const rootDir = path.resolve(import.meta.dirname, "..", "packages", "code-explorer");
   await setupViteFor(app, server, rootDir, "/code-explorer");
