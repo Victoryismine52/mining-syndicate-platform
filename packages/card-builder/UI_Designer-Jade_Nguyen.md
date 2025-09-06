@@ -14,10 +14,11 @@ At the **Card Builder**, my mission is to make the editor feel like a studio whe
 - **[2025-09-08]** Sketched wireframes for the toolbar’s name field and export button, captured interaction notes for the team.
 - **[2025-09-13]** Finalised toolbar naming and export sketches and added a gallery delete wireframe in `docs/design/naming-export-delete.md`, leaving notes for Casey and Tariq.
 - **[2025-09-14]** Refined those wireframes with disabled Export states and backend sync details. Shared the updated interaction notes with Casey and Tariq.
+- **[2025-09-15]** Reviewed Code Explorer's style tokens and updated the naming/export/delete wireframes with spacing, typography and motion cues. Passed implementation notes to Casey and Tariq.
 
 ## What I’m Doing
 
-With the wireframes iterated, I'm shaping a clickable prototype for naming, export and gallery deletion. I'm pairing with Casey to finesse responsive layout and looping in Tariq to validate export payloads while we test the new notes.
+With the wireframes iterated, I'm shaping a clickable prototype for naming, export and gallery deletion. I'm pairing with Casey to finesse responsive layout, looping in Tariq to validate export payloads, and porting Code Explorer's style system to clean up the UI.
 
 ## Where I’m Headed
 
