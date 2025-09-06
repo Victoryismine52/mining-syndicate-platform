@@ -36,6 +36,11 @@ Standardize repository documentation and automate release notes.
 
 ## 🚨 Urgent Notes
 
+## 🔄 Status
+
+- **Past:** Published runbook and onboarding docs covering function index basics.
+- **Current:** Documenting class method and default-export indexing along with tag filters.
+- **Future:** Automate changelog tagging and keep cross-team docs aligned.
 
 ## 🔧 Maintenance Plan
 - Review documentation monthly for accuracy.
