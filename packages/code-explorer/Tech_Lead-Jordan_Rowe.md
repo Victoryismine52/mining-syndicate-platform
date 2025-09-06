@@ -70,7 +70,7 @@ Coordinating integration of code exploration features while aligning documentati
 
 
 ## 🔄 Status
-- **Past:** Converted `scan.js` utilities into the `/code-explorer/api/functions` endpoint indexing declared, arrow, and async functions with tag filtering.
-- **Current:** Expanding unit tests to cover typical and edge cases for the functions endpoint.
-- **Future:** Investigate incremental parsing and broaden coverage for class methods and default exports.
+- **Past:** Converted `scan.js` utilities into the `/code-explorer/api/functions` endpoint and added class method and default-export support with tagging.
+- **Current:** Refining unit tests and tooling around the enhanced function scanner.
+- **Future:** Investigate incremental parsing and broaden coverage to additional AST patterns.
 
