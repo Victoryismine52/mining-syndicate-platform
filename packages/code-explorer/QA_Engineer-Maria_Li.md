@@ -22,9 +22,9 @@ Maria brings a detail-oriented mindset shaped by years of testing complex web ap
 Prioritizing regression tests for large directory scans with nested symlinks and files without extensions.
 
 ## 🔄 Status
-- **Past:** Extending tests for endpoint failure states and drag-and-drop between FunctionBrowser and CompositionCanvas.
-- **Current:** Adding tag-filter coverage and verifying index entries for class methods and default exports.
-- **Future:** Automate Playwright runs in CI to validate tag-based drag-and-drop interactions across browsers.
+- **Past:** Added tag-filter coverage, verified class-method and default-export index entries, and updated tagged drag-and-drop scenarios.
+- **Current:** Automating Playwright runs in CI to validate tag-based drag-and-drop interactions across browsers.
+- **Future:** Expand coverage to advanced tag editing and multi-tag drag-and-drop flows.
 
 ## 📝 Current Task Notes
 - Added regression tests covering nested symlink directories and extensionless files in the save/patch flow.
