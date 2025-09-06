@@ -13,6 +13,7 @@
     "check": "tsc",
     "test": "npm run test:unit && npm run test:playwright",
     "test:unit": "vitest run && vitest run packages/card-builder/src/__tests__/config.test.ts packages/card-builder/src/__tests__/export-assets.test.ts --dir packages/card-builder",
+
     "test:playwright": "playwright test",
     "db:push": "drizzle-kit push",
     "pre-commit": "node scripts/check-persona-updates.js"

@@ -1,5 +1,6 @@
 # Mining Syndicate Platform
 
+
 See our key guides:
 
 - [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions.

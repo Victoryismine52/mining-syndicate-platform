@@ -6,11 +6,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  testDir: './',
-  testMatch: [
-    'packages/code-explorer/e2e/**/*.spec.ts',
-    'packages/card-builder/src/__tests__/**/*.spec.{ts,tsx}',
-  ],
+  testDir: './packages/code-explorer/e2e',
   ctViteConfig: {
     plugins: [react()],
     resolve: {

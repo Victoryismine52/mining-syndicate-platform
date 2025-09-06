@@ -10,13 +10,15 @@ import open from "open";
 import { setupViteFor, log } from "./vite";
 import { buildFileTree } from "../packages/code-explorer/file-tree.js";
 import { applyPatchToFile } from "./save";
-
+import { createFunctionsRouter } from "./functions";
 const exec = promisify(execCb);
 
 const app = express();
 app.use(express.json());
 
 let currentRepoDir: string | null = null;
+
+app.use("/code-explorer/api/functions", createFunctionsRouter(() => currentRepoDir));
 
 /**
 {

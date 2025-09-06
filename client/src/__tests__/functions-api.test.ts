@@ -17,4 +17,18 @@ describe("/api/functions", () => {
     expect(data.length).toBeGreaterThan(0);
     server.close();
   });
+
+  it("includes class methods and default exports", async () => {
+    const app = express();
+    app.get("/api/functions", (_req, res) => {
+      res.json(functionIndex);
+    });
+    const server = app.listen(0);
+    const { port } = server.address() as any;
+    const res = await fetch(`http://127.0.0.1:${port}/api/functions`);
+    const data = await res.json();
+    server.close();
+    expect(data.some((f: any) => f.tags.includes("class-method"))).toBe(true);
+    expect(data.some((f: any) => f.tags.includes("default-export"))).toBe(true);
+  });
 });
