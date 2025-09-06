@@ -15,7 +15,9 @@ beforeAll(() => {
       "function decl(a: number, b: number): number { return a + b; }",
       "const arrow = (x: string) => x;",
       "const asyncArrow = async () => {};",
-      "export default function () {}",
+      "class MyClass { method() {} }",
+      "export default function defaultDecl() {}",
+      "export default () => {}",
       "function* gen() {}",
       "async function* asyncGen() {}",
     ].join("\n"),
@@ -27,7 +29,7 @@ afterAll(() => {
 });
 
 describe("scan", () => {
-  it("parses functions and skips anonymous defaults", () => {
+  it("parses functions including class methods and defaults", () => {
     const result = scan(dir);
     expect(result).toEqual([
       {
@@ -47,6 +49,24 @@ describe("scan", () => {
         signature: "async asyncArrow(): any",
         path: "sample.ts",
         tags: [],
+      },
+      {
+        name: "MyClass.method",
+        signature: "MyClass.method(): any",
+        path: "sample.ts",
+        tags: ["class-method"],
+      },
+      {
+        name: "defaultDecl",
+        signature: "defaultDecl(): any",
+        path: "sample.ts",
+        tags: ["default-export"],
+      },
+      {
+        name: "default",
+        signature: "default(): any",
+        path: "sample.ts",
+        tags: ["default-export"],
       },
       {
         name: "gen",
