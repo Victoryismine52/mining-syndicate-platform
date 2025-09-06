@@ -9,7 +9,7 @@ let dir: string;
 beforeAll(() => {
   dir = fs.mkdtempSync(path.join(os.tmpdir(), "scan-"));
   fs.writeFileSync(
-    path.join(dir, "sample.ts"),
+    path.join(dir, "a.ts"),
     [
       "/** @tag util */",
       "function decl(a: number, b: number): number { return a + b; }",
@@ -20,8 +20,12 @@ beforeAll(() => {
       "export default () => {}",
       "function* gen() {}",
       "async function* asyncGen() {}",
+      "class MyClass {",
+      "  method() {}",
+      "}",
     ].join("\n"),
   );
+  fs.writeFileSync(path.join(dir, "b.ts"), "export default () => {}\n");
 });
 
 afterAll(() => {
@@ -29,56 +33,59 @@ afterAll(() => {
 });
 
 describe("scan", () => {
-  it("parses functions including class methods and defaults", () => {
-    const result = scan(dir);
+  it("parses functions including class methods and default exports", () => {
+    const result = scan(dir).sort((a, b) =>
+      a.path === b.path ? a.name.localeCompare(b.name) : a.path.localeCompare(b.path),
+    );
     expect(result).toEqual([
-      {
-        name: "decl",
-        signature: "decl(a: number, b: number): number",
-        path: "sample.ts",
-        tags: ["util"],
-      },
       {
         name: "arrow",
         signature: "arrow(x: string): any",
-        path: "sample.ts",
+        path: "a.ts",
         tags: [],
       },
       {
         name: "asyncArrow",
         signature: "async asyncArrow(): any",
-        path: "sample.ts",
+        path: "a.ts",
         tags: [],
       },
       {
-        name: "MyClass.method",
-        signature: "MyClass.method(): any",
-        path: "sample.ts",
-        tags: ["class-method"],
+
+        name: "asyncGen",
+        signature: "async *asyncGen(): any",
+        path: "a.ts",
+        tags: [],
+      },
+      {
+        name: "decl",
+        signature: "decl(a: number, b: number): number",
+        path: "a.ts",
+        tags: ["util"],
       },
       {
         name: "defaultDecl",
         signature: "defaultDecl(): any",
-        path: "sample.ts",
-        tags: ["default-export"],
-      },
-      {
-        name: "default",
-        signature: "default(): any",
-        path: "sample.ts",
+        path: "a.ts",
         tags: ["default-export"],
       },
       {
         name: "gen",
         signature: "*gen(): any",
-        path: "sample.ts",
+        path: "a.ts",
         tags: [],
       },
       {
-        name: "asyncGen",
-        signature: "async *asyncGen(): any",
-        path: "sample.ts",
-        tags: [],
+        name: "MyClass.method",
+        signature: "MyClass.method(): any",
+        path: "a.ts",
+        tags: ["class-method"],
+      },
+      {
+        name: "default",
+        signature: "default(): any",
+        path: "b.ts",
+        tags: ["default-export"],
       },
     ]);
   });
@@ -89,8 +96,28 @@ describe("scan", () => {
       {
         name: "decl",
         signature: "decl(a: number, b: number): number",
-        path: "sample.ts",
+        path: "a.ts",
         tags: ["util"],
+      },
+    ]);
+  });
+
+  it("filters by default-export tag", () => {
+    const result = scan(dir, { tag: "default-export" }).sort((a, b) =>
+      a.path === b.path ? a.name.localeCompare(b.name) : a.path.localeCompare(b.path),
+    );
+    expect(result).toEqual([
+      {
+        name: "defaultDecl",
+        signature: "defaultDecl(): any",
+        path: "a.ts",
+        tags: ["default-export"],
+      },
+      {
+        name: "default",
+        signature: "default(): any",
+        path: "b.ts",
+        tags: ["default-export"],
       },
     ]);
   });

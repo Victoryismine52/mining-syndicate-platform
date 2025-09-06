@@ -55,6 +55,7 @@ function parseFile(file, rootDir) {
       .filter((t) => t.tagName.getText(sourceFile) === 'tag')
       .map((t) => (t.comment ?? '').toString());
     const tags = [...jsDocTags, ...extraTags];
+
     functions.push({
       name,
       signature: `${isAsync ? 'async ' : ''}${isGenerator ? '*' : ''}${name}(${params}): ${returnType}`,
@@ -71,6 +72,7 @@ function parseFile(file, rootDir) {
       const returnType = node.type ? node.type.getText(sourceFile) : 'any';
       const isAsync = node.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
       const isGenerator = !!node.asteriskToken;
+
       const isDefault =
         node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword) ?? false;
       const name = node.name ? node.name.text : isDefault ? 'default' : null;
@@ -104,6 +106,7 @@ function parseFile(file, rootDir) {
           );
         }
       }
+
     } else if (
       ts.isVariableDeclaration(node) &&
       ts.isIdentifier(node.name) &&
@@ -135,6 +138,7 @@ function parseFile(file, rootDir) {
         const returnType = expr.type ? expr.type.getText(sourceFile) : 'any';
         const isAsync =
           expr.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+
         const isGenerator = ts.isFunctionExpression(expr) && !!expr.asteriskToken;
         addFunction(
           'default',

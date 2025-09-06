@@ -70,7 +70,9 @@ Coordinating integration of code exploration features while aligning documentati
 
 
 ## 🔄 Status
+
 - **Past:** Extended `scan.js` to capture class methods and default-exported functions with tagging.
 - **Current:** Finalizing tests and type checks for the enhanced scanner.
 - **Future:** Explore incremental parsing strategies and optimize class method indexing.
+
 
