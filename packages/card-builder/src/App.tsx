@@ -1,16 +1,15 @@
-import React, { useState } from "react";
-import { CardEditor, CardConfig, elementLibrary } from "./Editor";
+import React, { useState, useEffect } from "react";
+import { CardEditor, CardConfig, elementLibrary, DEFAULT_NAME } from "./Editor";
 import { ActionCard } from "./components/ActionCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit } from "lucide-react";
+import { Plus, Edit, Trash } from "lucide-react";
 
 interface StoredCard extends CardConfig {
   id: string;
-  name: string;
 }
 
-function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<CardConfig, "elements"> & { children: React.ReactNode }) {
+function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<CardConfig, "elements" | "name"> & { children: React.ReactNode }) {
   const themeClass =
     theme === "dark"
       ? "bg-gray-900 text-white"
@@ -40,12 +39,14 @@ function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<Ca
 
 function PreviewCard({ card }: { card: StoredCard }) {
   return (
-    <PreviewCanvas
-      theme={card.theme}
-      shadow={card.shadow}
-      lighting={card.lighting}
-      animation={card.animation}
-    >
+    <div className="flex flex-col items-center gap-2">
+      <div className="font-semibold">{card.name}</div>
+      <PreviewCanvas
+        theme={card.theme}
+        shadow={card.shadow}
+        lighting={card.lighting}
+        animation={card.animation}
+      >
       {card.elements.map((el) => {
         const def = elementLibrary.find((d) => d.id === el.elementId);
         if (!def) return null;
@@ -84,25 +85,68 @@ function PreviewCard({ card }: { card: StoredCard }) {
         }
         return null;
       })}
-    </PreviewCanvas>
+      </PreviewCanvas>
+    </div>
   );
 }
 
 export function CardBuilderApp() {
-  const [cards, setCards] = useState<StoredCard[]>(() => {
-    const raw = localStorage.getItem("cards");
-    return raw ? JSON.parse(raw) : [];
-  });
+  const [cards, setCards] = useState<StoredCard[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<StoredCard | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("cards");
+      if (stored) {
+        setCards(JSON.parse(stored));
+      }
+    } catch (err) {
+      console.error("Failed to parse stored cards", err);
+      setError("Stored cards are corrupted. You can reset.");
+    }
+  }, []);
+
+  const persistCards = (list: StoredCard[]) => {
+    try {
+      if (list.length) {
+        localStorage.setItem("cards", JSON.stringify(list));
+      } else {
+        localStorage.removeItem("cards");
+      }
+    } catch (err) {
+      console.error("Failed to persist cards", err);
+      setError("Unable to save cards locally.");
+    }
+  };
+
+  const resetStorage = () => {
+    localStorage.removeItem("cards");
+    setCards([]);
+    setError(null);
+  };
+
+  const deleteCard = (id: string) => {
+    if (!window.confirm("Delete this card?")) return;
+    setCards((prev) => {
+      const list = prev.filter((c) => c.id !== id);
+      persistCards(list);
+      return list;
+    });
+  };
 
   const saveCard = (config: CardConfig) => {
     if (!editing) return;
-    const updated: StoredCard = { ...editing, ...config };
+    const updated: StoredCard = {
+      ...editing,
+      ...config,
+      name: config.name.trim() || DEFAULT_NAME,
+    };
     setCards((prev) => {
       const list = prev.some((c) => c.id === updated.id)
         ? prev.map((c) => (c.id === updated.id ? updated : c))
         : [...prev, updated];
-      localStorage.setItem("cards", JSON.stringify(list));
+      persistCards(list);
       return list;
     });
     setEditing(null);
@@ -111,7 +155,7 @@ export function CardBuilderApp() {
   const startNew = () => {
     setEditing({
       id: Date.now().toString(),
-      name: "Untitled Card",
+      name: DEFAULT_NAME,
       elements: [],
       theme: "light",
       shadow: "none",
@@ -128,6 +172,14 @@ export function CardBuilderApp() {
 
   return (
     <div className="p-8">
+      {error && (
+        <div className="mb-4 p-2 border border-red-500 text-red-700">
+          {error}
+          <Button variant="outline" className="ml-2" onClick={resetStorage}>
+            Reset
+          </Button>
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <ActionCard
           icon={Plus}
@@ -143,10 +195,19 @@ export function CardBuilderApp() {
             </CardHeader>
             <CardContent className="space-y-4">
               <PreviewCard card={card} />
-              <Button onClick={() => setEditing(card)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setEditing(card)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteCard(card.id)}
+                >
+                  <Trash className="mr-2 h-4 w-4" />
+                  Delete
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
