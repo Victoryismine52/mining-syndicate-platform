@@ -50,11 +50,12 @@ function parseFile(file, rootDir) {
     isGenerator = false,
     extraTags = [],
   ) {
-    const tags = ts
+    const jsDocTags = ts
       .getJSDocTags(jsDocNode)
       .filter((t) => t.tagName.getText(sourceFile) === 'tag')
-      .map((t) => (t.comment ?? '').toString())
-      .concat(extraTags);
+      .map((t) => (t.comment ?? '').toString());
+    const tags = [...jsDocTags, ...extraTags];
+
     functions.push({
       name,
       signature: `${isAsync ? 'async ' : ''}${isGenerator ? '*' : ''}${name}(${params}): ${returnType}`,
@@ -71,19 +72,41 @@ function parseFile(file, rootDir) {
       const returnType = node.type ? node.type.getText(sourceFile) : 'any';
       const isAsync = node.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
       const isGenerator = !!node.asteriskToken;
-      const isDefaultExport =
-        node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword) &&
-        node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword);
-      const name = node.name ? node.name.text : 'default';
-      addFunction(
-        name,
-        paramsText,
-        returnType,
-        node,
-        isAsync,
-        isGenerator,
-        isDefaultExport ? ['default-export'] : [],
-      );
+
+      const isDefault =
+        node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword) ?? false;
+      const name = node.name ? node.name.text : isDefault ? 'default' : null;
+      if (name) {
+        const extraTags = isDefault ? ['default-export'] : [];
+        addFunction(name, paramsText, returnType, node, isAsync, isGenerator, extraTags);
+      }
+    } else if (ts.isClassDeclaration(node) && node.name) {
+      const className = node.name.text;
+      for (const member of node.members) {
+        if (
+          ts.isMethodDeclaration(member) &&
+          member.name &&
+          ts.isIdentifier(member.name)
+        ) {
+          const paramsText = member.parameters
+            .map((p) => p.getText(sourceFile))
+            .join(', ');
+          const returnType = member.type ? member.type.getText(sourceFile) : 'any';
+          const isAsync =
+            member.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+          const isGenerator = !!member.asteriskToken;
+          addFunction(
+            `${className}.${member.name.text}`,
+            paramsText,
+            returnType,
+            member,
+            isAsync,
+            isGenerator,
+            ['class-method'],
+          );
+        }
+      }
+
     } else if (
       ts.isVariableDeclaration(node) &&
       ts.isIdentifier(node.name) &&
@@ -106,26 +129,6 @@ function parseFile(file, rootDir) {
         isAsync,
         isGenerator,
       );
-    } else if (ts.isClassDeclaration(node) && node.name) {
-      for (const member of node.members) {
-        if (ts.isMethodDeclaration(member) && ts.isIdentifier(member.name)) {
-          const paramsText = member.parameters
-            .map((p) => p.getText(sourceFile))
-            .join(', ');
-          const returnType = member.type ? member.type.getText(sourceFile) : 'any';
-          const isAsync = member.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
-          const isGenerator = !!member.asteriskToken;
-          addFunction(
-            `${node.name.text}.${member.name.text}`,
-            paramsText,
-            returnType,
-            member,
-            isAsync,
-            isGenerator,
-            ['class-method'],
-          );
-        }
-      }
     } else if (ts.isExportAssignment(node)) {
       const expr = node.expression;
       if (ts.isArrowFunction(expr) || ts.isFunctionExpression(expr)) {
@@ -133,7 +136,9 @@ function parseFile(file, rootDir) {
           .map((p) => p.getText(sourceFile))
           .join(', ');
         const returnType = expr.type ? expr.type.getText(sourceFile) : 'any';
-        const isAsync = expr.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+        const isAsync =
+          expr.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+
         const isGenerator = ts.isFunctionExpression(expr) && !!expr.asteriskToken;
         addFunction(
           'default',

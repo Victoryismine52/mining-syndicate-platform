@@ -15,7 +15,9 @@ beforeAll(() => {
       "function decl(a: number, b: number): number { return a + b; }",
       "const arrow = (x: string) => x;",
       "const asyncArrow = async () => {};",
+      "class MyClass { method() {} }",
       "export default function defaultDecl() {}",
+      "export default () => {}",
       "function* gen() {}",
       "async function* asyncGen() {}",
       "class MyClass {",
@@ -49,6 +51,7 @@ describe("scan", () => {
         tags: [],
       },
       {
+
         name: "asyncGen",
         signature: "async *asyncGen(): any",
         path: "a.ts",
