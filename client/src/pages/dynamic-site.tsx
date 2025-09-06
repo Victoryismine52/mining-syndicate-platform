@@ -1397,9 +1397,9 @@ export function DynamicSite() {
   });
 
   // Query to check if user is a site manager for this site
-  const { data: siteManagers = [] } = useQuery<any[]>({
+  const { data: siteManagers = [], isLoading: managersLoading } = useQuery<any[]>({
     queryKey: [`/api/sites/${siteId}/managers`],
-    enabled: !!siteId && !!user && !user.isAdmin, // Only query if not admin
+    enabled: !!siteId && !!user, // Always query when we have siteId and user
   });
 
   // Check if user already has access to this site
@@ -1512,6 +1512,15 @@ export function DynamicSite() {
 
   // Check if site is launched and user has access
   if (site.isLaunched === false) {
+    // Wait for authentication and manager data to load before making access decision
+    if (!user || managersLoading) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      );
+    }
+    
     // Check if user is admin or site manager
     const isAdmin = user?.isAdmin === true;
     const isSiteManager = siteManagers.some(manager => manager.userEmail === user?.email);

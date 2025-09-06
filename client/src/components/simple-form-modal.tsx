@@ -58,22 +58,8 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
     
     formFields.forEach((field) => {
       const fieldName = field.fieldLibrary.name;
-      let fieldSchema = z.string();
+      let fieldSchema: any;
       
-      // Apply validation based on field type and custom validation
-      if (field.fieldLibrary.dataType === 'email') {
-        fieldSchema = z.string().email("Please enter a valid email address");
-      } else if (field.fieldLibrary.dataType === 'phone') {
-        fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
-      } else if (field.fieldLibrary.dataType === 'number') {
-        fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
-      }
-
-      // Handle required validation before special field types
-      if (field.isRequired) {
-        fieldSchema = fieldSchema.min(1, "This field is required");
-      }
-
       // Handle extensible_list fields
       if (field.fieldLibrary.dataType === 'extensible_list') {
         if (field.isRequired) {
@@ -82,12 +68,11 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
           fieldSchema = z.array(z.string()).optional();
         }
       }
-      // Handle radio fields with special validation (after required validation)
+      // Handle radio fields with special validation
       else if (field.fieldLibrary.dataType === 'radio') {
         const options = field.fieldLibrary.defaultValidation?.options || [];
         if (options.length > 0) {
           if (field.isRequired) {
-            // For required radio fields, ensure a value is selected and it's valid
             fieldSchema = z.string()
               .min(1, "Please select an option")
               .refine(
@@ -95,7 +80,6 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
                 { message: "Please select one of the available options" }
               );
           } else {
-            // For optional radio fields
             fieldSchema = z.string()
               .optional()
               .refine(
@@ -103,10 +87,26 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
                 { message: "Please select one of the available options" }
               );
           }
+        } else {
+          fieldSchema = field.isRequired ? z.string().min(1, "This field is required") : z.string().optional();
         }
       } else {
-        // For non-radio fields, apply optional after required validation
-        if (!field.isRequired) {
+        // Handle standard string fields
+        fieldSchema = z.string();
+        
+        // Apply validation based on field type
+        if (field.fieldLibrary.dataType === 'email') {
+          fieldSchema = z.string().email("Please enter a valid email address");
+        } else if (field.fieldLibrary.dataType === 'phone') {
+          fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
+        } else if (field.fieldLibrary.dataType === 'number') {
+          fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
+        }
+
+        // Apply required validation
+        if (field.isRequired) {
+          fieldSchema = fieldSchema.min(1, "This field is required");
+        } else {
           fieldSchema = fieldSchema.optional();
         }
       }
@@ -150,12 +150,9 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
   // Submit mutation
   const submitFormMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest(`/api/sites/${siteId}/leads`, {
-        method: 'POST',
-        body: {
-          formTemplateId: formTemplate.id,
-          formData: data
-        }
+      return apiRequest('POST', `/api/sites/${siteId}/leads`, {
+        formTemplateId: formTemplate.id,
+        formData: data
       });
     },
     onSuccess: () => {
@@ -574,7 +571,7 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className={`sm:max-w-lg bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
+        <DialogContent className={`w-[95vw] max-w-lg mx-auto bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 ${colorTheme?.icon || 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
