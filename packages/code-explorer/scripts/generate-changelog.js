@@ -13,6 +13,7 @@ const typeMap = {
   ci: 'CI',
   perf: 'Performance',
   style: 'Styles',
+  tag: 'Tag Enhancements',
   other: 'Other',
 };
 
@@ -45,7 +46,12 @@ function getCommits(from, to) {
 function parseCommit(message) {
   const match = message.match(/^(\w+)(?:\([^)]+\))?:\s*(.+)$/);
   if (match) {
-    return { type: match[1], description: match[2] };
+    let type = match[1];
+    const description = match[2];
+    if (description.toLowerCase().includes('tag')) {
+      type = 'tag';
+    }
+    return { type, description };
   }
   return { type: 'other', description: message };
 }
