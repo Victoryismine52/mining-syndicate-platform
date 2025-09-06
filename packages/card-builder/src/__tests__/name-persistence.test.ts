@@ -38,5 +38,20 @@ describe('config name persistence', () => {
     const parsed = parseConfig(JSON.stringify(built));
     expect(parsed?.name).toBe('Nombre: Café & Música!');
   });
+
+  it('keeps leading and trailing whitespace in name', () => {
+    const cfg: CardConfig = {
+      name: '  Spaced Card  ',
+      elements: [],
+      theme: 'light',
+      shadow: 'none',
+      lighting: 'none',
+      animation: 'none',
+    };
+
+    const built = buildConfig(cfg);
+    const parsed = parseConfig(JSON.stringify(built));
+    expect(parsed?.name).toBe('  Spaced Card  ');
+  });
 });
 

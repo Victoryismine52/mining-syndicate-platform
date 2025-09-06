@@ -74,4 +74,42 @@ describe('packages/card-builder delete flow', () => {
 
     confirmSpy.mockRestore();
   });
+
+  it('removes only the targeted card when multiple exist', () => {
+    const cards = [
+      {
+        id: '1',
+        name: 'First',
+        elements: [],
+        theme: 'light',
+        shadow: 'none',
+        lighting: 'none',
+        animation: 'none',
+      },
+      {
+        id: '2',
+        name: 'Second',
+        elements: [],
+        theme: 'light',
+        shadow: 'none',
+        lighting: 'none',
+        animation: 'none',
+      },
+    ];
+    localStorage.setItem('cards', JSON.stringify(cards));
+
+    render(<CardBuilderApp />);
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    fireEvent.click(screen.getAllByText('Delete')[0]);
+
+    expect(screen.queryByText('First')).toBeNull();
+    expect(screen.getByText('Second')).toBeTruthy();
+
+    expect(localStorage.getItem('cards')).toBe(
+      JSON.stringify([cards[1]])
+    );
+
+    confirmSpy.mockRestore();
+  });
 });
