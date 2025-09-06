@@ -94,20 +94,24 @@ export function CardEditor({
   };
 
   const applyCode = () => {
-    const parsed = parseConfig(code);
-    if (!parsed) {
-      console.error("Invalid JSON configuration");
-      setCodeError("Invalid JSON configuration");
-      return;
+    try {
+      const parsed = parseConfig(code);
+      if (!parsed) {
+        setCodeError("Invalid JSON configuration");
+        return;
+      }
+      setCodeError(null);
+      setName(parsed.name);
+      setElements(parsed.elements);
+      setTheme(parsed.theme);
+      setShadow(parsed.shadow);
+      setLighting(parsed.lighting);
+      setAnimation(parsed.animation);
+      setShowCode(false);
+    } catch (err) {
+      console.error("Failed to apply configuration", err);
+      setCodeError("Failed to apply configuration");
     }
-    setCodeError(null);
-    setName(parsed.name);
-    setElements(parsed.elements);
-    setTheme(parsed.theme);
-    setShadow(parsed.shadow);
-    setLighting(parsed.lighting);
-    setAnimation(parsed.animation);
-    setShowCode(false);
   };
 
   return (

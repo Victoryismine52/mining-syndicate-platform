@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CardEditor, CardConfig, elementLibrary, DEFAULT_NAME } from "./Editor";
 import { ActionCard } from "./components/ActionCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -91,27 +91,32 @@ function PreviewCard({ card }: { card: StoredCard }) {
 }
 
 export function CardBuilderApp() {
-  const stored = localStorage.getItem("cards");
-  let initialCards: StoredCard[] = [];
-  let initialError: string | null = null;
-  if (stored) {
-    try {
-      initialCards = JSON.parse(stored);
-    } catch (err) {
-      console.error("Failed to parse stored cards", err);
-      initialError = "Stored cards are corrupted. You can reset.";
-    }
-  }
-
-  const [cards, setCards] = useState<StoredCard[]>(initialCards);
-  const [error, setError] = useState<string | null>(initialError);
+  const [cards, setCards] = useState<StoredCard[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<StoredCard | null>(null);
 
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("cards");
+      if (stored) {
+        setCards(JSON.parse(stored));
+      }
+    } catch (err) {
+      console.error("Failed to parse stored cards", err);
+      setError("Stored cards are corrupted. You can reset.");
+    }
+  }, []);
+
   const persistCards = (list: StoredCard[]) => {
-    if (list.length) {
-      localStorage.setItem("cards", JSON.stringify(list));
-    } else {
-      localStorage.removeItem("cards");
+    try {
+      if (list.length) {
+        localStorage.setItem("cards", JSON.stringify(list));
+      } else {
+        localStorage.removeItem("cards");
+      }
+    } catch (err) {
+      console.error("Failed to persist cards", err);
+      setError("Unable to save cards locally.");
     }
   };
 
