@@ -164,6 +164,27 @@ describe("FunctionBrowser", () => {
     expect(screen.getByTestId("function-bar")).toBeTruthy();
   });
 
+  it("filters by tag case-insensitively", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve([
+          { name: "foo", signature: "", path: "a.ts", tags: ["Alpha"] },
+          { name: "bar", signature: "", path: "b.ts", tags: ["Beta"] },
+        ]),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    await screen.findByTestId("function-foo");
+
+    fireEvent.change(screen.getByTestId("function-tag-filter"), {
+      target: { value: "beta" },
+    });
+
+    expect(screen.queryByTestId("function-foo")).toBeNull();
+    expect(screen.getByTestId("function-bar")).toBeTruthy();
+  });
+
   it("drags function to composition canvas", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>
