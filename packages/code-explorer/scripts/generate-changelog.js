@@ -2,6 +2,8 @@ import { execSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+// Map conventional commit types to changelog section headings. Tag-related commits are
+// grouped under "Tag Enhancements" to highlight improvements around `@tag` support.
 const typeMap = {
   feat: 'Features',
   fix: 'Bug Fixes',
@@ -14,6 +16,7 @@ const typeMap = {
   perf: 'Performance',
   style: 'Styles',
   tag: 'Tag Enhancements',
+  tags: 'Tag Enhancements',
   other: 'Other',
 };
 
@@ -48,6 +51,7 @@ function parseCommit(message) {
   if (match) {
     let type = match[1];
     const description = match[2];
+    if (type === 'tags') type = 'tag';
     if (description.toLowerCase().includes('tag')) {
       type = 'tag';
     }
