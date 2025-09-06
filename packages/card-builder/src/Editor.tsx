@@ -398,8 +398,8 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
   };
 
   return (
-    <div className="p-4 space-y-4 text-sm">
-      <div className="flex gap-2 items-center flex-wrap">
+    <div className="flex h-screen flex-col text-sm">
+      <div className="flex items-center gap-2 flex-wrap border-b p-2">
         <label>Theme:</label>
         <select
           value={theme}
@@ -453,13 +453,12 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
           Export JSON
         </Button>
       </div>
-
       {showCode ? (
-        <div className="flex flex-col gap-2">
+        <div className="flex-1 p-4 flex flex-col gap-2">
           <textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="border p-2 font-mono h-80"
+            className="border p-2 font-mono flex-1"
           />
           <div>
             <Button onClick={applyCode} className="mr-2">Apply</Button>
@@ -468,73 +467,74 @@ export function CardEditor({ initial, onSave, onBack }: { initial?: CardConfig; 
         </div>
       ) : (
         <DndContext onDragEnd={handleDragEnd}>
-          <div className="flex gap-4">
-            <div>
+          <div className="flex flex-1 overflow-hidden">
+            <div className="w-64 border-r p-4 overflow-y-auto">
               {elementLibrary.map((def) => (
                 <PaletteItem key={def.id} def={def} />
               ))}
             </div>
-            <CardCanvas
-              theme={theme}
-              shadow={shadow}
-              lighting={lighting}
-              animation={animation}
-            >
-              <SortableContext
-                items={elements.map((e) => e.id)}
-                strategy={verticalListSortingStrategy}
+            <div className="flex-1 p-4 overflow-auto">
+              <CardCanvas
+                theme={theme}
+                shadow={shadow}
+                lighting={lighting}
+                animation={animation}
               >
-                {elements.map((el) => (
-                  <CardItem
-                    key={el.id}
-                    item={el}
-                    onRemove={removeElement}
-                    onSelect={(id) => setSelectedId(id)}
-                    selected={selectedId === el.id}
-                  />
-                ))}
-              </SortableContext>
-            </CardCanvas>
+                <SortableContext
+                  items={elements.map((e) => e.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {elements.map((el) => (
+                    <CardItem
+                      key={el.id}
+                      item={el}
+                      onRemove={removeElement}
+                      onSelect={(id) => setSelectedId(id)}
+                      selected={selectedId === el.id}
+                    />
+                  ))}
+                </SortableContext>
+              </CardCanvas>
+            </div>
+            {selected && (
+              <div className="w-64 border-l p-4 overflow-y-auto">
+                <div className="mb-2 font-bold">Element Properties</div>
+                <div className="flex flex-col gap-2">
+                  <label className="flex gap-2 items-center">
+                    <span className="w-24">Label</span>
+                    <input
+                      className="border px-2 py-1 flex-1"
+                      value={selected.props.label || ""}
+                      onChange={(e) => updateSelected({ label: e.target.value })}
+                    />
+                  </label>
+                  {selected.displayMode === "input" && (
+                    <label className="flex gap-2 items-center">
+                      <span className="w-24">Placeholder</span>
+                      <input
+                        className="border px-2 py-1 flex-1"
+                        value={selected.props.placeholder || ""}
+                        onChange={(e) =>
+                          updateSelected({ placeholder: e.target.value })
+                        }
+                      />
+                    </label>
+                  )}
+                  {selected.elementId === "image" && (
+                    <label className="flex gap-2 items-center">
+                      <span className="w-24">Image URL</span>
+                      <input
+                        className="border px-2 py-1 flex-1"
+                        value={selected.props.src || ""}
+                        onChange={(e) => updateSelected({ src: e.target.value })}
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </DndContext>
-      )}
-
-      {selected && (
-        <div className="border p-2 w-96">
-          <div className="mb-2 font-bold">Element Properties</div>
-          <div className="flex flex-col gap-2">
-            <label className="flex gap-2 items-center">
-              <span className="w-24">Label</span>
-              <input
-                className="border px-2 py-1 flex-1"
-                value={selected.props.label || ""}
-                onChange={(e) => updateSelected({ label: e.target.value })}
-              />
-            </label>
-            {selected.displayMode === "input" && (
-              <label className="flex gap-2 items-center">
-                <span className="w-24">Placeholder</span>
-                <input
-                  className="border px-2 py-1 flex-1"
-                  value={selected.props.placeholder || ""}
-                  onChange={(e) =>
-                    updateSelected({ placeholder: e.target.value })
-                  }
-                />
-              </label>
-            )}
-            {selected.elementId === "image" && (
-              <label className="flex gap-2 items-center">
-                <span className="w-24">Image URL</span>
-                <input
-                  className="border px-2 py-1 flex-1"
-                  value={selected.props.src || ""}
-                  onChange={(e) => updateSelected({ src: e.target.value })}
-                />
-              </label>
-            )}
-          </div>
-        </div>
       )}
     </div>
   );

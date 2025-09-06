@@ -127,8 +127,8 @@ export function CardBuilderApp() {
   }
 
   return (
-    <div className="p-8">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <div className="p-6 flex flex-col items-center">
+      <div className="grid gap-6 md:grid-cols-3">
         <ActionCard
           icon={Plus}
           title="Create New Card"
