@@ -21,10 +21,20 @@ Maria brings a detail-oriented mindset shaped by years of testing complex web ap
 ## 🎯 Current Assignment
 Prioritizing regression tests for large directory scans with nested symlinks and files without extensions.
 
+## 🔄 Status
+- **Past:** Added tag-filter coverage, verified class-method and default-export index entries, and updated tagged drag-and-drop scenarios.
+- **Current:** Automating Playwright runs in CI to validate tag-based drag-and-drop interactions across browsers.
+- **Future:** Expand coverage to advanced tag editing and multi-tag drag-and-drop flows.
+
 ## 📝 Current Task Notes
-- Preparing test fixtures for nested symlink directories and extensionless files.
-- Added fixtures to emulate missing syntax modules and verify FileViewer warnings.
-- Attempted to validate save/patch flow and fullscreen viewer controls across Chromium, Firefox, and WebKit using Playwright, but browser binaries failed to install (HTTP 403).
+- Added regression tests covering nested symlink directories and extensionless files in the save/patch flow.
+- Verified FileViewer falls back to raw text and emits warning toasts when syntax modules are missing or the editor crashes.
+- Added unit test coverage for FunctionBrowser fetch failures to ensure a safe empty state.
+- Adjusted Playwright drag-and-drop spec to simulate network errors before mounting.
+- Playwright run in this environment fails to launch browsers; set up `npx playwright install` in CI.
+- Added Playwright tests for API 500 responses and multi-function drag-and-drop between FunctionBrowser and CompositionCanvas; unit tests and type-checks pass, Playwright tests fail to launch browsers locally.
+- Extended component and Playwright tests to cover 404 function endpoint errors and duplicate function drag-and-drop on the CompositionCanvas; unit tests and type checks pass.
+- Added case-insensitive tag filtering tests, index coverage for class-method and default-export entries, and a tagged drag-and-drop scenario.
 
 ## 🗂️ Project Notes
 - Completed review of recent bug reports to design targeted tests.

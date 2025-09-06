@@ -21,7 +21,9 @@ Alex blends technical writing with operations experience, ensuring documentation
 Standardize repository documentation and automate release notes.
 
 ## 📝 Current Task Notes
-- Drafting runbooks for code explorer deployment.
+- Published Code Explorer runbook covering tests, save/patch flow, and viewer fallback.
+- Tracking automated release-note tooling; next step is wiring changelog script into CI.
+- Added repository runbook and onboarding sections detailing the function-index API and `FunctionBrowser` flow.
 
 ## 🗂️ Project Notes
 - Reference documentation kept in `/docs`; update as features stabilize.
@@ -34,6 +36,11 @@ Standardize repository documentation and automate release notes.
 
 ## 🚨 Urgent Notes
 
+## 🔄 Status
+
+- **Past:** Published runbook and onboarding docs covering function index basics and tag filter usage.
+- **Current:** Refining changelog script to surface tag enhancements.
+- **Future:** Automate changelog tagging and keep cross-team docs aligned.
 
 ## 🔧 Maintenance Plan
 - Review documentation monthly for accuracy.

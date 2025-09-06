@@ -64,6 +64,15 @@ Coordinating integration of code exploration features while aligning documentati
 - Centralized syntax highlighting utilities for maintainability (`src/utils/highlight.ts`).
 - Prioritize accessibility and performance across all new components.
 - Initial architecture approved for implementation.
+- Added CodeMirror (`@uiw/react-codemirror`, `@codemirror/lang-javascript`) and `diff` dependencies; `npx vitest run --root packages/code-explorer` now executes, though React rendering errors persist.
 
 ## 🚨 Urgent Notes
+
+
+## 🔄 Status
+
+- **Past:** Extended `scan.js` to capture class methods and default-exported functions with tagging.
+- **Current:** Finalizing tests and type checks for the enhanced scanner.
+- **Future:** Explore incremental parsing strategies and optimize class method indexing.
+
 

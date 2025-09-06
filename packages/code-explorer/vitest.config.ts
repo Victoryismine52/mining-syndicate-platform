@@ -9,6 +9,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "../../client/src"),
       "@uiw/react-codemirror": path.resolve(__dirname, "test-stubs/codemirror.tsx"),
       diff: path.resolve(__dirname, "test-stubs/diff.ts"),
+      react: path.resolve(__dirname, "../../node_modules/react"),
+      "react-dom": path.resolve(__dirname, "../../node_modules/react-dom"),
       "@codemirror/lang-javascript": path.resolve(
         __dirname,
         "test-stubs/lang-javascript.ts"

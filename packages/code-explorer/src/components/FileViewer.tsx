@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
+  /** Absolute repository path of the file to display */
   path: string;
 }
 
@@ -12,13 +13,24 @@ interface Props {
 {
   "friendlyName": "file viewer",
   "description": "Fetches and displays highlighted source code with line numbers.",
-  "editCount": 4,
+  "editCount": 5,
   "tags": ["ui", "code"],
   "location": "src/components/FileViewer",
-  "notes": "Provides copy and fullscreen controls for the current file."
+  "notes": "Provides copy and fullscreen controls for the current file.",
+  "props": { "path": "absolute repository path for the file" },
+  "state": {
+    "code": "current editor content",
+    "original": "last loaded file content",
+    "fullscreen": "whether the editor fills the screen",
+    "extensions": "language extensions for CodeMirror",
+    "langFailed": "true when syntax highlighting can't load",
+    "editorError": "true when the editor component crashes"
+  }
 }
 */
-export async function loadLanguageFromPath(path: string): Promise<Extension[]> {
+export async function loadLanguageFromPath(
+  path: string
+): Promise<Extension[] | null> {
   const ext = path.split(".").pop()?.toLowerCase();
   const loaders: Record<string, () => Promise<Extension>> = {
     js: () =>
@@ -44,15 +56,41 @@ export async function loadLanguageFromPath(path: string): Promise<Extension[]> {
     html: () =>
       import(/* @vite-ignore */ "@codemirror/lang-html").then((m) => m.html()),
   };
+  const loader = loaders[ext ?? ""];
+  if (!loader) {
+    console.warn(
+      `No language module found for "${ext}". Rendering as plain text.`
+    );
+    return null;
+  }
   try {
-    const lang = await loaders[ext ?? ""]?.();
+    const lang = await loader();
     return lang ? [lang] : [];
   } catch (err) {
     console.warn(
       `Failed to load language module for "${ext}". Rendering as plain text.`,
       err
     );
-    return [];
+    return null;
+  }
+}
+
+class EditorErrorBoundary extends React.Component<{
+  onError: (error: Error) => void;
+  children: React.ReactNode;
+}, { hasError: boolean }> {
+  constructor(props: { onError: (error: Error) => void; children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error) {
+    this.props.onError(error);
+  }
+  render() {
+    return this.state.hasError ? null : this.props.children;
   }
 }
 
@@ -61,6 +99,8 @@ export function FileViewer({ path }: Props) {
   const [original, setOriginal] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
   const [extensions, setExtensions] = useState<Extension[]>([]);
+  const [langFailed, setLangFailed] = useState(false);
+  const [editorError, setEditorError] = useState(false);
   const [CodeMirror, setCodeMirror] = useState<React.ComponentType<any> | null>(
     null
   );
@@ -74,9 +114,23 @@ export function FileViewer({ path }: Props) {
           "Failed to load CodeMirror. Rendering plain text instead.",
           err
         );
+        toast({ title: "Editor failed to load", variant: "destructive" });
         setCodeMirror(null);
       });
-  }, []);
+  }, [toast]);
+
+  useEffect(() => {
+    setEditorError(false);
+  }, [CodeMirror, path]);
+
+  const handleEditorError = useCallback(
+    (err: Error) => {
+      console.warn("CodeMirror crashed. Rendering plain text instead.", err);
+      toast({ title: "Editor failed to load", variant: "destructive" });
+      setEditorError(true);
+    },
+    [toast]
+  );
 
   useEffect(() => {
     /**
@@ -101,8 +155,20 @@ export function FileViewer({ path }: Props) {
   }, [path]);
 
   useEffect(() => {
-    loadLanguageFromPath(path).then(setExtensions);
-  }, [path]);
+    loadLanguageFromPath(path).then((exts) => {
+      if (exts) {
+        setLangFailed(false);
+        setExtensions(exts);
+      } else {
+        setLangFailed(true);
+        setExtensions([]);
+        toast({
+          title: "Syntax highlighting unavailable",
+          variant: "destructive",
+        });
+      }
+    });
+  }, [path, toast]);
 
   const handleSave = useCallback(async () => {
     const patch = createTwoFilesPatch(path, path, original, code);
@@ -163,25 +229,27 @@ export function FileViewer({ path }: Props) {
           {fullscreen ? "Exit" : "Full screen"}
         </Button>
       </div>
-      <div className="overflow-auto h-full border rounded">
-        {CodeMirror ? (
-          <CodeMirror
-            value={code}
-            height="100%"
-            extensions={extensions}
-            onChange={(value: any) =>
-              setCode(
-                typeof value === "string" ? value : value?.target?.value ?? ""
-              )
-            }
-          />
-        ) : (
-          <pre className="p-2" data-testid="raw-code">
-            {code}
-          </pre>
-        )}
+        <div className="overflow-auto h-full border rounded">
+          {CodeMirror && !langFailed && !editorError ? (
+            <EditorErrorBoundary onError={handleEditorError}>
+              <CodeMirror
+                value={code}
+                height="100%"
+                extensions={extensions}
+                onChange={(value: any) =>
+                  setCode(
+                    typeof value === "string" ? value : value?.target?.value ?? ""
+                  )
+                }
+              />
+            </EditorErrorBoundary>
+          ) : (
+            <pre className="p-2" data-testid="raw-code">
+              {code}
+            </pre>
+          )}
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 

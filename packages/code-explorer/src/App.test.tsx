@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { CodeExplorerApp } from "./App";
 vi.mock("./components/FileViewer", () => ({ FileViewer: ({ path }: any) => <div>{path}</div> }));
 vi.mock("./components/CompositionCanvas", () => ({ CompositionCanvas: () => <div /> }));
+vi.mock("./components/FunctionBrowser", () => ({ FunctionBrowser: () => <div /> }));
 
 vi.mock("prismjs", () => ({
   default: { highlightAll: vi.fn(), highlight: (code: string) => code, languages: { tsx: {} } },
@@ -88,8 +89,13 @@ describe("CodeExplorerApp", () => {
 
     fireEvent.click(screen.getByText("two.ts"));
     expect(await screen.findByText("/repo/two.ts")).toBeTruthy();
-
     const tabBar = screen.getByTestId("tab-bar");
+
+    // clicking already open file from tree should switch without duplicating
+    fireEvent.click(screen.getByText("one.ts"));
+    expect(await screen.findByText("/repo/one.ts")).toBeTruthy();
+    expect(within(tabBar).getAllByLabelText("Close").length).toBe(2);
+
     fireEvent.click(within(tabBar).getByText("one.ts"));
     expect(await screen.findByText("/repo/one.ts")).toBeTruthy();
 

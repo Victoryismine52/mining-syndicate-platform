@@ -42,9 +42,24 @@ Preparing the code explorer package for beta launch and refining remaining featu
 ### Past
 - Launched discovery for the card-builder initiative and defined MVP milestones.
 - Ran design sprint and user interviews to validate card creation workflows.
+- Assigned work for the function library and canvas integration to move Code Explorer toward beta.
+- Backend delivered async/arrow function support and Function Browser entered drag-and-drop testing; QA expanded regression coverage and docs published updated runbook.
+- Backend finalized patch engine diff endpoint; frontend wired drag-and-drop card builder; QA cleared regression suite; docs drafted patch engine walkthrough.
+- Updated roadmap to prioritize collaborative editing and incremental parsing after sprint demo.
+- Held cross-team sync aligning backend API, frontend card builder wiring, QA regression tests, and docs runbook updates.
 ### Current
 - Driving cross-team development of card-builder and aligning integration with code explorer.
 - Prioritizing backlog for card-builder beta and tracking package dependencies.
+- Coordinating function indexing API, UI wiring, and test coverage across teams.
+- Aligning incremental parsing research, release-note automation, and beta timeline for Code Explorer.
+- Coordinating backend optimizations and frontend integration for patch engine; QA expanding card-builder test coverage; docs iterating on beta guide.
+- Refining roadmap to sequence collaborative editing after patch engine stabilization.
+- Tracking cross-team dependencies for patch engine launch across backend endpoints, frontend UI, QA scripts, and docs.
 ### Future
 - Planning rollout strategy and metrics for card-builder adoption.
 - Mapping long-term roadmap for advanced card templates and collaborative editing.
+- Extending vision to multi-file patching and automated dependency conflict alerts.
+- Benchmark incremental AST parsing, wire changelog tooling into CI, and broaden test coverage for class methods and default exports.
+- Backend to implement conflict resolution and performance tuning; frontend to enable real-time preview; QA to automate patch engine end-to-end tests; docs to finalize launch playbook.
+- Schedule roadmap checkpoint after beta metrics to define collaborative editing scope.
+- Plan coordinated beta readiness review with backend, frontend, QA, and docs teams.
