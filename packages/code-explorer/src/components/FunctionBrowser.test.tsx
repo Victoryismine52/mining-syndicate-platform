@@ -24,11 +24,12 @@ describe("FunctionBrowser", () => {
     await waitFor(() => {
       const items = screen
         .queryAllByTestId(/function-/)
-        .filter(
-          (el) =>
-            !["function-browser", "function-search"].includes(
-              el.getAttribute("data-testid")!
-            ),
+        .filter((el) =>
+          ![
+            "function-browser",
+            "function-search",
+            "function-tag-filter",
+          ].includes(el.getAttribute("data-testid")!),
         );
       expect(items).toHaveLength(0);
     });
@@ -44,11 +45,12 @@ describe("FunctionBrowser", () => {
     await waitFor(() => {
       const items = screen
         .queryAllByTestId(/function-/)
-        .filter(
-          (el) =>
-            !["function-browser", "function-search"].includes(
-              el.getAttribute("data-testid")!,
-            ),
+        .filter((el) =>
+          ![
+            "function-browser",
+            "function-search",
+            "function-tag-filter",
+          ].includes(el.getAttribute("data-testid")!),
         );
       expect(items).toHaveLength(0);
     });
@@ -118,6 +120,47 @@ describe("FunctionBrowser", () => {
     });
 
     expect(screen.getByTestId("function-foo")).toBeTruthy();
+    expect(screen.getByTestId("function-bar")).toBeTruthy();
+  });
+
+  it("renders tags for each function", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve([
+          {
+            name: "foo",
+            signature: "",
+            path: "a.ts",
+            tags: ["math", "util"],
+          },
+        ]),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    const item = await screen.findByTestId("function-foo");
+    expect(within(item).getByText("math")).toBeTruthy();
+    expect(within(item).getByText("util")).toBeTruthy();
+  });
+
+  it("filters by tag", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve([
+          { name: "foo", signature: "", path: "a.ts", tags: ["alpha"] },
+          { name: "bar", signature: "", path: "b.ts", tags: ["beta"] },
+        ]),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    await screen.findByTestId("function-foo");
+
+    fireEvent.change(screen.getByTestId("function-tag-filter"), {
+      target: { value: "beta" },
+    });
+
+    expect(screen.queryByTestId("function-foo")).toBeNull();
     expect(screen.getByTestId("function-bar")).toBeTruthy();
   });
 
