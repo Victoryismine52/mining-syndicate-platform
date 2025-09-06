@@ -13,7 +13,7 @@ async function init() {
     if (!response.ok) {
       throw new Error("Local API not reachable");
     }
-    console.log("Successfully connected to the local API!");
+    // Connected to local API
   } catch (error: any) {
     console.error("Falling back to Codex API:", error.message);
     try {
@@ -21,7 +21,7 @@ async function init() {
       if (!response.ok) {
         throw new Error("Codex API call failed");
       }
-      console.log("Successfully connected to the Codex API!");
+      // Connected to Codex API
     } catch (error) {
       console.error("Failed to connect to the Codex API:", error);
     }

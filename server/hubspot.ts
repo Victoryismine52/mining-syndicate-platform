@@ -28,7 +28,7 @@ export async function submitToHubSpotForm(formId: string, contactData: any): Pro
       return null;
     }
 
-    console.log(`Submitting to HubSpot form ${formId} for ${contactData.email}`);
+    // Submitting to HubSpot form
     
     // Prepare form submission data using HubSpot's expected format
     const formFields = [
