@@ -48,11 +48,13 @@ function parseFile(file, rootDir) {
     jsDocNode,
     isAsync = false,
     isGenerator = false,
+    extraTags = [],
   ) {
     const tags = ts
       .getJSDocTags(jsDocNode)
       .filter((t) => t.tagName.getText(sourceFile) === 'tag')
-      .map((t) => (t.comment ?? '').toString());
+      .map((t) => (t.comment ?? '').toString())
+      .concat(extraTags);
     functions.push({
       name,
       signature: `${isAsync ? 'async ' : ''}${isGenerator ? '*' : ''}${name}(${params}): ${returnType}`,
@@ -62,14 +64,26 @@ function parseFile(file, rootDir) {
   }
 
   function visit(node) {
-    if (ts.isFunctionDeclaration(node) && node.name) {
+    if (ts.isFunctionDeclaration(node)) {
       const paramsText = node.parameters
         .map((p) => p.getText(sourceFile))
         .join(', ');
       const returnType = node.type ? node.type.getText(sourceFile) : 'any';
       const isAsync = node.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
       const isGenerator = !!node.asteriskToken;
-      addFunction(node.name.text, paramsText, returnType, node, isAsync, isGenerator);
+      const isDefaultExport =
+        node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword) &&
+        node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword);
+      const name = node.name ? node.name.text : 'default';
+      addFunction(
+        name,
+        paramsText,
+        returnType,
+        node,
+        isAsync,
+        isGenerator,
+        isDefaultExport ? ['default-export'] : [],
+      );
     } else if (
       ts.isVariableDeclaration(node) &&
       ts.isIdentifier(node.name) &&
@@ -92,6 +106,45 @@ function parseFile(file, rootDir) {
         isAsync,
         isGenerator,
       );
+    } else if (ts.isClassDeclaration(node) && node.name) {
+      for (const member of node.members) {
+        if (ts.isMethodDeclaration(member) && ts.isIdentifier(member.name)) {
+          const paramsText = member.parameters
+            .map((p) => p.getText(sourceFile))
+            .join(', ');
+          const returnType = member.type ? member.type.getText(sourceFile) : 'any';
+          const isAsync = member.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+          const isGenerator = !!member.asteriskToken;
+          addFunction(
+            `${node.name.text}.${member.name.text}`,
+            paramsText,
+            returnType,
+            member,
+            isAsync,
+            isGenerator,
+            ['class-method'],
+          );
+        }
+      }
+    } else if (ts.isExportAssignment(node)) {
+      const expr = node.expression;
+      if (ts.isArrowFunction(expr) || ts.isFunctionExpression(expr)) {
+        const paramsText = expr.parameters
+          .map((p) => p.getText(sourceFile))
+          .join(', ');
+        const returnType = expr.type ? expr.type.getText(sourceFile) : 'any';
+        const isAsync = expr.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+        const isGenerator = ts.isFunctionExpression(expr) && !!expr.asteriskToken;
+        addFunction(
+          'default',
+          paramsText,
+          returnType,
+          node,
+          isAsync,
+          isGenerator,
+          ['default-export'],
+        );
+      }
     }
     ts.forEachChild(node, visit);
   }
