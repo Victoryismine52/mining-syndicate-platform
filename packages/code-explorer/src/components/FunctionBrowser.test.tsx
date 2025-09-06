@@ -121,6 +121,49 @@ describe("FunctionBrowser", () => {
     expect(screen.getByTestId("function-bar")).toBeTruthy();
   });
 
+  it("renders tags for each function", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve([
+          { name: "foo", signature: "", path: "a.ts", tags: ["util", "core"] },
+        ]),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    const item = await screen.findByTestId("function-foo");
+    expect(within(item).getByTestId("tag-util")).toBeTruthy();
+    expect(within(item).getByTestId("tag-core")).toBeTruthy();
+  });
+
+  it("filters functions by tag", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve([
+          { name: "foo", signature: "", path: "a.ts", tags: ["util"] },
+          { name: "bar", signature: "", path: "b.ts", tags: ["core"] },
+        ]),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    await screen.findByTestId("function-foo");
+
+    fireEvent.change(screen.getByTestId("tag-filter"), {
+      target: { value: "core" },
+    });
+
+    expect(screen.queryByTestId("function-foo")).toBeNull();
+    expect(screen.getByTestId("function-bar")).toBeTruthy();
+
+    fireEvent.change(screen.getByTestId("tag-filter"), {
+      target: { value: "" },
+    });
+
+    expect(screen.getByTestId("function-foo")).toBeTruthy();
+    expect(screen.getByTestId("function-bar")).toBeTruthy();
+  });
+
   it("drags function to composition canvas", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>
