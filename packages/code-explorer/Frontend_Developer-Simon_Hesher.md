@@ -78,3 +78,10 @@ drag-and-drop libraries, and dependency graph automation.
 
 ## 🚨 Urgent Notes
 
+## 🕒 Frontend Development Log
+### Past
+- Implemented tag rendering and tag-based filtering in the Function Browser with accompanying tests.
+### Current
+- Refining component filtering controls and verifying accessibility of new tag inputs.
+### Future
+- Explore multi-select tag filters and animated transitions between explorer panels.

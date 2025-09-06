@@ -24,11 +24,12 @@ describe("FunctionBrowser", () => {
     await waitFor(() => {
       const items = screen
         .queryAllByTestId(/function-/)
-        .filter(
-          (el) =>
-            !["function-browser", "function-search"].includes(
-              el.getAttribute("data-testid")!
-            ),
+        .filter((el) =>
+          ![
+            "function-browser",
+            "function-search",
+            "function-tag-filter",
+          ].includes(el.getAttribute("data-testid")!),
         );
       expect(items).toHaveLength(0);
     });
@@ -44,11 +45,12 @@ describe("FunctionBrowser", () => {
     await waitFor(() => {
       const items = screen
         .queryAllByTestId(/function-/)
-        .filter(
-          (el) =>
-            !["function-browser", "function-search"].includes(
-              el.getAttribute("data-testid")!,
-            ),
+        .filter((el) =>
+          ![
+            "function-browser",
+            "function-search",
+            "function-tag-filter",
+          ].includes(el.getAttribute("data-testid")!),
         );
       expect(items).toHaveLength(0);
     });
