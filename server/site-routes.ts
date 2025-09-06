@@ -975,12 +975,28 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Sections Management Endpoints
   
   // Get sections for a site
-  app.get("/api/sites/:siteId/sections", isAuthenticated, async (req, res) => {
+  app.get("/api/sites/:siteId/sections", async (req, res) => {
     try {
       const { siteId } = req.params;
-      const user = req.user as any;
       
-      // Check if user has access to this site
+      // Check if site is launched (for public access) or requires authentication
+      const site = await siteStorage.getSite(siteId);
+      if (!site) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+      
+      // If site is launched, allow public access
+      if (site.isLaunched) {
+        const sections = await siteStorage.getSiteSections(siteId);
+        return res.json(sections);
+      }
+      
+      // If site is not launched, require authentication and site access
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
+      const user = req.user as any;
       const hasAccess = await siteStorage.checkSiteAccess(siteId, user.email, user.isAdmin);
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied to this site" });
