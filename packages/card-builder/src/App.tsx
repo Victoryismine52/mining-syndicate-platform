@@ -4,6 +4,7 @@ import { ActionCard } from "./components/ActionCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash } from "lucide-react";
+import { ThemeSelector } from "../../theme-framework";
 
 interface StoredCard extends CardConfig {
   id: string;
@@ -12,10 +13,10 @@ interface StoredCard extends CardConfig {
 function PreviewCanvas({ theme, shadow, lighting, animation, children }: Omit<CardConfig, "elements" | "name"> & { children: React.ReactNode }) {
   const themeClass =
     theme === "dark"
-      ? "bg-gray-900 text-white"
+      ? "bg-background text-foreground"
       : theme === "neon"
-      ? "bg-gradient-to-r from-blue-500 to-pink-500 text-white"
-      : "bg-white text-black";
+      ? "bg-gradient-accent text-white"
+      : "bg-card text-card-foreground";
   const shadowClass =
     shadow === "soft" ? "shadow-md" : shadow === "strong" ? "shadow-xl" : "";
   const lightingClass =
@@ -172,6 +173,13 @@ export function CardBuilderApp() {
 
   return (
     <div className="p-8">
+      <div className="mb-6 flex justify-center">
+        <ThemeSelector 
+          variant="pills" 
+          size="md"
+          className="bg-muted/50 border border-border"
+        />
+      </div>
       {error && (
         <div className="mb-4 p-2 border border-red-500 text-red-700">
           {error}

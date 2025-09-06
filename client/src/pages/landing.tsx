@@ -6,6 +6,7 @@ import { LearnMoreModal } from "@/components/learn-more-modal";
 import { MiningPoolModal } from "@/components/mining-pool-modal";
 import { LendingPoolModal } from "@/components/lending-pool-modal";
 import { SiteFooter } from "@/components/site-footer";
+import { ThemeSelector } from "../../../packages/theme-framework";
 import { 
   TrendingUp, 
   Shield, 
@@ -40,6 +41,15 @@ export function Landing() {
               />
             </div>
           </a>
+        </div>
+
+        {/* Theme Selector - Top Right */}
+        <div className="absolute top-6 right-6 z-10">
+          <ThemeSelector 
+            variant="icons" 
+            size="sm"
+            className="bg-slate-800/80 backdrop-blur-sm border border-slate-600 rounded-lg p-1"
+          />
         </div>
         
         <div className="relative max-w-7xl mx-auto px-6 py-24">

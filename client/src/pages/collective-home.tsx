@@ -19,6 +19,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { MessageCircle, FileText, CheckSquare, Users, Calendar, Settings, LogOut, Send, Plus, Edit } from 'lucide-react';
 import { Link } from 'wouter';
+import { ThemeSelector } from '../../../packages/theme-framework';
 
 interface CollectiveHomeProps {
   siteId: string;
@@ -423,6 +424,11 @@ export function CollectiveHome({ siteId, membershipData }: CollectiveHomeProps) 
               </Badge>
             </div>
             <div className="flex items-center gap-4">
+              <ThemeSelector 
+                variant="pills" 
+                size="sm"
+                className="bg-slate-800/50 border border-slate-600"
+              />
               <Button 
                 variant="outline" 
                 size="sm"

@@ -3,6 +3,7 @@ import { Folder, Github, FilePlus } from "lucide-react";
 import { ActionCard } from "./components/ActionCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ThemeSelector } from "../../theme-framework";
 import {
   Dialog,
   DialogContent,
@@ -156,6 +157,13 @@ export function CodeExplorerApp() {
   if (screen === "home") {
     return (
       <div className="p-6 flex flex-col items-center">
+        <div className="mb-6 flex justify-center">
+          <ThemeSelector 
+            variant="pills" 
+            size="md"
+            className="bg-muted/50 border border-border"
+          />
+        </div>
         <div className="grid gap-6 md:grid-cols-3">
           <ActionCard
             icon={Folder}
@@ -213,7 +221,10 @@ export function CodeExplorerApp() {
     return (
       <div className="flex h-screen">
         <div className="w-64 border-r p-2 flex flex-col">
-          <Button variant="outline" size="sm" className="mb-2" onClick={() => setScreen("home")}>Back</Button>
+          <div className="mb-2 flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setScreen("home")}>Back</Button>
+            <ThemeSelector variant="icons" size="sm" />
+          </div>
           <Button variant="outline" size="sm" className="mb-2" onClick={collapseAll}>Collapse All</Button>
           <Input
             placeholder="Search..."
