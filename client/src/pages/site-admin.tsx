@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Settings, Users, BarChart3, Eye, UserPlus, X, FileText, Shield, ExternalLink, Plus, Trash2, Edit, Images, Globe, Download, CheckCircle, GripVertical, ChevronUp, ChevronDown, Folder } from 'lucide-react';
+import { Settings, Users, BarChart3, Eye, UserPlus, X, FileText, Shield, ExternalLink, Plus, Trash2, Edit, Images, Globe, Download, CheckCircle, GripVertical, ChevronUp, ChevronDown, Folder, Monitor } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
@@ -469,14 +469,7 @@ export function SiteAdmin(props: SiteAdminProps) {
     })
   );
 
-  // Debug: Log the URL and siteId
   useEffect(() => {
-    console.log('SiteAdmin component mounted');
-    console.log('Current location:', location);
-    console.log('siteId from props:', props.siteId);
-    console.log('siteId from useParams:', params.siteId);
-    console.log('siteId final value:', siteId);
-    console.log('Window location:', window.location.pathname);
   }, [location, props.siteId, params.siteId, siteId]);
 
   // Note: Authentication is handled by ProtectedRoute wrapper
@@ -1058,7 +1051,7 @@ export function SiteAdmin(props: SiteAdminProps) {
         icon: BarChart3,
       }
     };
-    return configs[formType] || configs['unknown'];
+    return configs[formType as keyof typeof configs] || configs['unknown'];
   };
 
   // Excel export function
@@ -1229,13 +1222,14 @@ export function SiteAdmin(props: SiteAdminProps) {
                 {Object.entries(formTypeGroups).map(([formType, formLeads]) => {
                   const config = getFormTypeConfig(formType);
                   const IconComponent = config.icon;
-                  const colorClass = {
+                  const colorMap: Record<string, string> = {
                     blue: 'text-blue-400',
                     orange: 'text-orange-400', 
                     green: 'text-green-400',
                     purple: 'text-purple-400',
                     gray: 'text-gray-400'
-                  }[config.color];
+                  };
+                  const colorClass = colorMap[config.color] || 'text-gray-400';
 
                   return (
                     <Card key={formType} className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">

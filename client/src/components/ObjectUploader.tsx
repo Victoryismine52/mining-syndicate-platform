@@ -34,7 +34,6 @@ export function ObjectUploader({
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    console.log('Files selected:', files.length, files.map(f => f.name));
     if (files.length === 0) return;
 
     // Validate file count
@@ -57,7 +56,6 @@ export function ObjectUploader({
 
     try {
       setUploading(true);
-      console.log('Starting upload process for', files.length, 'files...');
 
       const successful = [];
       const failed = [];
@@ -66,11 +64,9 @@ export function ObjectUploader({
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         try {
-          console.log(`Uploading file ${i + 1}/${files.length}: ${file.name}`);
           
           // Get upload parameters for this file
           const { method, url } = await onGetUploadParameters();
-          console.log('Upload parameters received for', file.name);
 
           // Upload file directly to signed URL
           const uploadResponse = await fetch(url, {
@@ -87,7 +83,6 @@ export function ObjectUploader({
 
           // Extract the object path from the upload URL
           const uploadUrl = url.split('?')[0]; // Remove query parameters
-          console.log('Upload successful for', file.name, ':', uploadUrl);
           
           successful.push({
             name: file.name,
@@ -127,7 +122,6 @@ export function ObjectUploader({
   };
 
   const handleButtonClick = () => {
-    console.log('Upload button clicked - triggering file input');
     fileInputRef.current?.click();
   };
 
