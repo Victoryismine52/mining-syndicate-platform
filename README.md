@@ -8,6 +8,12 @@ See our key guides:
 
 Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
 
+## Team roster
+
+| Role | Persona file |
+|-----|--------------|
+| Accessibility Specialist | `Accessibility_Specialist-Logan_Patel.md` |
+
 ## Development
 
 - **Full application**: `npm run dev`
