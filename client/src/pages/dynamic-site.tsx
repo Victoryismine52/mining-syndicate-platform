@@ -1100,7 +1100,7 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
                 sectionForms.length === 1 
                   ? "justify-items-center" 
                   : sectionForms.length === 2
-                    ? "md:grid-cols-2 justify-items-center"
+                    ? "md:grid-cols-2"
                     : "md:grid-cols-2 lg:grid-cols-3"
               }`}>
                         {sectionForms.map((cardAssignment: any) => {
@@ -1216,7 +1216,7 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
               groupedForms['no-section'].length === 1 
                 ? "justify-items-center" 
                 : groupedForms['no-section'].length === 2
-                  ? "md:grid-cols-2 justify-items-center"
+                  ? "md:grid-cols-2"
                   : "md:grid-cols-2 lg:grid-cols-3"
             }`}>
                       {groupedForms['no-section'].map((cardAssignment: any) => {
