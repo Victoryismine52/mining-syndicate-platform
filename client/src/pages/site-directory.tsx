@@ -151,7 +151,7 @@ export function SiteDirectory() {
           </a>
         </div>
 
-        {/* Admin Login Button - Top Right */}
+        {/* Admin Login - Top Right */}
         <div className="absolute top-6 right-6 z-10">
           <Button 
             variant="outline" 

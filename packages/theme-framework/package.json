@@ -1,0 +1,22 @@
+{
+  "name": "@mining-syndicate/theme-framework",
+  "version": "1.0.0",
+  "description": "Unified theme framework for Mining Syndicate platform",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "echo 'Theme framework loaded'",
+    "build": "echo 'Theme framework built'"
+  },
+  "keywords": ["theme", "framework", "react", "typescript"],
+  "author": "Mining Syndicate Platform Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}

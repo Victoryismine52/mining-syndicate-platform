@@ -41,6 +41,7 @@ export function Landing() {
             </div>
           </a>
         </div>
+
         
         <div className="relative max-w-7xl mx-auto px-6 py-24">
           <div className="text-center space-y-8">
