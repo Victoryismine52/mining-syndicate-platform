@@ -15,9 +15,11 @@ I have a degree in information systems and several years of experience testing w
 - **[2025‑09‑09]** Wrote unit tests for config name persistence and OpenAPI generation, and added Playwright cross-browser checks confirming `card.json` and `card.yaml` exports across Chromium, Firefox and WebKit. Logged the successful run with a satisfied sip of mate.
 - **[2025‑09‑10]** Extended coverage for tricky edges: special characters now persist in card names, deletion cancellations leave cards untouched, and even static cards produce valid OpenAPI specs. Added a cross-browser Playwright check ensuring default exports generate `card.json` and `card.yaml` with "Untitled Card" across Chromium, Firefox and WebKit. Celebrated with an extra-long mate break.
 
+- **[2025‑09‑11]** Wrote extra unit tests covering whitespace in names, multi-card deletion and detailed OpenAPI `operationId` checks. Enhanced cross-browser Playwright tests to confirm `openapi: "3.0.0"` appears even when exporting an untitled card. All suites passed—clinked mugs of mate with the team.
+
 ## What I’m Doing
 
-With edge-case exports under control, I’m diving deeper into complex multi‑card flows. I’m scripting scenarios where users create a sequence of cards with conditional navigation and ensuring exports preserve those relationships. I’m also adding accessibility checks using axe-core to catch issues like insufficient colour contrast or missing focus indicators. On the API side, I’m testing error handling: what happens when a generated endpoint returns a 500, or when network latency spikes? These tests are like rehearsals for worst‑case scenarios.
+With edge-case exports under control and fresh tests green, I’m diving deeper into complex multi‑card flows. I’m scripting scenarios where users create a sequence of cards with conditional navigation and ensuring exports preserve those relationships. I’m also adding accessibility checks using axe-core to catch issues like insufficient colour contrast or missing focus indicators. On the API side, I’m testing error handling: what happens when a generated endpoint returns a 500, or when network latency spikes? These tests are like rehearsals for worst‑case scenarios.
 
 ## Where I’m Headed
 

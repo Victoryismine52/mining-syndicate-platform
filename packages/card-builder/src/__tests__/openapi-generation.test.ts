@@ -33,6 +33,9 @@ describe('exportApi', () => {
     expect(yaml).toContain('Handle Submit click');
     expect(yaml).toContain('/element/input1:');
     expect(yaml).toContain('Submit value for Name');
+    expect(yaml).toContain('operationId: "handle_btn1"');
+    expect(yaml).toContain('operationId: "submit_input1"');
+    expect(yaml).toContain('requestBody:');
   });
 
   it('generates base OpenAPI when card has no interactive elements', () => {

@@ -51,4 +51,5 @@ test('exports with default name when no name provided', async ({ mount, page }) 
 
   expect(jsonContent).toContain('"name": "Untitled Card"');
   expect(yamlContent).toContain('title: "Untitled Card"');
+  expect(yamlContent).toContain('openapi: "3.0.0"');
 });
