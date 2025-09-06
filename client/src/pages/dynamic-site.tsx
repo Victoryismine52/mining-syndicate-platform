@@ -701,7 +701,7 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className={`sm:max-w-lg bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
+        <DialogContent className={`w-[95vw] max-w-lg mx-auto bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 ${colorTheme?.icon || 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
