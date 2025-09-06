@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Globe, Lock, ExternalLink, User, Shield } from 'lucide-react';
-import { ThemeSelector } from '../../../packages/theme-framework';
 import type { Site } from '@shared/schema';
 
 interface PasswordCheckDialogProps {
@@ -152,13 +151,8 @@ export function SiteDirectory() {
           </a>
         </div>
 
-        {/* Theme Selector and Admin Login - Top Right */}
-        <div className="absolute top-6 right-6 z-10 flex items-center gap-3">
-          <ThemeSelector 
-            variant="icons" 
-            size="sm"
-            className="bg-slate-800/80 backdrop-blur-sm border border-slate-600 rounded-lg p-1"
-          />
+        {/* Admin Login - Top Right */}
+        <div className="absolute top-6 right-6 z-10">
           <Button 
             variant="outline" 
             size="sm"

@@ -13,7 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, QrCode, Eye, Edit, Trash2, Copy, Settings, ArrowLeft, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import { ThemeSelector } from '../../../packages/theme-framework';
 import type { Site, InsertSite } from '@shared/site-schema';
 
 export function SiteManager() {
@@ -313,12 +312,6 @@ export function SiteManager() {
           {/* Navigation with Create Button */}
           <div className="flex items-center justify-between pt-6 border-t border-slate-700/50">
             <nav className="flex items-center gap-1">
-              <ThemeSelector 
-                variant="pills" 
-                size="sm"
-                className="bg-slate-800/50 border border-slate-600 mr-3"
-              />
-              
               <Button
                 variant="ghost"
                 size="sm"

@@ -4,7 +4,6 @@ import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LogIn } from 'lucide-react';
-import { ThemeSelector } from '../../../packages/theme-framework';
 
 export function Login() {
   const [, setLocation] = useLocation();
@@ -52,13 +51,6 @@ export function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
-      <div className="absolute top-6 right-6 z-10">
-        <ThemeSelector 
-          variant="icons" 
-          size="sm"
-          className="bg-slate-800/80 backdrop-blur-sm border border-slate-600 rounded-lg p-1"
-        />
-      </div>
       <Card className="w-full max-w-md bg-slate-800 border-slate-600">
         <CardHeader className="text-center">
           <div className="w-16 h-16 bg-blue-600 rounded-full mx-auto flex items-center justify-center mb-4">

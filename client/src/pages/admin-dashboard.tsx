@@ -37,7 +37,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
-import { ThemeSelector } from '../../../packages/theme-framework';
 import type { GlobalSlide, Site, SiteLead, LegalDisclaimer } from "@shared/site-schema";
 import type { FormTemplate, InsertFormTemplate } from "@shared/schema";
 import { FormBuilder } from "@/components/form-builder";
@@ -1873,11 +1872,6 @@ export function AdminDashboard() {
             </div>
 
             <div className="flex items-center gap-3">
-              <ThemeSelector 
-                variant="pills" 
-                size="sm"
-                className="bg-slate-800/50 border border-slate-600"
-              />
               <Link href="/sites">
                 <Button
                   variant="outline"
