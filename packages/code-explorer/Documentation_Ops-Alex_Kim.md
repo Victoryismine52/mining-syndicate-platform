@@ -38,8 +38,8 @@ Standardize repository documentation and automate release notes.
 
 ## 🔄 Status
 
-- **Past:** Published runbook and onboarding docs covering function index basics.
-- **Current:** Documenting class method and default-export indexing along with tag filters.
+- **Past:** Published runbook and onboarding docs covering function index basics and tag filter usage.
+- **Current:** Refining changelog script to surface tag enhancements.
 - **Future:** Automate changelog tagging and keep cross-team docs aligned.
 
 ## 🔧 Maintenance Plan

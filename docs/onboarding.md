@@ -33,8 +33,8 @@ This guide covers setting up the project locally, running tests, and establishin
 ## Function Index & `FunctionBrowser` Flow
 
 - `GET /api/functions` returns the prebuilt **function index** generated at startup by `server/function-index.ts`.
-- The index includes standalone functions, class methods, and default exports. Class methods are named `ClassName.method`; default exports appear as `default` and receive the `default-export` tag.
-- Functions can carry custom metadata with JSDoc tags:
+- The index includes standalone functions, class methods, and default exports. Class methods appear as `ClassName.method`, while default exports are recorded as `default` and automatically tagged with `default-export`.
+- Functions can carry custom metadata with JSDoc `@tag`; these tags feed the `FunctionBrowser` filter:
   ```ts
   /** @tag util */
   export function add(a: number, b: number) { return a + b; }
@@ -47,7 +47,7 @@ This guide covers setting up the project locally, running tests, and establishin
   ```
 - The `FunctionBrowser` panel uses this endpoint to enable search, tag filtering, and drag-and-drop:
   1. Open the browser from the explorer sidebar.
-  2. Enter a tag or search term to find a function.
+  2. Use the tag filter or search field to find a function by name or `@tag`.
   3. Drag the function onto the `CompositionCanvas` to begin a new flow.
 
 ## Profile Conventions
