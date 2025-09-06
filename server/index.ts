@@ -4,8 +4,8 @@ import fs from "fs";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
-const BASE_DEV_URL = "http://0.0.0.0:5000/api";
-const BASE_CODEX_URL = "https://485e2e64-1b2c-43eb-99b5-63298da289f4-00-1kpwljks2mo2e.kirk.replit.dev/api";
+const BASE_DEV_URL = process.env.BASE_DEV_URL || "http://0.0.0.0:5000/api";
+const BASE_CODEX_URL = process.env.BASE_CODEX_URL || `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/api`;
 
 async function init() {
   try {

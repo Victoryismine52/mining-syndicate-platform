@@ -7,9 +7,9 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-// Set default for development
+// Set default for development - will be overridden in production
 if (!process.env.REPLIT_DOMAINS) {
-  process.env.REPLIT_DOMAINS = "localhost:5000";
+  process.env.REPLIT_DOMAINS = process.env.REPLIT_DEV_DOMAIN || "localhost:5000";
 }
 
 console.log('REPLIT_DOMAINS:', process.env.REPLIT_DOMAINS);
