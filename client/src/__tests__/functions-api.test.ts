@@ -17,4 +17,9 @@ describe("/api/functions", () => {
     expect(data.length).toBeGreaterThan(0);
     server.close();
   });
+
+  it("includes class methods and default exports", () => {
+    expect(functionIndex.some((f) => f.tags.includes("class-method"))).toBe(true);
+    expect(functionIndex.some((f) => f.tags.includes("default-export"))).toBe(true);
+  });
 });
