@@ -3,8 +3,8 @@
 See our key guides:
 
 - [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions.
-- [Exporting Cards](docs/exporting-cards.md) to download card modules with `JSON` or `OpenAPI` specs.
-- [Documentation Style Guide](docs/style-guide.md) for writing tone and formatting.
+- [Exporting Cards](docs/exporting-cards.md) explains how to grab the configuration `JSON` and matching `OpenAPI` spec.
+- [Documentation Style Guide](docs/style-guide.md) outlines tone and formatting.
 
 Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
 

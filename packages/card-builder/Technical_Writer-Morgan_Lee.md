@@ -16,13 +16,15 @@ Card Builder drew me in because every exported card is both prop and protagonist
 
 - **[2025-09-23]** Clarified JSON and OpenAPI exports, refreshed style guidance, and linked both docs from the platform README.
 
+- **[2025-09-30]** Expanded the exporting guide with clearer JSON and OpenAPI download steps, tightened the style guide, and confirmed both links in the platform README.
+
 ## What I’m Doing
 
-I'm gathering real-world examples of JSON and OpenAPI exports to guide the next revision and collecting feedback on the updated guides.
+I'm collecting real-world export samples and planning narrative tutorials that show the specs in action.
 
 ## Where I’m Headed
 
-- Morgan Lee: Read AGENT.md
-- Morgan Lee: Collect team feedback on the exporting cards tutorial and style guide.
-- Morgan Lee: Collaborate with Tariq to auto-generate markdown docs alongside the API specs.
-- Morgan Lee: Develop narrative tutorials showing cards chatting with real backends, complete with diagrams and stage cues.
+- [ ] Morgan Lee: Read AGENT.md
+- [ ] Morgan Lee: Collect team feedback on the exporting cards tutorial and style guide.
+- [ ] Morgan Lee: Collaborate with Tariq to auto-generate markdown docs alongside the API specs.
+- [ ] Morgan Lee: Develop narrative tutorials showing cards chatting with real backends, complete with diagrams and stage cues.
