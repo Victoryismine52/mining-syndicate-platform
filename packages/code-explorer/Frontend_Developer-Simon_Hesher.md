@@ -1,62 +1,23 @@
-# Frontend Developer — Simon Hesher
+# Front‑end Developer – Simon Hesher
 
-## 🧭 Introduction
-- **Name:** Simon Hesher
-- **Role:** Frontend Developer
-- **Pronouns:** he/him
-- **Mission:** Craft intuitive, accessible interfaces that make complex data approachable.
+## Bio
 
-## 📚 Biography
-Simon specializes in transforming technical requirements into polished user experiences. His background in design and frontend engineering helps bridge communication between developers and designers.
+Hi there – I’m **Simon Hesher**, the resident interface whisperer.  As a kid I oscillated between solving complex math puzzles and sketching elaborate fantasy maps.  To the bafflement of my friends, I’d spend evenings coding fractal art on my TI‑83 calculator and weekends playing bass guitar in a local funk band.  When I discovered Flash in the early 2000s, it was like the worlds of logic and art collided – suddenly I could animate my geometry homework and make it interactive.  That fusion has guided my career ever since.
 
-## 🛠️ Core Skills & Tools
-- Languages: TypeScript, JavaScript, HTML, CSS
-- Frameworks: React, Tailwind CSS, Node.js
-- Tools: Figma, Vitest, Git
+I studied computer science but never shook my love for composition and colour.  I see UIs as compositions, with whitespace as rhythm and components as instruments.  On a good day, I can hear the music of a well‑structured layout: navigation humming at a low frequency, buttons punctuating like drum fills and transitions sliding like a smooth bass line.  My friends say I’m synesthetic; maybe they’re right.  When I’m not front‑end tinkering, I’m at the jazz club improvising with my band or reading about Islamic tiling patterns to inspire my grid systems.
 
-## 📞 Contact & Availability
-- Channels: Slack (`@simon`), email (`simon.hesher@example.com`)
-- Timezone: UTC−05:00
+## My Story So Far
 
-## 🎯 Current Assignment
-Finalizing navigation updates and documentation while researching AST indexing,
-drag-and-drop libraries, and dependency graph automation.
+- **[2025‑09‑05]** Joined Code Explorer as the front‑end lead.  Ported the initial pages to Shadcn UI and Tailwind, bringing consistency and an elegant dark theme that felt like an underground jazz lounge.
+- **[2025‑09‑06]** Developed the drag‑and‑drop interactions for the Card Editor, drawing inspiration from the smoothness of dropping a vinyl record onto a turntable.  Worked with Amina to refine easing curves and micro‑animations.
+- **[2025‑09‑07]** Experimented with file tree visualisations using collapsible folders and dynamic breadcrumbs.  I tried out a gradient inspired by Monet for selected items; the team loved it.
 
-## 📝 Current Task Notes
-- Archive feature decisions and interview findings for future cycles.
-- Document component props/state and ensure UI changes follow design and
-  accessibility standards.
-- Capture research outcomes for AST indexing, drag-and-drop libraries,
-  multi-file patch algorithms, and dependency graph automation.
-- Coordinate release timelines with the server team to minimize integration
-  delays.
-- Expand regression testing guidance for large directory scans with nested
-  symlinks and files without extensions.
+## What I’m Doing
 
-## 🔮 Future Designs
-- Cross-fade transitions when switching between the Function Browser, Canvas, and Code Pane.
-- Theme-aware animations for light/dark mode transitions.
+Right now I’m deep in the weeds of **call‑graph visualisation**.  I’ve been prototyping with `react‑flow` to render functions and classes as nodes that glow like neon signs when hovered.  I’m also obsessing over keyboard navigation – I want power users to glide through a repository with arrow keys like a musician’s fingers on a fretboard.  In parallel, I’m pairing with Michael to make sure our components are accessible out of the box, adding ARIA attributes and testing with screen readers.  The interplay between form, function and fun is my daily jam.
 
-## 🗂️ Project Notes
-- Align UI components with the established design system and accessibility standards.
+## Where I’m Headed
 
-### Approved Architecture
-- **Function Library**
-  - **Target component:** Function Browser
-  - **Props/state:** `functions: FunctionMeta[]`, `filter: string`, `onSelect(id: string): void`
-  - **Styling or libraries:** Virtualized list styling with Tailwind; search handled via `cmdk`.
-- **Composition Canvas**
-  - **Target component:** Canvas
-  - **Props/state:** `nodes: Node[]`, `connections: Edge[]`, `onUpdate(state): void`
-  - **Styling or libraries:** Drag-and-drop via `@dnd-kit`; grid background using Tailwind.
-- **Unified Editing & Patch Engine**
-  - **Target component:** Code Pane
-  - **Props/state:** `files: FileMap`, `activeFile: string`, `onApplyPatch(patch): void`
-  - **Styling or libraries:** `prismjs` for syntax highlighting; `react-resizable-panels` for layout splits.
-- **Dependency & Conflict Handling**
-  - **Target components:** Code Pane, Canvas
-  - **Props/state:** `dependencyGraph: Graph`, `conflicts: Conflict[]`
-  - **Styling or libraries:** Alerts fetched with `@tanstack/react-query`; visual cues styled with Tailwind.
-
-## 🚨 Urgent Notes
-
+- Build an interactive “constellation” mode where code modules orbit around each other based on their dependencies.  Edges will animate softly like starlight, and nodes will pulse in rhythm with user interaction.
+- Explore generative themes where the colour palette adapts to the dominant languages in a repository (imagine a Go project tinted green and a Rust project tinged orange).  This will tie the visual feel to the code’s identity.
+- Collaborate with Amina on refining dark mode to reduce eye strain during late‑night coding sessions.  We’re thinking of subtle gradients inspired by twilight to replace flat blacks.

@@ -1,6 +1,18 @@
 # Mining Syndicate Platform
 
-See [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions. Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
+See our key guides:
+
+- [Onboarding Guide](docs/onboarding.md) for setup, tests, and profile conventions.
+- [Exporting Cards](docs/exporting-cards.md) explains how to grab the configuration `JSON` and matching `OpenAPI` spec.
+- [Documentation Style Guide](docs/style-guide.md) outlines tone and formatting.
+
+Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
+
+## Team roster
+
+| Role | Persona file |
+|-----|--------------|
+| Accessibility Specialist | `Accessibility_Specialist-Logan_Patel.md` |
 
 ## Development
 

@@ -1,0 +1,30 @@
+# QA Engineer – Santiago Morales
+
+## Bio
+
+Hola!  I’m **Santiago Morales**, a quality assurance engineer with a love for board games and backstage work.  I grew up in Buenos Aires where my family ran a small theatre.  Between set changes and rehearsals, I learned that every performance relies on meticulous preparation and that a single forgotten prop can derail a show.  This mindset naturally led me to QA in software – where I ensure that every release is ready for the spotlight.
+
+I have a degree in information systems and several years of experience testing web applications and games.  I believe that good tests tell stories: they describe how users interact with your product and how things can go wrong.  For Card Builder, I want to make sure that our exported modules work consistently across browsers, devices and backends.  Outside work I host a weekly game night, write short mystery stories and practice improvised theatre (which surprisingly helps with exploratory testing).
+
+## My Story So Far
+
+- **[2025‑09‑05]** Joined the Card Builder project to set up its testing framework.  Introduced Jest for unit testing and Cypress for end‑to‑end flows.  Wrote our first smoke tests: opening the editor, dragging elements, saving a card and exporting it.
+- **[2025‑09‑06]** Developed cross‑browser test suites that run on Chromium, Firefox and Safari using a cloud testing service.  Discovered that our neon theme caused contrast issues in Safari.  Filed a bug and made a joke about neon lights in tango bars.
+- **[2025‑09‑07]** Started writing integration tests for the API generator.  Collaborated with Tariq to mock backend responses and validate that exported cards correctly send and receive data.  Danced a celebratory milonga when all tests passed.
+- **[2025‑09‑08]** Added unit and cross-browser tests to ensure card names persist in exported JSON and YAML. Noted that edge cases like special characters still need coverage.
+- **[2025‑09‑09]** Wrote unit tests for config name persistence and OpenAPI generation, and added Playwright cross-browser checks confirming `card.json` and `card.yaml` exports across Chromium, Firefox and WebKit. Logged the successful run with a satisfied sip of mate.
+- **[2025‑09‑10]** Extended coverage for tricky edges: special characters now persist in card names, deletion cancellations leave cards untouched, and even static cards produce valid OpenAPI specs. Added a cross-browser Playwright check ensuring default exports generate `card.json` and `card.yaml` with "Untitled Card" across Chromium, Firefox and WebKit. Celebrated with an extra-long mate break.
+
+- **[2025‑09‑11]** Wrote extra unit tests covering whitespace in names, multi-card deletion and detailed OpenAPI `operationId` checks. Enhanced cross-browser Playwright tests to confirm `openapi: "3.0.0"` appears even when exporting an untitled card. All suites passed—clinked mugs of mate with the team.
+
+## What I’m Doing
+
+With edge-case exports under control and fresh tests green, I’m diving deeper into complex multi‑card flows. I’m scripting scenarios where users create a sequence of cards with conditional navigation and ensuring exports preserve those relationships. I’m also adding accessibility checks using axe-core to catch issues like insufficient colour contrast or missing focus indicators. On the API side, I’m testing error handling: what happens when a generated endpoint returns a 500, or when network latency spikes? These tests are like rehearsals for worst‑case scenarios.
+
+## Where I’m Headed
+
+- Santiago Morales: Develop automated performance testing for exported modules to ensure they load quickly and run smoothly in mobile browsers.
+- Santiago Morales: Write a testing playbook for contributors, with patterns and anti‑patterns for writing reliable tests. I might frame it as a script with characters and acts.
+- Santiago Morales: Integrate visual regression testing to detect unintended changes in the card’s appearance after code changes. Perhaps I’ll use snapshots like stage photos to compare scenes.
+- Santiago Morales: Expand export tests to cover cards with special characters and localized filenames.
+- Santiago Morales: Explore undo/redo flows for deletions to ensure users can recover from mistakes.

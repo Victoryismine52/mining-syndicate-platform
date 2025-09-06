@@ -76,6 +76,7 @@ coverage/
 *.lcov
 .nyc_output/
 .jest/
+test-results/
 
 # IDE and editor files
 .vscode/settings.json
