@@ -166,6 +166,32 @@ describe("FunctionBrowser", () => {
     expect(screen.getByTestId("function-bar")).toBeTruthy();
   });
 
+  it("combines text and tag filters", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve([
+          { name: "foo", signature: "", path: "a.ts", tags: ["util"] },
+          { name: "bar", signature: "", path: "b.ts", tags: ["util"] },
+          { name: "baz", signature: "", path: "c.ts", tags: ["core"] },
+        ]),
+    } as any);
+
+    render(<FunctionBrowser />);
+
+    await screen.findByTestId("function-foo");
+
+    fireEvent.change(screen.getByTestId("function-search"), {
+      target: { value: "ba" },
+    });
+    fireEvent.change(screen.getByTestId("tag-filter"), {
+      target: { value: "util" },
+    });
+
+    expect(screen.queryByTestId("function-foo")).toBeNull();
+    expect(screen.queryByTestId("function-baz")).toBeNull();
+    expect(screen.getByTestId("function-bar")).toBeTruthy();
+  });
+
   it("drags function to composition canvas", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>

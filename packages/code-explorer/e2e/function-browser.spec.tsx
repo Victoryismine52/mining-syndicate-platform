@@ -92,7 +92,44 @@ test('handles API failure gracefully', async ({ mount, page }) => {
 
     const component = await mount(<Wrapper />);
     const fn = component.locator('[data-testid="function-foo"]');
-    await expect(fn.locator('[data-testid="function-tag-util"]').first()).toBeVisible();
+    await expect(fn.locator('[data-testid="tag-util"]').first()).toBeVisible();
+    const canvas = component.locator('[data-testid="canvas"]');
+    await fn.dragTo(canvas);
+    await expect(component.getByText('foo')).toBeVisible();
+  });
+
+  test('filters by tag then drags function', async ({ mount, page }) => {
+    await page.route('**/api/functions', route =>
+      route.fulfill({
+        status: 200,
+        body: JSON.stringify([
+          { name: 'foo', signature: '', path: 'a.ts', tags: ['util'] },
+          { name: 'bar', signature: '', path: 'b.ts', tags: ['core'] },
+        ]),
+      })
+    );
+
+    const Wrapper = () => {
+      const [state, setState] = React.useState({
+        nodes: [] as CompositionNode[],
+        connections: [] as Edge[],
+      });
+      return (
+        <div className="flex">
+          <FunctionBrowser />
+          <CompositionCanvas
+            nodes={state.nodes}
+            connections={state.connections}
+            onUpdate={setState}
+          />
+        </div>
+      );
+    };
+
+    const component = await mount(<Wrapper />);
+    await component.locator('[data-testid="tag-filter"]').selectOption('util');
+    await expect(component.locator('[data-testid="function-bar"]')).toHaveCount(0);
+    const fn = component.locator('[data-testid="function-foo"]');
     const canvas = component.locator('[data-testid="canvas"]');
     await fn.dragTo(canvas);
     await expect(component.getByText('foo')).toBeVisible();
