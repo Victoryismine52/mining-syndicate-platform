@@ -64,7 +64,7 @@ export async function setupAuth(app: Express) {
   const { clientId, clientSecret } = validateGoogleOAuthConfig();
   
   // Google OAuth Strategy - Use environment variable or build from host
-  const callbackURL = process.env.GOOGLE_OAUTH_CALLBACK_URL || `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/api/auth/google/callback`;
+  const callbackURL = process.env.GOOGLE_OAUTH_CALLBACK_URL || `https://conduit.replit.app/api/auth/google/callback`;
   // Google OAuth configured with callback URL
   
   passport.use(

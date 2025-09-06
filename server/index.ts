@@ -5,7 +5,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const BASE_DEV_URL = process.env.BASE_DEV_URL || "http://0.0.0.0:5000/api";
-const BASE_CODEX_URL = process.env.BASE_CODEX_URL || `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/api`;
+const BASE_CODEX_URL = process.env.BASE_CODEX_URL || `https://conduit.replit.app/api`;
 
 async function init() {
   try {

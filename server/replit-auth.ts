@@ -9,7 +9,7 @@ import { storage } from "./storage";
 
 // Set default for development - will be overridden in production
 if (!process.env.REPLIT_DOMAINS) {
-  process.env.REPLIT_DOMAINS = process.env.REPLIT_DEV_DOMAIN || "localhost:5000";
+  process.env.REPLIT_DOMAINS = process.env.REPLIT_DEV_DOMAIN || "conduit.replit.app";
 }
 
 // REPLIT_DOMAINS configured
