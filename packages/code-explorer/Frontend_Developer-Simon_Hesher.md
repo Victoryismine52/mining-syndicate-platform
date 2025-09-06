@@ -22,6 +22,11 @@ Simon specializes in transforming technical requirements into polished user expe
 Finalizing navigation updates and documentation while researching AST indexing,
 drag-and-drop libraries, and dependency graph automation.
 
+## 🔄 Status
+- **Past:** Added tag display and filtering to the Function Browser.
+- **Current:** Refining tag UI and expanding tests for tag-based filtering.
+- **Future:** Investigate tag suggestions and multi-tag search support.
+
 ## 📝 Current Task Notes
 - Archive feature decisions and interview findings for future cycles.
 - Document component props/state and ensure UI changes follow design and

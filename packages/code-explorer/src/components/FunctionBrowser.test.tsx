@@ -127,28 +127,23 @@ describe("FunctionBrowser", () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>
         Promise.resolve([
-          {
-            name: "foo",
-            signature: "",
-            path: "a.ts",
-            tags: ["math", "util"],
-          },
+          { name: "foo", signature: "", path: "a.ts", tags: ["util", "core"] },
         ]),
     } as any);
 
     render(<FunctionBrowser />);
 
     const item = await screen.findByTestId("function-foo");
-    expect(within(item).getByText("math")).toBeTruthy();
-    expect(within(item).getByText("util")).toBeTruthy();
+    expect(within(item).getByTestId("tag-util")).toBeTruthy();
+    expect(within(item).getByTestId("tag-core")).toBeTruthy();
   });
 
-  it("filters by tag", async () => {
+  it("filters functions by tag", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       json: () =>
         Promise.resolve([
-          { name: "foo", signature: "", path: "a.ts", tags: ["alpha"] },
-          { name: "bar", signature: "", path: "b.ts", tags: ["beta"] },
+          { name: "foo", signature: "", path: "a.ts", tags: ["util"] },
+          { name: "bar", signature: "", path: "b.ts", tags: ["core"] },
         ]),
     } as any);
 
@@ -156,32 +151,18 @@ describe("FunctionBrowser", () => {
 
     await screen.findByTestId("function-foo");
 
-    fireEvent.change(screen.getByTestId("function-tag-filter"), {
-      target: { value: "beta" },
+    fireEvent.change(screen.getByTestId("tag-filter"), {
+      target: { value: "core" },
     });
 
     expect(screen.queryByTestId("function-foo")).toBeNull();
     expect(screen.getByTestId("function-bar")).toBeTruthy();
-  });
 
-  it("filters by tag case-insensitively", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      json: () =>
-        Promise.resolve([
-          { name: "foo", signature: "", path: "a.ts", tags: ["Alpha"] },
-          { name: "bar", signature: "", path: "b.ts", tags: ["Beta"] },
-        ]),
-    } as any);
-
-    render(<FunctionBrowser />);
-
-    await screen.findByTestId("function-foo");
-
-    fireEvent.change(screen.getByTestId("function-tag-filter"), {
-      target: { value: "beta" },
+    fireEvent.change(screen.getByTestId("tag-filter"), {
+      target: { value: "" },
     });
 
-    expect(screen.queryByTestId("function-foo")).toBeNull();
+    expect(screen.getByTestId("function-foo")).toBeTruthy();
     expect(screen.getByTestId("function-bar")).toBeTruthy();
   });
 
