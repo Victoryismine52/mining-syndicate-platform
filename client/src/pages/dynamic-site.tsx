@@ -18,7 +18,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, publicApiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { insertLeadSchema, type InsertLead } from '@shared/schema';
 import { z } from 'zod';
@@ -130,6 +130,7 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   const config = formTemplate.config || {};
 
   // Fetch the actual form template fields
+  const formFieldsUrl = `/api/form-templates/${formTemplate.id}/fields`;
   const {
     data: formFields = [],
     isLoading,
@@ -137,8 +138,9 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
     error,
     refetch,
   } = useQuery<any[]>({
-    queryKey: [`/api/form-templates/${formTemplate.id}/fields`],
+    queryKey: [formFieldsUrl],
     enabled: !!formTemplate.id && isOpen,
+    queryFn: () => publicApiRequest('GET', formFieldsUrl).then((res) => res.json()),
   });
 
   if (isError) {

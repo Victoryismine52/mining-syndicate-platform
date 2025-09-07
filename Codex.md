@@ -7,4 +7,5 @@
 - Captured `isError` and `error` from the form field query so the modal can detect when loading fails.
 - Displayed a descriptive error message with retry and close options instead of form fields when the query fails.
 - Validated dynamic form fields before schema and default value construction, skipping malformed entries to avoid runtime errors.
+- Introduced `publicApiRequest` helper to fetch form fields without cookies and updated form modals to use it.
 
