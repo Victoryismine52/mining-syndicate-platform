@@ -15,5 +15,4 @@
 - 2025-09-07: persisted HubSpot contact IDs on site leads via new `updateSiteLead` helper for CRM integration consistency; analytics collection remains unchanged, but marketing workflows can now cross-reference local leads with HubSpot contacts.
 
 - 2025-09-07: enabled internal analytics tracking via `/api/sites/:siteId/analytics` with client-side consent checks. Set `VITE_ANALYTICS_PROVIDER` (default `internal`) for deployments; Replit and Card-Builder teams must ensure this variable is configured and respect `analytics-consent` localStorage before collecting events.
-
-
+- 2025-09-07: introduced a `TaskRepo` interface and Express stub generator that delegates task creation to injected repositories. Code-Explorer should supply a `SnowflakeTaskRepo` that calls stored procedures, while Card-Builder can use the provided `InMemoryTaskRepo` for local tests before swapping in a Snowflake-backed repo.
