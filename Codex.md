@@ -4,6 +4,7 @@
 
 ## Summary of Recent Changes
 
+2025-09-09: Added Playwright end-to-end tests for form submission, error handling, analytics consent, and translations – expand coverage to success, network failure, malformed data, and consent flows – increases confidence for Code-Explorer and Card-Builder releases.
 2025-09-08: Localized form modals using site language – fetch preferred language and translate labels, placeholders, and validation errors – non-English users see correct text; Replit must supply translations for new locales.
 2025-09-07: Introduced GitHub Actions CI with caching – automate tests and builds to gate merges – Replit, Code-Explorer, and Card-Builder gain faster feedback and protected main branch.
 2025-09-07: Honored site-specific form field translations – ensure forms reflect language configuration with fallbacks – improved localized UX across sites.
