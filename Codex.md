@@ -4,6 +4,7 @@
 
 ## Summary of Recent Changes
 
+2025-09-13: Added fallback in-memory object storage when REPLIT_SIDECAR_ENDPOINT is missing – support Replit-independent local development – uploads persist only for the process lifetime.
 2025-09-12: Introduced pino-based JSON logger with per-request IDs – unify structured logging and enable traceability – downstream log consumers must parse JSON and respect the `reqId` field for correlation.
 
 2025-09-07: Added rate limiting and stricter lead validation – throttle spam and enforce clean contact data – marketing analytics receive higher fidelity lead metrics.

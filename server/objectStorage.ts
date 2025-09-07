@@ -1,28 +1,82 @@
 import { Storage, File } from "@google-cloud/storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
+import { Readable } from "stream";
 import { logger } from './logger';
 
-const REPLIT_SIDECAR_ENDPOINT = process.env.REPLIT_SIDECAR_ENDPOINT || "http://127.0.0.1:1106";
+const REPLIT_SIDECAR_ENDPOINT = process.env.REPLIT_SIDECAR_ENDPOINT;
 
-// The object storage client is used to interact with the object storage service.
-export const objectStorageClient = new Storage({
-  credentials: {
-    audience: "replit",
-    subject_token_type: "access_token",
-    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-    type: "external_account",
-    credential_source: {
-      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-      format: {
-        type: "json",
-        subject_token_field_name: "access_token",
+class MemoryFile {
+  private content?: Buffer;
+
+  constructor(private store: Map<string, Buffer>, private key: string) {}
+
+  async exists(): Promise<[boolean]> {
+    return [this.store.has(this.key)];
+  }
+
+  async getMetadata(): Promise<any[]> {
+    const data = this.store.get(this.key);
+    if (!data) throw new Error("File not found");
+    return [{ contentType: "application/octet-stream", size: data.length }];
+  }
+
+  createReadStream() {
+    const data = this.store.get(this.key) || Buffer.alloc(0);
+    return Readable.from(data);
+  }
+
+  async delete() {
+    this.store.delete(this.key);
+  }
+
+  async save(data: Buffer) {
+    this.store.set(this.key, data);
+  }
+}
+
+class MemoryBucket {
+  constructor(private store: Map<string, Buffer>, private name: string) {}
+
+  file(objectName: string) {
+    const key = `${this.name}/${objectName}`;
+    return new MemoryFile(this.store, key);
+  }
+}
+
+class MemoryStorage {
+  private store = new Map<string, Buffer>();
+
+  bucket(name: string) {
+    return new MemoryBucket(this.store, name);
+  }
+}
+
+let objectStorageClient: any = REPLIT_SIDECAR_ENDPOINT
+  ? new Storage({
+      credentials: {
+        audience: "replit",
+        subject_token_type: "access_token",
+        token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+        type: "external_account",
+        credential_source: {
+          url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+          format: {
+            type: "json",
+            subject_token_field_name: "access_token",
+          },
+        },
+        universe_domain: "googleapis.com",
       },
-    },
-    universe_domain: "googleapis.com",
-  },
-  projectId: "",
-});
+      projectId: "",
+    })
+  : new MemoryStorage();
+
+export function setObjectStorageClient(client: any) {
+  objectStorageClient = client;
+}
+
+export { objectStorageClient };
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -134,6 +188,10 @@ export class ObjectStorageService {
     const fullPath = `${privateObjectDir}/slides/${slideId}.jpg`;
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
+
+    if (!REPLIT_SIDECAR_ENDPOINT) {
+      return fullPath;
+    }
 
     // Sign URL for PUT method with TTL
     return signObjectURL({
