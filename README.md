@@ -81,6 +81,20 @@ This command applies pending schema changes and inserts records from `server/see
 
 `git` must be available in your PATH for repository cloning.
 
+### Overriding slide assets
+
+Default presentation slides are listed in `server/seeds/slides.json` using relative
+file names. At runtime, the server prefixes each entry with the first path from
+`PUBLIC_OBJECT_SEARCH_PATHS` to build full URLs.
+
+To customize slides for a deployment:
+
+1. Upload images to a bucket referenced by `PUBLIC_OBJECT_SEARCH_PATHS`.
+2. Replace file names in `server/seeds/slides.json` with your assets.
+3. Rerun `npm run db:seed` or create a new site to apply the changes.
+
+This allows each environment to ship branded decks without modifying source code.
+
 ### Memory storage mode
 
 Setting `STORAGE_MODE=memory` launches the API using JSON files loaded into RAM

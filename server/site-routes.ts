@@ -1,6 +1,8 @@
 import type { Express, Response } from "express";
 import express from "express";
 import path from "path";
+import { readFile } from "fs/promises";
+import { fileURLToPath } from "url";
 import { siteStorage, updateSiteLead } from "./site-storage";
 import { storage } from "./storage";
 import { qrGenerator } from "./qr-generator";
@@ -12,37 +14,25 @@ import { checkSiteAccess, requireAdmin } from "./site-access-control";
 import { isAuthenticated } from "./google-auth";
 import { z } from "zod";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 // Function to create default slides for a site
 async function createDefaultSlides(siteId: string) {
-  const defaultSlides = [
-    { title: 'Welcome to Mining Syndicate', imageUrl: '/api/assets/Mining Syndicate Presentation-1_1755027297237.jpg', slideOrder: '1', description: 'Introduction slide' },
-    { title: 'Mining Infrastructure Overview', imageUrl: '/api/assets/Mining Syndicate Presentation-2_1755027297237.jpg', slideOrder: '2', description: 'Infrastructure overview' },
-    { title: 'Investment Opportunities', imageUrl: '/api/assets/Mining Syndicate Presentation-3_1755027297237.jpg', slideOrder: '3', description: 'Investment details' },
-    { title: 'Technology Stack', imageUrl: '/api/assets/Mining Syndicate Presentation-4_1755027297238.jpg', slideOrder: '4', description: 'Technology overview' },
-    { title: 'Market Analysis', imageUrl: '/api/assets/Mining Syndicate Presentation-5_1755027297238.jpg', slideOrder: '5', description: 'Market analysis' },
-    { title: 'Financial Projections', imageUrl: '/api/assets/Mining Syndicate Presentation-6_1755027297238.jpg', slideOrder: '6', description: 'Financial projections' },
-    { title: 'Risk Management', imageUrl: '/api/assets/Mining Syndicate Presentation-7_1755027297238.jpg', slideOrder: '7', description: 'Risk management' },
-    { title: 'Partnership Strategy', imageUrl: '/api/assets/Mining Syndicate Presentation-8_1755027297239.jpg', slideOrder: '8', description: 'Partnership strategy' },
-    { title: 'Operational Excellence', imageUrl: '/api/assets/Mining Syndicate Presentation-9_1755027297239.jpg', slideOrder: '9', description: 'Operational excellence' },
-    { title: 'Sustainability Focus', imageUrl: '/api/assets/Mining Syndicate Presentation-10_1755027297239.jpg', slideOrder: '10', description: 'Sustainability focus' },
-    { title: 'Community Impact', imageUrl: '/api/assets/Mining Syndicate Presentation-11_1755027297239.jpg', slideOrder: '11', description: 'Community impact' },
-    { title: 'Innovation Pipeline', imageUrl: '/api/assets/Mining Syndicate Presentation-12_1755027297240.jpg', slideOrder: '12', description: 'Innovation pipeline' },
-    { title: 'Global Expansion', imageUrl: '/api/assets/Mining Syndicate Presentation-13_1755027297240.jpg', slideOrder: '13', description: 'Global expansion' },
-    { title: 'Regulatory Compliance', imageUrl: '/api/assets/Mining Syndicate Presentation-14_1755027297240.jpg', slideOrder: '14', description: 'Regulatory compliance' },
-    { title: 'Team Expertise', imageUrl: '/api/assets/Mining Syndicate Presentation-15_1755027297240.jpg', slideOrder: '15', description: 'Team expertise' },
-    { title: 'Success Metrics', imageUrl: '/api/assets/Mining Syndicate Presentation-16_1755027297241.jpg', slideOrder: '16', description: 'Success metrics' },
-    { title: 'Future Vision', imageUrl: '/api/assets/Mining Syndicate Presentation-17_1755027297241.jpg', slideOrder: '17', description: 'Future vision' }
-  ];
+  const slidesPath = path.join(__dirname, "seeds", "slides.json");
+  const raw = await readFile(slidesPath, "utf-8");
+  const defaultSlides: Array<{ title: string; imageUrl: string; slideOrder: string; description: string }> = JSON.parse(raw);
+  const [publicPath] = new ObjectStorageService().getPublicObjectSearchPaths();
 
   for (const slide of defaultSlides) {
+    const imageUrl = path.posix.join(publicPath, slide.imageUrl);
     await siteStorage.createSiteSlide({
       siteId: siteId,
       title: slide.title,
-      imageUrl: slide.imageUrl,
+      imageUrl,
       slideOrder: slide.slideOrder,
       isVisible: true,
-      slideType: 'image',
-      description: slide.description
+      slideType: "image",
+      description: slide.description,
     });
   }
 }

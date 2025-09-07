@@ -4,6 +4,7 @@
 
 ## Summary of Recent Changes
 
+2025-09-11: Externalized default slide metadata to seeds with object storage paths – centralize configuration for branding – Replit styling and Card-Builder exports can swap slide assets per deployment.
 2025-09-10: Added boot tests for memory and Postgres storage using Playwright – verify /api/health and lead submission – ensure server boot and persistence across backends.
 2025-09-09: Documented local development modes for Docker Postgres and in-memory setups – clarify environment variables and seed scripts – developers can choose Postgres containers or memory storage.
 2025-09-09: Added in-memory site storage mode – dev-only JSON seed storage; resets on restart – allows running without Postgres.
