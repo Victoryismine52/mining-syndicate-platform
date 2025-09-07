@@ -40,6 +40,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `TEST_DATABASE_URL` | Overrides `DATABASE_URL` during tests for an isolated database. |
 | `SESSION_SECRET` | Secret used to sign Express session cookies. |
 | `HUBSPOT_API_KEY` | Token for submitting forms to HubSpot. |
+| `AUTH_DISABLED` | Set to `true` to bypass authentication with a mock admin user. |
 | `PORT` | Port for the combined Express and Vite servers (defaults to `5000`). |
 | `BASE_DEV_URL` | Local API base URL used during initialization. |
 | `BASE_CODEX_URL` | Fallback Codex API endpoint when the local API is unavailable. |
