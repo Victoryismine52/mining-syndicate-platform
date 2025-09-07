@@ -27,6 +27,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import { VideoCard } from '@/components/video-card';
 import { YouTubeCard } from '@/components/youtube-card';
 import { useAuth } from '@/hooks/use-auth';
+import { useAnalyticsConsent } from '@/components/analytics-consent-modal';
 import type { Site } from '@shared/site-schema';
 
 const ANALYTICS_PROVIDER = import.meta.env.VITE_ANALYTICS_PROVIDER || 'internal';
@@ -1437,6 +1438,8 @@ export function DynamicSite() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingPassword, setIsCheckingPassword] = useState(false);
 
+  const { consent, ConsentModal } = useAnalyticsConsent();
+
   const { data: site, isLoading, error } = useQuery<Site>({
     queryKey: [`/api/sites/${siteId}`],
     enabled: !!siteId,
@@ -1465,18 +1468,18 @@ export function DynamicSite() {
   // Track page view analytics
   useEffect(() => {
     if (site && isAuthenticated) {
-      const consentGiven = localStorage.getItem('analytics-consent') === 'granted';
       const doNotTrack = navigator.doNotTrack === '1';
-      if (ANALYTICS_PROVIDER === 'internal' && consentGiven && !doNotTrack) {
+      if (ANALYTICS_PROVIDER === 'internal' && consent?.status === 'granted' && !doNotTrack) {
         apiRequest('POST', `/api/sites/${siteId}/analytics`, {
           eventType: 'page_view',
           eventData: { path: window.location.pathname },
+          consent,
         }).catch((err) => {
           console.error('Analytics tracking failed', err);
         });
       }
     }
-  }, [site, isAuthenticated, siteId]);
+  }, [site, isAuthenticated, siteId, consent]);
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1498,31 +1501,39 @@ export function DynamicSite() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
+      <>
+        <ConsentModal />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      </>
     );
   }
 
   if (error || !site) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Site not found</div>
-      </div>
+      <>
+        <ConsentModal />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+          <div className="text-white text-xl">Site not found</div>
+        </div>
+      </>
     );
   }
 
   // Show password form if site is protected and user is not authenticated
   if (site.password && !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="w-full max-w-md mx-auto p-6">
-          <Card className="bg-slate-800/90 backdrop-blur-sm border-slate-600">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-yellow-500/20 rounded-full mx-auto flex items-center justify-center mb-4">
-                <Lock className="text-yellow-400 w-8 h-8" />
-              </div>
-              <CardTitle className="text-2xl text-white">Password Required</CardTitle>
+      <>
+        <ConsentModal />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+          <div className="w-full max-w-md mx-auto p-6">
+            <Card className="bg-slate-800/90 backdrop-blur-sm border-slate-600">
+              <CardHeader className="text-center">
+                <div className="w-16 h-16 bg-yellow-500/20 rounded-full mx-auto flex items-center justify-center mb-4">
+                  <Lock className="text-yellow-400 w-8 h-8" />
+                </div>
+                <CardTitle className="text-2xl text-white">Password Required</CardTitle>
               <CardDescription className="text-slate-400">
                 This site is password protected. Please enter the password to access {site.name}.
               </CardDescription>
@@ -1548,9 +1559,9 @@ export function DynamicSite() {
                     </p>
                   )}
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700" 
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700"
                   disabled={isCheckingPassword}
                   data-testid="button-submit-password"
                 >
@@ -1560,8 +1571,9 @@ export function DynamicSite() {
               </form>
             </CardContent>
           </Card>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -1570,9 +1582,12 @@ export function DynamicSite() {
     // Wait for authentication and manager data to load before making access decision
     if (!user || managersLoading) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-          <div className="text-white text-xl">Loading...</div>
-        </div>
+        <>
+          <ConsentModal />
+          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+            <div className="text-white text-xl">Loading...</div>
+          </div>
+        </>
       );
     }
     
@@ -1582,14 +1597,24 @@ export function DynamicSite() {
     
     // If user is not admin AND not site manager, show coming soon
     if (!isAdmin && !isSiteManager) {
-      return <ComingSoon />;
+      return (
+        <>
+          <ConsentModal />
+          <ComingSoon />
+        </>
+      );
     }
   }
 
   // Check site type and render appropriate interface
   if (site.siteType === 'pitch-site') {
     // Render pitch site interface
-    return <PitchSiteInterface site={site} siteId={siteId} showPresentation={showPresentation} setShowPresentation={setShowPresentation} />;
+    return (
+      <>
+        <ConsentModal />
+        <PitchSiteInterface site={site} siteId={siteId} showPresentation={showPresentation} setShowPresentation={setShowPresentation} />
+      </>
+    );
   }
 
   // Render mining syndicate site content
@@ -1599,11 +1624,13 @@ export function DynamicSite() {
   const companyName = config.companyName || "Mining Syndicate";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <>
+      <ConsentModal />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       {/* For collective sites, use dynamic section/card rendering; for others, show hardcoded hero and participation pathways */}
       {site?.siteType === 'collective' ? (
         // For collective sites, show ONLY the PitchSiteInterface (which includes its own hero)
-        <PitchSiteInterface 
+        <PitchSiteInterface
           siteId={siteId || ''}
           site={site} 
           showPresentation={showPresentation} 
@@ -1803,6 +1830,7 @@ export function DynamicSite() {
           />
         </>
       )}
-    </div>
+      </div>
+    </>
   );
 }

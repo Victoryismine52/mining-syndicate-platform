@@ -400,6 +400,12 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.post("/api/sites/:siteId/analytics", async (req, res, next) => {
     try {
       const { siteId } = req.params;
+      const consentSchema = z.object({ status: z.literal('granted'), timestamp: z.number() });
+      try {
+        consentSchema.parse(req.body.consent);
+      } catch {
+        return res.status(400).json({ error: 'Missing analytics consent' });
+      }
       const analyticsData = insertSiteAnalyticsSchema.parse({
         siteId,
         eventType: req.body.eventType || 'page_view',
