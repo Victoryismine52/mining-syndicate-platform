@@ -47,9 +47,11 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
   const config = formTemplate.config || {};
 
   // Fetch the actual form template fields
-  const { data: formFields = [], isLoading } = useQuery<any[]>({
+  const { data: formFields = [], isLoading, isError, error } = useQuery<any[]>({
     queryKey: [`/api/form-templates/${formTemplate.id}/fields`],
     enabled: !!formTemplate.id && isOpen,
+    retry: 2, // Retry failed requests
+    retryDelay: 1000, // Wait 1 second between retries
   });
 
   // Create dynamic form schema based on actual fields - memoized to prevent recreations
@@ -622,8 +624,29 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
               </div>
             )}
 
+            {/* Error State */}
+            {isError && (
+              <div className="p-4 border-2 border-dashed border-red-500 rounded-lg">
+                <p className="text-red-400 text-center font-medium">
+                  Failed to load form fields
+                </p>
+                <p className="text-red-300 text-center text-sm mt-2">
+                  {error instanceof Error ? error.message : 'Please try closing and reopening the form.'}
+                </p>
+                <div className="flex justify-center mt-4">
+                  <Button
+                    onClick={() => window.location.reload()}
+                    variant="outline"
+                    className="border-red-500 text-red-400 hover:bg-red-500/10"
+                  >
+                    Refresh Page
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Dynamic Form Fields */}
-            {!isLoading && formFields.length > 0 && (
+            {!isLoading && !isError && formFields.length > 0 && (
               <TooltipProvider>
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
@@ -651,7 +674,7 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
             )}
 
             {/* No Fields Message */}
-            {!isLoading && formFields.length === 0 && (
+            {!isLoading && !isError && formFields.length === 0 && (
               <div className="p-4 border-2 border-dashed border-yellow-500 rounded-lg">
                 <p className="text-yellow-400 text-center">
                   No form fields configured. Please contact the administrator to set up this form.
@@ -659,23 +682,40 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onClose}
-                className="text-slate-400 hover:text-slate-200"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={submitFormMutation.isPending}
-                className={`${colorTheme?.button || 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'} text-white font-semibold min-w-[120px] transition-all duration-300`}
-              >
-                {submitFormMutation.isPending ? 'Submitting...' : (config.buttonText || 'Submit')}
-              </Button>
-            </div>
+            {/* Form Actions */}
+            {!isError && (
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-slate-200"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={submitFormMutation.isPending || isLoading || formFields.length === 0}
+                  className={`${colorTheme?.button || 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'} text-white font-semibold min-w-[120px] transition-all duration-300`}
+                >
+                  {submitFormMutation.isPending ? 'Submitting...' : (config.buttonText || 'Submit')}
+                </Button>
+              </div>
+            )}
+
+            {/* Error State Actions */}
+            {isError && (
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-slate-200"
+                >
+                  Close
+                </Button>
+              </div>
+            )}
           </form>
         </DialogContent>
       </Dialog>
