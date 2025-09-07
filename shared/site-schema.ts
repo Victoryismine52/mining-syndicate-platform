@@ -296,6 +296,19 @@ export const insertSiteLeadSchema = createInsertSchema(siteLeads).omit({
   ipAddress: true,
   userAgent: true,
   referrer: true,
+}).extend({
+  email: z.string().email().max(255).optional(),
+  firstName: z.string().max(100).optional(),
+  lastName: z.string().max(100).optional(),
+  phone: z.string().max(50).optional(),
+  company: z.string().max(255).optional(),
+  identifier: z.string().max(255),
+  identifierType: z.string().max(50).default('email'),
+  formType: z.string().max(50),
+  submissionCount: z.string().max(10).default('1'),
+  miningAmount: z.string().max(100).optional(),
+  lendingAmount: z.string().max(100).optional(),
+  siteId: z.string().max(50),
 });
 
 export const insertSiteAnalyticsSchema = createInsertSchema(siteAnalytics).omit({
