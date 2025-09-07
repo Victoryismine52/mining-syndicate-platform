@@ -25,6 +25,26 @@ This guide covers setting up the project locally, running tests, and establishin
    ```
    Visit `http://localhost:5000` to view the app.
 
+## Quick start with mock auth
+
+1. Copy the example environment file.
+   ```bash
+   cp .env.example .env
+   ```
+2. Set `AUTH_DISABLED=true` in `.env` to bypass OAuth.
+3. Start your local database if the app uses one.
+4. Run the development server.
+   ```bash
+   npm run dev
+   ```
+
+### Switch to the full auth flow
+
+1. Stop the server.
+2. Remove `AUTH_DISABLED` or set it to `false`.
+3. Add the required auth variables to `.env`.
+4. Restart the server to sign in with OAuth.
+
 ## Running Tests
 
 - **Full test suite**
