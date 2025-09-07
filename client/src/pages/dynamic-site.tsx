@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -164,31 +164,31 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
     );
   }
 
-  // Create dynamic form schema based on actual fields
-  const createDynamicSchema = () => {
+  // Memoize dynamic schema based on actual fields
+  const formSchema = useMemo(() => {
     let schemaFields: any = {};
-    
+
     formFields.forEach((field) => {
       const fieldName = field.fieldLibrary.name;
       let fieldSchema: any;
-      
+
       // Handle array fields first since they have completely different schema structure
       if (field.fieldLibrary.dataType === 'array') {
         const options = field.fieldLibrary.defaultValidation?.options || [];
         if (options.length > 0) {
           // For array fields with predefined options (multiselect)
           const minItems = field.fieldLibrary.defaultValidation?.minItems || 0;
-          
+
           // Start with basic array schema
           fieldSchema = z.array(z.string());
-          
+
           // Apply min constraint BEFORE refine
           if (field.isRequired && minItems > 0) {
             fieldSchema = fieldSchema.min(minItems, `Please select at least ${minItems} option${minItems > 1 ? 's' : ''}`);
           } else if (field.isRequired) {
             fieldSchema = fieldSchema.min(1, "Please select at least one option");
           }
-          
+
           // Apply refine constraint AFTER min
           fieldSchema = fieldSchema.refine(
             (values: string[]) => values.every((value: string) => options.includes(value)),
@@ -198,7 +198,7 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
           // For array fields without predefined options (extensible lists)
           const minItems = field.fieldLibrary.defaultValidation?.minItems || 0;
           fieldSchema = z.array(z.string());
-          
+
           if (field.isRequired && minItems > 0) {
             fieldSchema = fieldSchema.min(minItems, `Please add at least ${minItems} item${minItems > 1 ? 's' : ''}`);
           } else if (field.isRequired) {
@@ -206,7 +206,7 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
           }
         }
       }
-      // Handle radio fields 
+      // Handle radio fields
       else if (field.fieldLibrary.dataType === 'radio') {
         const options = field.fieldLibrary.defaultValidation?.options || [];
         if (options.length > 0) {
@@ -269,25 +269,30 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
     });
 
     return z.object(schemaFields);
-  };
+  }, [formFields]);
 
-  // Create default values based on form fields
-  const createDefaultValues = () => {
+  // Memoize default values based on form fields
+  const defaultValues = useMemo(() => {
     let defaultValues: any = {};
-    
+
     formFields.forEach((field) => {
       const fieldName = field.fieldLibrary.name;
       // Array fields should default to empty array, others to empty string
       defaultValues[fieldName] = field.fieldLibrary.dataType === 'array' ? [] : "";
     });
-    
+
     return defaultValues;
-  };
+  }, [formFields]);
 
   const form = useForm<any>({
-    resolver: zodResolver(createDynamicSchema()),
-    defaultValues: createDefaultValues(),
+    resolver: zodResolver(formSchema),
+    defaultValues,
   });
+
+  useEffect(() => {
+    form.control._options.resolver = zodResolver(formSchema);
+    form.reset(defaultValues, { keepDefaultValues: true });
+  }, [formFields, formSchema, defaultValues, form]);
 
   const submitFormMutation = useMutation({
     mutationFn: async (data: any) => {
