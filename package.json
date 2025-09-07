@@ -16,6 +16,7 @@
     "test:playwright": "playwright test",
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit push",
+    "db:seed": "npm run db:migrate && tsx scripts/seed-db.ts",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "pre-commit": "node scripts/check-persona-updates.js"

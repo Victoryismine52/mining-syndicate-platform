@@ -1,0 +1,9 @@
+[
+  {
+    "email": "admin@example.com",
+    "firstName": "Admin",
+    "lastName": "User",
+    "role": "admin",
+    "isAdmin": true
+  }
+]
