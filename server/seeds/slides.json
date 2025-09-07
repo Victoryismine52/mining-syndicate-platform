@@ -1,0 +1,19 @@
+[
+  { "title": "Welcome to Mining Syndicate", "imageUrl": "Mining Syndicate Presentation-1_1755027297237.jpg", "slideOrder": "1", "description": "Introduction slide" },
+  { "title": "Mining Infrastructure Overview", "imageUrl": "Mining Syndicate Presentation-2_1755027297237.jpg", "slideOrder": "2", "description": "Infrastructure overview" },
+  { "title": "Investment Opportunities", "imageUrl": "Mining Syndicate Presentation-3_1755027297237.jpg", "slideOrder": "3", "description": "Investment details" },
+  { "title": "Technology Stack", "imageUrl": "Mining Syndicate Presentation-4_1755027297238.jpg", "slideOrder": "4", "description": "Technology overview" },
+  { "title": "Market Analysis", "imageUrl": "Mining Syndicate Presentation-5_1755027297238.jpg", "slideOrder": "5", "description": "Market analysis" },
+  { "title": "Financial Projections", "imageUrl": "Mining Syndicate Presentation-6_1755027297238.jpg", "slideOrder": "6", "description": "Financial projections" },
+  { "title": "Risk Management", "imageUrl": "Mining Syndicate Presentation-7_1755027297238.jpg", "slideOrder": "7", "description": "Risk management" },
+  { "title": "Partnership Strategy", "imageUrl": "Mining Syndicate Presentation-8_1755027297239.jpg", "slideOrder": "8", "description": "Partnership strategy" },
+  { "title": "Operational Excellence", "imageUrl": "Mining Syndicate Presentation-9_1755027297239.jpg", "slideOrder": "9", "description": "Operational excellence" },
+  { "title": "Sustainability Focus", "imageUrl": "Mining Syndicate Presentation-10_1755027297239.jpg", "slideOrder": "10", "description": "Sustainability focus" },
+  { "title": "Community Impact", "imageUrl": "Mining Syndicate Presentation-11_1755027297239.jpg", "slideOrder": "11", "description": "Community impact" },
+  { "title": "Innovation Pipeline", "imageUrl": "Mining Syndicate Presentation-12_1755027297240.jpg", "slideOrder": "12", "description": "Innovation pipeline" },
+  { "title": "Global Expansion", "imageUrl": "Mining Syndicate Presentation-13_1755027297240.jpg", "slideOrder": "13", "description": "Global expansion" },
+  { "title": "Regulatory Compliance", "imageUrl": "Mining Syndicate Presentation-14_1755027297240.jpg", "slideOrder": "14", "description": "Regulatory compliance" },
+  { "title": "Team Expertise", "imageUrl": "Mining Syndicate Presentation-15_1755027297240.jpg", "slideOrder": "15", "description": "Team expertise" },
+  { "title": "Success Metrics", "imageUrl": "Mining Syndicate Presentation-16_1755027297241.jpg", "slideOrder": "16", "description": "Success metrics" },
+  { "title": "Future Vision", "imageUrl": "Mining Syndicate Presentation-17_1755027297241.jpg", "slideOrder": "17", "description": "Future vision" }
+]
