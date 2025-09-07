@@ -18,9 +18,7 @@ function validateGoogleOAuthConfig() {
     throw new Error("GOOGLE_CLIENT_SECRET environment variable is required");
   }
   
-  console.log("Google OAuth Config Validation:");
-  console.log("- Client ID:", clientId.substring(0, 10) + "...");
-  console.log("- Client Secret:", clientSecret.substring(0, 6) + "...");
+  // OAuth config validated successfully
   
   return { clientId, clientSecret };
 }
@@ -65,9 +63,9 @@ export async function setupAuth(app: Express) {
   // Validate Google OAuth configuration
   const { clientId, clientSecret } = validateGoogleOAuthConfig();
   
-  // Google OAuth Strategy
-  const callbackURL = "https://485e2e64-1b2c-43eb-99b5-63298da289f4-00-1kpwljks2mo2e.kirk.replit.dev/api/auth/google/callback";
-  console.log('Setting up Google OAuth with callback URL:', callbackURL);
+  // Google OAuth Strategy - Use environment variable or build from host
+  const callbackURL = process.env.GOOGLE_OAUTH_CALLBACK_URL || `https://conduit.replit.app/api/auth/google/callback`;
+  // Google OAuth configured with callback URL
   
   passport.use(
     new GoogleStrategy(
@@ -78,11 +76,7 @@ export async function setupAuth(app: Express) {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          console.log('Google OAuth Profile received:', {
-            id: profile.id,
-            email: profile.emails?.[0]?.value,
-            name: profile.displayName
-          });
+          // Google OAuth profile received
 
           const email = profile.emails?.[0]?.value;
           if (!email) {
@@ -92,12 +86,10 @@ export async function setupAuth(app: Express) {
 
           // Allow generic users to sign up without access restrictions
           // Admin and site_manager users still need to be in access list
-          console.log('Checking access for user:', email);
           const hasAccess = await storage.checkUserAccess(email);
           
           // Always allow generic user creation, restrict admin/site_manager access
           if (!hasAccess) {
-            console.log('Creating generic user account for:', email);
             // Generic users are always allowed, but with limited permissions
           }
 

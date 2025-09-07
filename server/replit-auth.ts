@@ -7,22 +7,20 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-// Set default for development
+// Set default for development - will be overridden in production
 if (!process.env.REPLIT_DOMAINS) {
-  process.env.REPLIT_DOMAINS = "localhost:5000";
+  process.env.REPLIT_DOMAINS = process.env.REPLIT_DEV_DOMAIN || "conduit.replit.app";
 }
 
-console.log('REPLIT_DOMAINS:', process.env.REPLIT_DOMAINS);
+// REPLIT_DOMAINS configured
 
 const getOidcConfig = memoize(
   async () => {
-    console.log('Getting OIDC config with ISSUER_URL:', process.env.ISSUER_URL ?? "https://replit.com/oidc");
     try {
       const config = await client.discovery(
         new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
         process.env.REPL_ID!
       );
-      console.log('OIDC config loaded successfully');
       return config;
     } catch (error) {
       console.error('Failed to load OIDC config:', error);

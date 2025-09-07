@@ -311,9 +311,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Site Form Assignment routes
-  app.get("/api/sites/:siteId/form-assignments", requireAuth, async (req, res, next) => {
+  app.get("/api/sites/:siteId/form-assignments", async (req, res, next) => {
     try {
-      const assignments = await storage.getSiteFormAssignments(req.params.siteId);
+      const { siteId } = req.params;
+      
+      // Check if site is launched (for public access) or requires authentication
+      const site = await siteStorage.getSite(siteId);
+      if (!site) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+      
+      // If site is launched, allow public access
+      if (site.isLaunched) {
+        const assignments = await storage.getSiteFormAssignments(siteId);
+        return res.json(assignments);
+      }
+      
+      // If site is not launched, require authentication and site access
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
+      const user = req.user as any;
+      const hasAccess = await siteStorage.checkSiteAccess(siteId, user.email, user.isAdmin);
+      if (!hasAccess) {
+        return res.status(403).json({ error: "Access denied to this site" });
+      }
+      
+      const assignments = await storage.getSiteFormAssignments(siteId);
       res.json(assignments);
     } catch (error) {
       next(error);
@@ -458,10 +483,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Form Template Fields routes
-  app.get("/api/form-templates/:formTemplateId/fields", requireAuth, async (req, res, next) => {
+  app.get("/api/form-templates/:formTemplateId/fields", async (req, res, next) => {
     try {
       const fields = await storage.getFormTemplateFields(req.params.formTemplateId);
-      res.json(fields);
+
+      // Sanitize response to expose only public field data
+      const sanitizedFields = fields.map(field => ({
+        id: field.id,
+        formTemplateId: field.formTemplateId,
+        fieldLibraryId: field.fieldLibraryId,
+        isRequired: field.isRequired,
+        order: field.order,
+        customValidation: field.customValidation,
+        customLabel: field.customLabel,
+        placeholder: field.placeholder,
+        fieldLibrary: {
+          id: field.fieldLibrary.id,
+          name: field.fieldLibrary.name,
+          label: field.fieldLibrary.label,
+          dataType: field.fieldLibrary.dataType,
+          defaultPlaceholder: field.fieldLibrary.defaultPlaceholder,
+          defaultValidation: field.fieldLibrary.defaultValidation,
+          translations: field.fieldLibrary.translations,
+        }
+      }));
+
+      res.json(sanitizedFields);
     } catch (error) {
       next(error);
     }

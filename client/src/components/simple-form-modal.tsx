@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, publicApiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import { ExternalLink, Mail, Users, Phone, FileText, Info, DollarSign, Pickaxe, Star, Heart, Shield, Plus, Minus, HelpCircle } from 'lucide-react';
@@ -21,6 +21,7 @@ interface DynamicFormModalProps {
   formTemplate: any;
   siteId: string;
   colorTheme?: any;
+  selectedLanguage?: string;
 }
 
 // Helper function for form icons
@@ -40,127 +41,154 @@ const getFormIcon = (iconName: string) => {
   }
 };
 
-export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }: DynamicFormModalProps) {
+export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, selectedLanguage = 'en' }: DynamicFormModalProps) {
   const { toast } = useToast();
   const [showSuccess, setShowSuccess] = useState(false);
   
   const config = formTemplate.config || {};
 
   // Fetch the actual form template fields
-  const { data: formFields = [], isLoading } = useQuery<any[]>({
-    queryKey: [`/api/form-templates/${formTemplate.id}/fields`],
+  const formFieldsUrl = `/api/form-templates/${formTemplate.id}/fields`;
+  const {
+    data: formFields = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery<any[]>({
+    queryKey: [formFieldsUrl],
     enabled: !!formTemplate.id && isOpen,
+    retry: 2, // Retry failed requests
+    retryDelay: 1000, // Wait 1 second between retries
+    queryFn: () => publicApiRequest('GET', formFieldsUrl).then((res) => res.json()),
   });
 
-  // Create dynamic form schema based on actual fields
-  const createDynamicSchema = () => {
+  // Create dynamic form schema based on actual fields - memoized to prevent recreations
+  const dynamicSchema = useMemo(() => {
+    if (!formFields || formFields.length === 0) {
+      return z.object({});
+    }
+
     let schemaFields: any = {};
     
     formFields.forEach((field) => {
-      const fieldName = field.fieldLibrary.name;
-      let fieldSchema = z.string();
-      
-      // Apply validation based on field type and custom validation
-      if (field.fieldLibrary.dataType === 'email') {
-        fieldSchema = z.string().email("Please enter a valid email address");
-      } else if (field.fieldLibrary.dataType === 'phone') {
-        fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
-      } else if (field.fieldLibrary.dataType === 'number') {
-        fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
-      }
+      try {
+        const fieldName = field.fieldLibrary?.name;
+        if (!fieldName) return;
 
-      // Handle required validation before special field types
-      if (field.isRequired) {
-        fieldSchema = fieldSchema.min(1, "This field is required");
-      }
-
-      // Handle extensible_list fields
-      if (field.fieldLibrary.dataType === 'extensible_list') {
-        if (field.isRequired) {
-          fieldSchema = z.array(z.string()).min(1, "At least one item is required");
-        } else {
-          fieldSchema = z.array(z.string()).optional();
-        }
-      }
-      // Handle radio fields with special validation (after required validation)
-      else if (field.fieldLibrary.dataType === 'radio') {
-        const options = field.fieldLibrary.defaultValidation?.options || [];
-        if (options.length > 0) {
+        let fieldSchema: any;
+        
+        // Handle extensible_list fields
+        if (field.fieldLibrary.dataType === 'extensible_list') {
           if (field.isRequired) {
-            // For required radio fields, ensure a value is selected and it's valid
-            fieldSchema = z.string()
-              .min(1, "Please select an option")
-              .refine(
-                (value) => options.includes(value),
-                { message: "Please select one of the available options" }
-              );
+            fieldSchema = z.array(z.string()).min(1, "At least one item is required");
           } else {
-            // For optional radio fields
-            fieldSchema = z.string()
-              .optional()
-              .refine(
-                (value) => !value || value === "" || options.includes(value),
-                { message: "Please select one of the available options" }
-              );
+            fieldSchema = z.array(z.string()).optional();
           }
         }
-      } else {
-        // For non-radio fields, apply optional after required validation
-        if (!field.isRequired) {
-          fieldSchema = fieldSchema.optional();
-        }
-      }
+        // Handle radio fields with special validation
+        else if (field.fieldLibrary.dataType === 'radio') {
+          const options = field.fieldLibrary.defaultValidation?.options || [];
+          if (options.length > 0) {
+            if (field.isRequired) {
+              fieldSchema = z.string()
+                .min(1, "Please select an option")
+                .refine(
+                  (value) => options.includes(value),
+                  { message: "Please select one of the available options" }
+                );
+            } else {
+              fieldSchema = z.string()
+                .optional()
+                .refine(
+                  (value) => !value || value === "" || options.includes(value),
+                  { message: "Please select one of the available options" }
+                );
+            }
+          } else {
+            fieldSchema = field.isRequired ? z.string().min(1, "This field is required") : z.string().optional();
+          }
+        } else {
+          // Handle standard string fields
+          fieldSchema = z.string();
+          
+          // Apply validation based on field type
+          if (field.fieldLibrary.dataType === 'email') {
+            fieldSchema = z.string().email("Please enter a valid email address");
+          } else if (field.fieldLibrary.dataType === 'phone') {
+            fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
+          } else if (field.fieldLibrary.dataType === 'number') {
+            fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
+          }
 
-      schemaFields[fieldName] = fieldSchema;
+          // Apply required validation
+          if (field.isRequired) {
+            fieldSchema = fieldSchema.min(1, "This field is required");
+          } else {
+            fieldSchema = fieldSchema.optional();
+          }
+        }
+
+        schemaFields[fieldName] = fieldSchema;
+      } catch (error) {
+        console.error('Error creating schema for field:', field, error);
+      }
     });
 
     return z.object(schemaFields);
-  };
+  }, [formFields]);
 
-  // Create default values based on form fields
-  const createDefaultValues = () => {
-    let defaultValues: any = {};
+  // Create default values based on form fields - memoized
+  const defaultValues = useMemo(() => {
+    if (!formFields || formFields.length === 0) {
+      return {};
+    }
+
+    let values: any = {};
     
     formFields.forEach((field) => {
-      const fieldName = field.fieldLibrary.name;
-      if (field.fieldLibrary.dataType === 'checkbox') {
-        defaultValues[fieldName] = 'false';
-      } else if (field.fieldLibrary.dataType === 'extensible_list') {
-        defaultValues[fieldName] = [''];
-      } else {
-        defaultValues[fieldName] = '';
+      try {
+        const fieldName = field.fieldLibrary?.name;
+        if (!fieldName) return;
+
+        if (field.fieldLibrary.dataType === 'checkbox') {
+          values[fieldName] = 'false';
+        } else if (field.fieldLibrary.dataType === 'extensible_list') {
+          values[fieldName] = [''];
+        } else {
+          values[fieldName] = '';
+        }
+      } catch (error) {
+        console.error('Error creating default value for field:', field, error);
       }
     });
 
-    return defaultValues;
-  };
+    return values;
+  }, [formFields]);
 
   const form = useForm({
-    resolver: zodResolver(createDynamicSchema()),
-    defaultValues: createDefaultValues(),
+    resolver: zodResolver(dynamicSchema),
+    defaultValues,
   });
 
   // Reset form when formFields change
   useEffect(() => {
-    if (formFields.length > 0) {
-      form.reset(createDefaultValues());
+    if (formFields.length > 0 && defaultValues) {
+      form.reset(defaultValues);
     }
-  }, [formFields]);
+  }, [formFields, defaultValues, form]);
 
   // Submit mutation
   const submitFormMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest(`/api/sites/${siteId}/leads`, {
-        method: 'POST',
-        body: {
-          formTemplateId: formTemplate.id,
-          formData: data
-        }
+      return apiRequest('POST', `/api/sites/${siteId}/leads`, {
+        formTemplateId: formTemplate.id,
+        formData: data
       });
     },
     onSuccess: () => {
       setShowSuccess(true);
       form.reset();
+      onClose(); // Close the main modal when success modal opens
     },
     onError: (error: any) => {
       toast({
@@ -313,17 +341,25 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
 
   // Dynamic field renderer component
   const renderFormField = (field: any) => {
+    if (!field || !field.fieldLibrary) {
+      console.error('Invalid field data:', field);
+      return null;
+    }
+
     const fieldName = field.fieldLibrary.name;
+    if (!fieldName) {
+      console.error('Field missing name:', field);
+      return null;
+    }
     
-    // Get language from formAssignment or default to 'en'
-    const selectedLanguage = 'en'; // TODO: Get from site form assignment
-    
+    const language = selectedLanguage || 'en';
+
     // Use translations if available, otherwise fall back to default
-    const translation = field.fieldLibrary.translations?.[selectedLanguage];
-    const label = field.customLabel || translation?.label || field.fieldLibrary.label;
+    const translation = field.fieldLibrary.translations?.[language];
+    const label = field.customLabel || translation?.label || field.fieldLibrary.label || fieldName;
     const placeholder = field.placeholder || translation?.placeholder || field.fieldLibrary.defaultPlaceholder || '';
     const description = translation?.description || field.fieldLibrary.defaultValidation?.description;
-    const isRequired = field.isRequired;
+    const isRequired = field.isRequired || false;
     
     const commonClasses = "bg-card border-border text-foreground focus:border-accent";
     
@@ -574,7 +610,7 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className={`sm:max-w-lg bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
+        <DialogContent className={`w-[95vw] max-w-lg mx-auto bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 ${colorTheme?.icon || 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
@@ -595,21 +631,57 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
               </div>
             )}
 
+            {/* Error State */}
+            {isError && (
+              <div className="p-4 border-2 border-dashed border-red-500 rounded-lg">
+                <p className="text-red-400 text-center font-medium">
+                  Failed to load form fields
+                </p>
+                <p className="text-red-300 text-center text-sm mt-2">
+                  {error instanceof Error ? error.message : 'Please try closing and reopening the form.'}
+                </p>
+                <div className="flex justify-center mt-4">
+                  <Button
+                    onClick={() => window.location.reload()}
+                    variant="outline"
+                    className="border-red-500 text-red-400 hover:bg-red-500/10"
+                  >
+                    Refresh Page
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Dynamic Form Fields */}
-            {!isLoading && formFields.length > 0 && (
+            {!isLoading && !isError && formFields.length > 0 && (
               <TooltipProvider>
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     {formFields
-                      .sort((a, b) => parseInt(a.order) - parseInt(b.order))
-                      .map(renderFormField)}
+                      .sort((a, b) => {
+                        const orderA = parseInt(a.order) || 0;
+                        const orderB = parseInt(b.order) || 0;
+                        return orderA - orderB;
+                      })
+                      .map((field) => {
+                        try {
+                          return renderFormField(field);
+                        } catch (error) {
+                          console.error('Error rendering field:', field, error);
+                          return (
+                            <div key={field.id} className="p-2 border border-red-500 rounded text-red-400">
+                              Error rendering field: {field.fieldLibrary?.name || 'Unknown'}
+                            </div>
+                          );
+                        }
+                      })}
                   </div>
                 </div>
               </TooltipProvider>
             )}
 
             {/* No Fields Message */}
-            {!isLoading && formFields.length === 0 && (
+            {!isLoading && !isError && formFields.length === 0 && (
               <div className="p-4 border-2 border-dashed border-yellow-500 rounded-lg">
                 <p className="text-yellow-400 text-center">
                   No form fields configured. Please contact the administrator to set up this form.
@@ -617,30 +689,49 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onClose}
-                className="text-slate-400 hover:text-slate-200"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={submitFormMutation.isPending}
-                className={`${colorTheme?.button || 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'} text-white font-semibold min-w-[120px] transition-all duration-300`}
-              >
-                {submitFormMutation.isPending ? 'Submitting...' : (config.buttonText || 'Submit')}
-              </Button>
-            </div>
+            {/* Form Actions */}
+            {!isError && (
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-slate-200"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={submitFormMutation.isPending || isLoading || formFields.length === 0}
+                  className={`${colorTheme?.button || 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'} text-white font-semibold min-w-[120px] transition-all duration-300`}
+                >
+                  {submitFormMutation.isPending ? 'Submitting...' : (config.buttonText || 'Submit')}
+                </Button>
+              </div>
+            )}
+
+            {/* Error State Actions */}
+            {isError && (
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-slate-200"
+                >
+                  Close
+                </Button>
+              </div>
+            )}
           </form>
         </DialogContent>
       </Dialog>
 
       <SuccessConfirmation 
         isOpen={showSuccess}
-        onClose={() => setShowSuccess(false)}
+        onClose={() => {
+          setShowSuccess(false);
+        }}
         title="Thank You!"
         description={config.successMessage || "We've received your submission and will be in touch soon."}
       />

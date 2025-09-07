@@ -16,6 +16,7 @@ export interface ISiteStorage {
   createSiteLead(lead: InsertSiteLead & { siteId: string }): Promise<SiteLead>;
   getSiteLeads(siteId: string): Promise<SiteLead[]>;
   getSiteLeadsByType(siteId: string, formType: string): Promise<SiteLead[]>;
+  updateSiteLead(leadId: string, updates: Partial<InsertSiteLead>): Promise<SiteLead>;
   
   // Analytics operations
   createSiteAnalytics(analytics: InsertSiteAnalytics & { siteId: string }): Promise<SiteAnalytics>;
@@ -146,6 +147,18 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .from(siteLeads)
       .where(and(eq(siteLeads.siteId, siteId), eq(siteLeads.formType, formType)))
       .orderBy(desc(siteLeads.createdAt));
+  }
+
+  async updateSiteLead(leadId: string, updates: Partial<InsertSiteLead>): Promise<SiteLead> {
+    const [lead] = await db
+      .update(siteLeads)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(siteLeads.id, leadId))
+      .returning();
+    return lead;
   }
 
   // Analytics operations
@@ -1121,3 +1134,10 @@ export class DatabaseSiteStorage implements ISiteStorage {
 }
 
 export const siteStorage = new DatabaseSiteStorage();
+
+export async function updateSiteLead(
+  leadId: string,
+  hubspotContactId: string
+) {
+  return siteStorage.updateSiteLead(leadId, { hubspotContactId });
+}

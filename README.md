@@ -26,11 +26,29 @@ Install CodeMirror and its language packages with `npm install` so code snippets
   - Requires `git` and network access to import public repositories.
   - Automatically opens your browser to the explorer page.
 
-Assumptions/Env vars:
+### Environment variables
 
-- `PORT` (optional) – port for both servers (defaults to `5000`).
-- `git` must be available in your PATH for repository cloning.
-- No other environment variables are required for local development.
+Environment configuration is managed through Replit's Secrets manager. For local development, copy `.env.example` to `.env` and provide values. Keep this sample file in sync whenever new variables are introduced.
+
+| Variable | Purpose |
+|----------|---------|
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials for login. |
+| `GOOGLE_OAUTH_CALLBACK_URL` | Callback URL used by Google during OAuth. |
+| `DATABASE_URL` | Postgres connection string for application data and sessions. |
+| `SESSION_SECRET` | Secret used to sign Express session cookies. |
+| `HUBSPOT_API_KEY` | Token for submitting forms to HubSpot. |
+| `PORT` | Port for the combined Express and Vite servers (defaults to `5000`). |
+| `BASE_DEV_URL` | Local API base URL used during initialization. |
+| `BASE_CODEX_URL` | Fallback Codex API endpoint when the local API is unavailable. |
+| `REPLIT_SIDECAR_ENDPOINT` | Internal endpoint for object storage auth on Replit. |
+| `PUBLIC_OBJECT_SEARCH_PATHS` | Comma-separated object storage paths for public assets. |
+| `PRIVATE_OBJECT_DIR` | Object storage path for private uploads. |
+| `ISSUER_URL` | OIDC issuer for Replit authentication. |
+| `REPL_ID` | Replit workspace identifier required for OIDC. |
+| `REPLIT_DEV_DOMAIN` | Default Replit domain during development. |
+| `REPLIT_DOMAINS` | Comma-separated list of domains allowed for OIDC callbacks. |
+
+`git` must be available in your PATH for repository cloning.
 
 ## Self-Contained Tools
 

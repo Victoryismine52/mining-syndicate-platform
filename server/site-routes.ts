@@ -1,13 +1,13 @@
 import type { Express, Response } from "express";
 import express from "express";
 import path from "path";
-import { siteStorage } from "./site-storage";
+import { siteStorage, updateSiteLead } from "./site-storage";
 import { storage } from "./storage";
 import { qrGenerator } from "./qr-generator";
 import { submitToHubSpotForm } from "./hubspot";
 import { createHubSpotService, type ContactData } from "./hubspot-service";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, insertSiteDisclaimerSchema, insertSiteSlideSchema, insertGlobalSlideSchema } from "@shared/site-schema";
+import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, insertSiteDisclaimerSchema, insertSiteSlideSchema, insertGlobalSlideSchema, insertSiteAnalyticsSchema } from "@shared/site-schema";
 import { checkSiteAccess, requireAdmin } from "./site-access-control";
 import { isAuthenticated } from "./google-auth";
 import { z } from "zod";
@@ -328,9 +328,16 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           const result = await hubspotService.createContact(contactData);
           if (result) {
             console.log(`Contact created/updated in HubSpot with ID: ${result.id}`);
-            
             // Update the lead with HubSpot contact ID
-            // TODO: Implement updateSiteLead method if needed
+            try {
+              await updateSiteLead(lead.id, result.id);
+              console.log(`Lead ${lead.id} updated with HubSpot contact ID ${result.id}`);
+            } catch (updateError) {
+              console.error(
+                "Failed to update lead with HubSpot contact ID:",
+                updateError
+              );
+            }
           }
         } catch (hubspotError) {
           console.error("HubSpot contact creation failed:", hubspotError);
@@ -386,6 +393,32 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
       res.status(500).json({ error: "Failed to submit lead" });
+    }
+  });
+
+  // Track analytics events for a site
+  app.post("/api/sites/:siteId/analytics", async (req, res, next) => {
+    try {
+      const { siteId } = req.params;
+      const consentSchema = z.object({ status: z.literal('granted'), timestamp: z.number() });
+      try {
+        consentSchema.parse(req.body.consent);
+      } catch {
+        return res.status(400).json({ error: 'Missing analytics consent' });
+      }
+      const analyticsData = insertSiteAnalyticsSchema.parse({
+        siteId,
+        eventType: req.body.eventType || 'page_view',
+        eventData: req.body.eventData || {},
+        sessionId: req.body.sessionId,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        referrer: req.get('Referrer'),
+      });
+      const analytics = await siteStorage.createSiteAnalytics(analyticsData);
+      res.status(201).json(analytics);
+    } catch (error) {
+      next(error);
     }
   });
 
@@ -975,12 +1008,28 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Sections Management Endpoints
   
   // Get sections for a site
-  app.get("/api/sites/:siteId/sections", isAuthenticated, async (req, res) => {
+  app.get("/api/sites/:siteId/sections", async (req, res) => {
     try {
       const { siteId } = req.params;
-      const user = req.user as any;
       
-      // Check if user has access to this site
+      // Check if site is launched (for public access) or requires authentication
+      const site = await siteStorage.getSite(siteId);
+      if (!site) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+      
+      // If site is launched, allow public access
+      if (site.isLaunched) {
+        const sections = await siteStorage.getSiteSections(siteId);
+        return res.json(sections);
+      }
+      
+      // If site is not launched, require authentication and site access
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
+      const user = req.user as any;
       const hasAccess = await siteStorage.checkSiteAccess(siteId, user.email, user.isAdmin);
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied to this site" });

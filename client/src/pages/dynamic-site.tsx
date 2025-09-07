@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, publicApiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { insertLeadSchema, type InsertLead } from '@shared/schema';
 import { z } from 'zod';
@@ -27,7 +27,10 @@ import { ComingSoon } from '@/components/coming-soon';
 import { VideoCard } from '@/components/video-card';
 import { YouTubeCard } from '@/components/youtube-card';
 import { useAuth } from '@/hooks/use-auth';
+import { useAnalyticsConsent } from '@/components/analytics-consent-modal';
 import type { Site } from '@shared/site-schema';
+
+const ANALYTICS_PROVIDER = import.meta.env.VITE_ANALYTICS_PROVIDER || 'internal';
 
 // Helper function for form icons
 const getFormIcon = (iconName: string) => {
@@ -121,45 +124,81 @@ interface DynamicFormModalProps {
   formTemplate: any;
   siteId: string;
   colorTheme?: any;
+  selectedLanguage?: string;
 }
 
-function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }: DynamicFormModalProps) {
+function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, selectedLanguage = 'en' }: DynamicFormModalProps) {
   const { toast } = useToast();
   const [showSuccess, setShowSuccess] = useState(false);
   
   const config = formTemplate.config || {};
 
   // Fetch the actual form template fields
-  const { data: formFields = [], isLoading } = useQuery<any[]>({
-    queryKey: [`/api/form-templates/${formTemplate.id}/fields`],
+  const formFieldsUrl = `/api/form-templates/${formTemplate.id}/fields`;
+  const {
+    data: formFields = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<any[]>({
+    queryKey: [formFieldsUrl],
     enabled: !!formTemplate.id && isOpen,
+    queryFn: () => publicApiRequest('GET', formFieldsUrl).then((res) => res.json()),
   });
 
-  // Create dynamic form schema based on actual fields
-  const createDynamicSchema = () => {
+  if (isError) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Failed to load form</DialogTitle>
+            <DialogDescription>
+              {error instanceof Error
+                ? error.message
+                : "An unexpected error occurred while loading the form."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
+            <Button onClick={() => refetch()}>Retry</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Memoize dynamic schema based on actual fields
+  const formSchema = useMemo(() => {
     let schemaFields: any = {};
     
-    formFields.forEach((field) => {
+    formFields.forEach((field, index) => {
+      if (!field?.fieldLibrary || !field.fieldLibrary.name) {
+        console.warn('Skipping malformed field entry', { index, field });
+        return;
+      }
       const fieldName = field.fieldLibrary.name;
       let fieldSchema: any;
-      
+
       // Handle array fields first since they have completely different schema structure
       if (field.fieldLibrary.dataType === 'array') {
         const options = field.fieldLibrary.defaultValidation?.options || [];
         if (options.length > 0) {
           // For array fields with predefined options (multiselect)
           const minItems = field.fieldLibrary.defaultValidation?.minItems || 0;
-          
+
           // Start with basic array schema
           fieldSchema = z.array(z.string());
-          
+
           // Apply min constraint BEFORE refine
           if (field.isRequired && minItems > 0) {
             fieldSchema = fieldSchema.min(minItems, `Please select at least ${minItems} option${minItems > 1 ? 's' : ''}`);
           } else if (field.isRequired) {
             fieldSchema = fieldSchema.min(1, "Please select at least one option");
           }
-          
+
           // Apply refine constraint AFTER min
           fieldSchema = fieldSchema.refine(
             (values: string[]) => values.every((value: string) => options.includes(value)),
@@ -169,7 +208,7 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
           // For array fields without predefined options (extensible lists)
           const minItems = field.fieldLibrary.defaultValidation?.minItems || 0;
           fieldSchema = z.array(z.string());
-          
+
           if (field.isRequired && minItems > 0) {
             fieldSchema = fieldSchema.min(minItems, `Please add at least ${minItems} item${minItems > 1 ? 's' : ''}`);
           } else if (field.isRequired) {
@@ -177,7 +216,7 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
           }
         }
       }
-      // Handle radio fields 
+      // Handle radio fields
       else if (field.fieldLibrary.dataType === 'radio') {
         const options = field.fieldLibrary.defaultValidation?.options || [];
         if (options.length > 0) {
@@ -240,25 +279,34 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
     });
 
     return z.object(schemaFields);
-  };
+  }, [formFields]);
 
-  // Create default values based on form fields
-  const createDefaultValues = () => {
+  // Memoize default values based on form fields
+  const defaultValues = useMemo(() => {
     let defaultValues: any = {};
     
-    formFields.forEach((field) => {
+    formFields.forEach((field, index) => {
+      if (!field?.fieldLibrary || !field.fieldLibrary.name) {
+        console.warn('Skipping malformed field entry', { index, field });
+        return;
+      }
       const fieldName = field.fieldLibrary.name;
       // Array fields should default to empty array, others to empty string
       defaultValues[fieldName] = field.fieldLibrary.dataType === 'array' ? [] : "";
     });
-    
+
     return defaultValues;
-  };
+  }, [formFields]);
 
   const form = useForm<any>({
-    resolver: zodResolver(createDynamicSchema()),
-    defaultValues: createDefaultValues(),
+    resolver: zodResolver(formSchema),
+    defaultValues,
   });
+
+  useEffect(() => {
+    form.control._options.resolver = zodResolver(formSchema);
+    form.reset(defaultValues, { keepDefaultValues: true });
+  }, [formFields, formSchema, defaultValues, form]);
 
   const submitFormMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -436,12 +484,10 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   // Dynamic field renderer component
   const renderFormField = (field: any) => {
     const fieldName = field.fieldLibrary.name;
-    
-    // Get language from formAssignment or default to 'en'
-    const selectedLanguage = 'en'; // TODO: Get from site form assignment
-    
+    const language = selectedLanguage || 'en';
+
     // Use translations if available, otherwise fall back to default
-    const translation = field.fieldLibrary.translations?.[selectedLanguage];
+    const translation = field.fieldLibrary.translations?.[language];
     const label = field.customLabel || translation?.label || field.fieldLibrary.label;
     const placeholder = field.placeholder || translation?.placeholder || field.fieldLibrary.defaultPlaceholder || '';
     const description = translation?.description || field.fieldLibrary.defaultValidation?.description;
@@ -701,7 +747,7 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className={`sm:max-w-lg bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
+        <DialogContent className={`w-[95vw] max-w-lg mx-auto bg-slate-800 border-slate-600 backdrop-blur-sm ${colorTheme?.shadow || 'shadow-lg shadow-blue-500/25'}`}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 ${colorTheme?.icon || 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
@@ -1100,7 +1146,7 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
                 sectionForms.length === 1 
                   ? "justify-items-center" 
                   : sectionForms.length === 2
-                    ? "md:grid-cols-2 justify-items-center"
+                    ? "md:grid-cols-2"
                     : "md:grid-cols-2 lg:grid-cols-3"
               }`}>
                         {sectionForms.map((cardAssignment: any) => {
@@ -1216,7 +1262,7 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
               groupedForms['no-section'].length === 1 
                 ? "justify-items-center" 
                 : groupedForms['no-section'].length === 2
-                  ? "md:grid-cols-2 justify-items-center"
+                  ? "md:grid-cols-2"
                   : "md:grid-cols-2 lg:grid-cols-3"
             }`}>
                       {groupedForms['no-section'].map((cardAssignment: any) => {
@@ -1348,6 +1394,7 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
           formTemplate={selectedFormAssignment.formTemplate}
           siteId={siteId || ''}
           colorTheme={getFormColor(selectedFormAssignment.overrideConfig?.color || selectedFormAssignment.formTemplate.config?.color || 'blue')}
+          selectedLanguage={selectedFormAssignment.selectedLanguage}
         />
       )}
 
@@ -1391,15 +1438,17 @@ export function DynamicSite() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingPassword, setIsCheckingPassword] = useState(false);
 
+  const { consent, ConsentModal } = useAnalyticsConsent();
+
   const { data: site, isLoading, error } = useQuery<Site>({
     queryKey: [`/api/sites/${siteId}`],
     enabled: !!siteId,
   });
 
   // Query to check if user is a site manager for this site
-  const { data: siteManagers = [] } = useQuery<any[]>({
+  const { data: siteManagers = [], isLoading: managersLoading } = useQuery<any[]>({
     queryKey: [`/api/sites/${siteId}/managers`],
-    enabled: !!siteId && !!user && !user.isAdmin, // Only query if not admin
+    enabled: !!siteId && !!user, // Always query when we have siteId and user
   });
 
   // Check if user already has access to this site
@@ -1419,9 +1468,18 @@ export function DynamicSite() {
   // Track page view analytics
   useEffect(() => {
     if (site && isAuthenticated) {
-      // TODO: Implement analytics tracking
+      const doNotTrack = navigator.doNotTrack === '1';
+      if (ANALYTICS_PROVIDER === 'internal' && consent?.status === 'granted' && !doNotTrack) {
+        apiRequest('POST', `/api/sites/${siteId}/analytics`, {
+          eventType: 'page_view',
+          eventData: { path: window.location.pathname },
+          consent,
+        }).catch((err) => {
+          console.error('Analytics tracking failed', err);
+        });
+      }
     }
-  }, [site, isAuthenticated]);
+  }, [site, isAuthenticated, siteId, consent]);
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1443,31 +1501,39 @@ export function DynamicSite() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
+      <>
+        <ConsentModal />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      </>
     );
   }
 
   if (error || !site) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Site not found</div>
-      </div>
+      <>
+        <ConsentModal />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+          <div className="text-white text-xl">Site not found</div>
+        </div>
+      </>
     );
   }
 
   // Show password form if site is protected and user is not authenticated
   if (site.password && !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="w-full max-w-md mx-auto p-6">
-          <Card className="bg-slate-800/90 backdrop-blur-sm border-slate-600">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-yellow-500/20 rounded-full mx-auto flex items-center justify-center mb-4">
-                <Lock className="text-yellow-400 w-8 h-8" />
-              </div>
-              <CardTitle className="text-2xl text-white">Password Required</CardTitle>
+      <>
+        <ConsentModal />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+          <div className="w-full max-w-md mx-auto p-6">
+            <Card className="bg-slate-800/90 backdrop-blur-sm border-slate-600">
+              <CardHeader className="text-center">
+                <div className="w-16 h-16 bg-yellow-500/20 rounded-full mx-auto flex items-center justify-center mb-4">
+                  <Lock className="text-yellow-400 w-8 h-8" />
+                </div>
+                <CardTitle className="text-2xl text-white">Password Required</CardTitle>
               <CardDescription className="text-slate-400">
                 This site is password protected. Please enter the password to access {site.name}.
               </CardDescription>
@@ -1493,9 +1559,9 @@ export function DynamicSite() {
                     </p>
                   )}
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700" 
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700"
                   disabled={isCheckingPassword}
                   data-testid="button-submit-password"
                 >
@@ -1505,27 +1571,50 @@ export function DynamicSite() {
               </form>
             </CardContent>
           </Card>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   // Check if site is launched and user has access
   if (site.isLaunched === false) {
+    // Wait for authentication and manager data to load before making access decision
+    if (!user || managersLoading) {
+      return (
+        <>
+          <ConsentModal />
+          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+            <div className="text-white text-xl">Loading...</div>
+          </div>
+        </>
+      );
+    }
+    
     // Check if user is admin or site manager
     const isAdmin = user?.isAdmin === true;
     const isSiteManager = siteManagers.some(manager => manager.userEmail === user?.email);
     
     // If user is not admin AND not site manager, show coming soon
     if (!isAdmin && !isSiteManager) {
-      return <ComingSoon />;
+      return (
+        <>
+          <ConsentModal />
+          <ComingSoon />
+        </>
+      );
     }
   }
 
   // Check site type and render appropriate interface
   if (site.siteType === 'pitch-site') {
     // Render pitch site interface
-    return <PitchSiteInterface site={site} siteId={siteId} showPresentation={showPresentation} setShowPresentation={setShowPresentation} />;
+    return (
+      <>
+        <ConsentModal />
+        <PitchSiteInterface site={site} siteId={siteId} showPresentation={showPresentation} setShowPresentation={setShowPresentation} />
+      </>
+    );
   }
 
   // Render mining syndicate site content
@@ -1535,11 +1624,13 @@ export function DynamicSite() {
   const companyName = config.companyName || "Mining Syndicate";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <>
+      <ConsentModal />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       {/* For collective sites, use dynamic section/card rendering; for others, show hardcoded hero and participation pathways */}
       {site?.siteType === 'collective' ? (
         // For collective sites, show ONLY the PitchSiteInterface (which includes its own hero)
-        <PitchSiteInterface 
+        <PitchSiteInterface
           siteId={siteId || ''}
           site={site} 
           showPresentation={showPresentation} 
@@ -1739,6 +1830,7 @@ export function DynamicSite() {
           />
         </>
       )}
-    </div>
+      </div>
+    </>
   );
 }
