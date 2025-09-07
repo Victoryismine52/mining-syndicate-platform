@@ -4,6 +4,7 @@
 
 ## Summary of Recent Changes
 
+2025-09-09: Documented local development modes for Docker Postgres and in-memory setups – clarify environment variables and seed scripts – developers can choose Postgres containers or memory storage.
 2025-09-09: Added in-memory site storage mode – dev-only JSON seed storage; resets on restart – allows running without Postgres.
 2025-09-07: Switched database driver based on URL host – local DB support – enables all teams to run against local Postgres without Neon.
 

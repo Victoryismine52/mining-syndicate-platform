@@ -28,6 +28,16 @@ Required packages include `libnss3`, `libatk-1.0-0`, and `fonts-liberation`.
   - Requires `git` and network access to import public repositories.
   - Automatically opens your browser to the explorer page.
 
+### Local Development Modes
+
+Choose how to run the stack during development. Copy `.env.example` to `.env` and provide values for required
+variables like `DATABASE_URL`, `SESSION_SECRET`, and others listed below.
+
+- **Docker Postgres**: `npm run db:up`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`
+  - Spins up a Postgres container and loads seed data from `server/seeds/`.
+- **In-memory**: set `AUTH_DISABLED=true` and `STORAGE_MODE=memory`, then `npm run dev`
+  - Bypasses authentication and uses `server/data/seed.json` for ephemeral data.
+
 ### Environment variables
 
 Environment configuration is managed through Replit's Secrets manager. For local development, copy `.env.example` to `.env` and provide values. Keep this sample file in sync whenever new variables are introduced. Database URLs must use the standard Postgres URI format (e.g., `postgres://user:pass@localhost:5432/db`).
