@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,100 +52,120 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
     enabled: !!formTemplate.id && isOpen,
   });
 
-  // Create dynamic form schema based on actual fields
-  const createDynamicSchema = () => {
+  // Create dynamic form schema based on actual fields - memoized to prevent recreations
+  const dynamicSchema = useMemo(() => {
+    if (!formFields || formFields.length === 0) {
+      return z.object({});
+    }
+
     let schemaFields: any = {};
     
     formFields.forEach((field) => {
-      const fieldName = field.fieldLibrary.name;
-      let fieldSchema: any;
-      
-      // Handle extensible_list fields
-      if (field.fieldLibrary.dataType === 'extensible_list') {
-        if (field.isRequired) {
-          fieldSchema = z.array(z.string()).min(1, "At least one item is required");
-        } else {
-          fieldSchema = z.array(z.string()).optional();
-        }
-      }
-      // Handle radio fields with special validation
-      else if (field.fieldLibrary.dataType === 'radio') {
-        const options = field.fieldLibrary.defaultValidation?.options || [];
-        if (options.length > 0) {
+      try {
+        const fieldName = field.fieldLibrary?.name;
+        if (!fieldName) return;
+
+        let fieldSchema: any;
+        
+        // Handle extensible_list fields
+        if (field.fieldLibrary.dataType === 'extensible_list') {
           if (field.isRequired) {
-            fieldSchema = z.string()
-              .min(1, "Please select an option")
-              .refine(
-                (value) => options.includes(value),
-                { message: "Please select one of the available options" }
-              );
+            fieldSchema = z.array(z.string()).min(1, "At least one item is required");
           } else {
-            fieldSchema = z.string()
-              .optional()
-              .refine(
-                (value) => !value || value === "" || options.includes(value),
-                { message: "Please select one of the available options" }
-              );
+            fieldSchema = z.array(z.string()).optional();
+          }
+        }
+        // Handle radio fields with special validation
+        else if (field.fieldLibrary.dataType === 'radio') {
+          const options = field.fieldLibrary.defaultValidation?.options || [];
+          if (options.length > 0) {
+            if (field.isRequired) {
+              fieldSchema = z.string()
+                .min(1, "Please select an option")
+                .refine(
+                  (value) => options.includes(value),
+                  { message: "Please select one of the available options" }
+                );
+            } else {
+              fieldSchema = z.string()
+                .optional()
+                .refine(
+                  (value) => !value || value === "" || options.includes(value),
+                  { message: "Please select one of the available options" }
+                );
+            }
+          } else {
+            fieldSchema = field.isRequired ? z.string().min(1, "This field is required") : z.string().optional();
           }
         } else {
-          fieldSchema = field.isRequired ? z.string().min(1, "This field is required") : z.string().optional();
-        }
-      } else {
-        // Handle standard string fields
-        fieldSchema = z.string();
-        
-        // Apply validation based on field type
-        if (field.fieldLibrary.dataType === 'email') {
-          fieldSchema = z.string().email("Please enter a valid email address");
-        } else if (field.fieldLibrary.dataType === 'phone') {
-          fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
-        } else if (field.fieldLibrary.dataType === 'number') {
-          fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
+          // Handle standard string fields
+          fieldSchema = z.string();
+          
+          // Apply validation based on field type
+          if (field.fieldLibrary.dataType === 'email') {
+            fieldSchema = z.string().email("Please enter a valid email address");
+          } else if (field.fieldLibrary.dataType === 'phone') {
+            fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
+          } else if (field.fieldLibrary.dataType === 'number') {
+            fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
+          }
+
+          // Apply required validation
+          if (field.isRequired) {
+            fieldSchema = fieldSchema.min(1, "This field is required");
+          } else {
+            fieldSchema = fieldSchema.optional();
+          }
         }
 
-        // Apply required validation
-        if (field.isRequired) {
-          fieldSchema = fieldSchema.min(1, "This field is required");
-        } else {
-          fieldSchema = fieldSchema.optional();
-        }
+        schemaFields[fieldName] = fieldSchema;
+      } catch (error) {
+        console.error('Error creating schema for field:', field, error);
       }
-
-      schemaFields[fieldName] = fieldSchema;
     });
 
     return z.object(schemaFields);
-  };
+  }, [formFields]);
 
-  // Create default values based on form fields
-  const createDefaultValues = () => {
-    let defaultValues: any = {};
+  // Create default values based on form fields - memoized
+  const defaultValues = useMemo(() => {
+    if (!formFields || formFields.length === 0) {
+      return {};
+    }
+
+    let values: any = {};
     
     formFields.forEach((field) => {
-      const fieldName = field.fieldLibrary.name;
-      if (field.fieldLibrary.dataType === 'checkbox') {
-        defaultValues[fieldName] = 'false';
-      } else if (field.fieldLibrary.dataType === 'extensible_list') {
-        defaultValues[fieldName] = [''];
-      } else {
-        defaultValues[fieldName] = '';
+      try {
+        const fieldName = field.fieldLibrary?.name;
+        if (!fieldName) return;
+
+        if (field.fieldLibrary.dataType === 'checkbox') {
+          values[fieldName] = 'false';
+        } else if (field.fieldLibrary.dataType === 'extensible_list') {
+          values[fieldName] = [''];
+        } else {
+          values[fieldName] = '';
+        }
+      } catch (error) {
+        console.error('Error creating default value for field:', field, error);
       }
     });
 
-    return defaultValues;
-  };
+    return values;
+  }, [formFields]);
 
   const form = useForm({
-    resolver: zodResolver(createDynamicSchema()),
-    defaultValues: createDefaultValues(),
+    resolver: zodResolver(dynamicSchema),
+    defaultValues,
   });
 
   // Reset form when formFields change
   useEffect(() => {
-    if (formFields.length > 0) {
-      form.reset(createDefaultValues());
+    if (formFields.length > 0 && defaultValues) {
+      form.reset(defaultValues);
     }
-  }, [formFields]);
+  }, [formFields, defaultValues, form]);
 
   // Submit mutation
   const submitFormMutation = useMutation({
@@ -310,17 +330,26 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
 
   // Dynamic field renderer component
   const renderFormField = (field: any) => {
+    if (!field || !field.fieldLibrary) {
+      console.error('Invalid field data:', field);
+      return null;
+    }
+
     const fieldName = field.fieldLibrary.name;
+    if (!fieldName) {
+      console.error('Field missing name:', field);
+      return null;
+    }
     
     // Get language from formAssignment or default to 'en'
     const selectedLanguage = 'en'; // TODO: Get from site form assignment
     
     // Use translations if available, otherwise fall back to default
     const translation = field.fieldLibrary.translations?.[selectedLanguage];
-    const label = field.customLabel || translation?.label || field.fieldLibrary.label;
+    const label = field.customLabel || translation?.label || field.fieldLibrary.label || fieldName;
     const placeholder = field.placeholder || translation?.placeholder || field.fieldLibrary.defaultPlaceholder || '';
     const description = translation?.description || field.fieldLibrary.defaultValidation?.description;
-    const isRequired = field.isRequired;
+    const isRequired = field.isRequired || false;
     
     const commonClasses = "bg-card border-border text-foreground focus:border-accent";
     
@@ -598,8 +627,23 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     {formFields
-                      .sort((a, b) => parseInt(a.order) - parseInt(b.order))
-                      .map(renderFormField)}
+                      .sort((a, b) => {
+                        const orderA = parseInt(a.order) || 0;
+                        const orderB = parseInt(b.order) || 0;
+                        return orderA - orderB;
+                      })
+                      .map((field) => {
+                        try {
+                          return renderFormField(field);
+                        } catch (error) {
+                          console.error('Error rendering field:', field, error);
+                          return (
+                            <div key={field.id} className="p-2 border border-red-500 rounded text-red-400">
+                              Error rendering field: {field.fieldLibrary?.name || 'Unknown'}
+                            </div>
+                          );
+                        }
+                      })}
                   </div>
                 </div>
               </TooltipProvider>
