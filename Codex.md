@@ -2,6 +2,7 @@
 
 ## Summary of Recent Changes
 
+- 2025-09-07: added `.env.example` and documented environment variables to improve developer onboarding; all teams must keep the sample file updated when new variables are introduced.
 - Enabled unauthenticated retrieval of form template fields and sanitized the response to expose only public field data, excluding internal attributes like system flags and timestamps.
 - Added a unit test confirming the endpoint’s sanitized output and public accessibility without authentication.
 - Captured `isError` and `error` from the form field query so the modal can detect when loading fails.
