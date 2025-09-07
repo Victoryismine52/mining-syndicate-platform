@@ -4,6 +4,8 @@
 
 ## Summary of Recent Changes
 
+2025-09-09: Added AUTH_DISABLED flag for mock sessions – support local development without OAuth – developers can bypass login.
+
 2025-09-07: Installed Playwright browsers and system packages after npm install – ensure tests run locally and in CI – developers get a consistent E2E environment.
 2025-09-07: Documented Playwright browser downloads blocked and missing libs – cdn.playwright.dev returns 403 "Domain forbidden" and system packages like libatk1.0-0 are absent – E2E tests cannot run until network access and dependencies are installed.
 2025-09-09: Added Playwright end-to-end tests for form submission, error handling, analytics consent, and translations – expand coverage to success, network failure, malformed data, and consent flows – increases confidence for Code-Explorer and Card-Builder releases.

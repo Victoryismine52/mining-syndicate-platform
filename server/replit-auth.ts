@@ -7,6 +7,17 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
+const AUTH_DISABLED = process.env.AUTH_DISABLED === "true";
+
+const mockUser = {
+  id: "dev-user",
+  email: "dev@example.com",
+  firstName: "Dev",
+  lastName: "User",
+  role: "admin",
+  isAdmin: true,
+};
+
 // Set default for development - will be overridden in production
 if (!process.env.REPLIT_DOMAINS) {
   process.env.REPLIT_DOMAINS = process.env.REPLIT_DEV_DOMAIN || "conduit.replit.app";
@@ -93,6 +104,16 @@ async function upsertUser(claims: any) {
 }
 
 export async function setupReplitAuth(app: Express) {
+  if (AUTH_DISABLED) {
+    app.use(getSession());
+    app.use((req: any, _res, next) => {
+      req.user = mockUser;
+      req.isAuthenticated = () => true;
+      next();
+    });
+    return;
+  }
+
   console.log('Setting up Replit authentication...');
   app.set("trust proxy", 1);
   app.use(getSession());
@@ -362,6 +383,10 @@ export async function setupReplitAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  if (AUTH_DISABLED) {
+    return next();
+  }
+
   console.log('isAuthenticated middleware called');
   console.log('req.isAuthenticated():', req.isAuthenticated());
   console.log('req.user:', req.user);

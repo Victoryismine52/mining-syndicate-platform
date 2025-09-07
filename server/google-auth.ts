@@ -5,6 +5,17 @@ import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
+const AUTH_DISABLED = process.env.AUTH_DISABLED === "true";
+
+const mockUser = {
+  id: "dev-user",
+  email: "dev@example.com",
+  firstName: "Dev",
+  lastName: "User",
+  role: "admin",
+  isAdmin: true,
+};
+
 // Validate environment variables
 function validateGoogleOAuthConfig() {
   const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -58,6 +69,16 @@ export function getSession() {
 }
 
 export async function setupAuth(app: Express) {
+  if (AUTH_DISABLED) {
+    app.use(getSession());
+    app.use((req: any, _res, next) => {
+      req.user = mockUser;
+      req.isAuthenticated = () => true;
+      next();
+    });
+    return;
+  }
+
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
@@ -204,7 +225,7 @@ export async function setupAuth(app: Express) {
 
 // Middleware to check if user is authenticated
 export const isAuthenticated: RequestHandler = (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if (AUTH_DISABLED || req.isAuthenticated()) {
     return next();
   }
   res.status(401).json({ error: 'Authentication required' });
