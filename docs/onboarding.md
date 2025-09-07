@@ -18,6 +18,7 @@ This guide covers setting up the project locally, running tests, and establishin
    npx playwright install --with-deps
    ```
    Required packages include `libnss3`, `libatk-1.0-0`, and `fonts-liberation`.
+   > **Note:** A `403 Domain forbidden` error during `npx playwright install` usually means the CDN is blocked or requires credentials, while `403`s during test execution typically come from anti-bot measures on the target website.
 4. **Start the development servers**
    ```bash
    npm run dev
