@@ -2,6 +2,7 @@ import { sites, siteLeads, siteAnalytics, siteManagers, legalDisclaimers, siteDi
 import { collectiveTasks, taskAssignments, users } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, isNull, sql } from "drizzle-orm";
+import { logger } from './logger';
 
 export interface ISiteStorage {
   // Site operations
@@ -478,7 +479,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .where(eq(siteMemberships.userId, userId));
       return memberships;
     } catch (error) {
-      console.error('Error getting user memberships:', error);
+      logger.error('Error getting user memberships:', error);
       return [];
     }
   }
@@ -506,7 +507,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .where(eq(siteMemberships.siteId, siteId));
       return memberships;
     } catch (error) {
-      console.error('Error getting site memberships:', error);
+      logger.error('Error getting site memberships:', error);
       return [];
     }
   }
@@ -527,7 +528,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return membership;
     } catch (error) {
-      console.error('Error creating site membership:', error);
+      logger.error('Error creating site membership:', error);
       throw error;
     }
   }
@@ -548,7 +549,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return membership;
     } catch (error) {
-      console.error('Error updating site membership:', error);
+      logger.error('Error updating site membership:', error);
       throw error;
     }
   }
@@ -564,7 +565,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         ));
       return (result.rowCount ?? 0) > 0;
     } catch (error) {
-      console.error('Error deleting site membership:', error);
+      logger.error('Error deleting site membership:', error);
       return false;
     }
   }
@@ -614,7 +615,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       
       return messages;
     } catch (error) {
-      console.error('Error getting collective messages:', error);
+      logger.error('Error getting collective messages:', error);
       throw error;
     }
   }
@@ -634,7 +635,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return message;
     } catch (error) {
-      console.error('Error creating collective message:', error);
+      logger.error('Error creating collective message:', error);
       throw error;
     }
   }
@@ -666,7 +667,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       
       return message;
     } catch (error) {
-      console.error('Error getting collective message with sender:', error);
+      logger.error('Error getting collective message with sender:', error);
       throw error;
     }
   }
@@ -743,7 +744,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return posts;
     } catch (error) {
-      console.error('Error getting collective blog posts:', error);
+      logger.error('Error getting collective blog posts:', error);
       throw error;
     }
   }
@@ -784,7 +785,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       
       return post;
     } catch (error) {
-      console.error('Error getting collective blog post by ID:', error);
+      logger.error('Error getting collective blog post by ID:', error);
       throw error;
     }
   }
@@ -810,7 +811,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return post;
     } catch (error) {
-      console.error('Error creating collective blog post:', error);
+      logger.error('Error creating collective blog post:', error);
       throw error;
     }
   }
@@ -828,7 +829,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return post;
     } catch (error) {
-      console.error('Error updating collective blog post:', error);
+      logger.error('Error updating collective blog post:', error);
       throw error;
     }
   }
@@ -840,7 +841,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .delete(collectiveBlogPosts)
         .where(eq(collectiveBlogPosts.id, postId));
     } catch (error) {
-      console.error('Error deleting collective blog post:', error);
+      logger.error('Error deleting collective blog post:', error);
       throw error;
     }
   }
@@ -856,7 +857,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         })
         .where(eq(collectiveBlogPosts.id, postId));
     } catch (error) {
-      console.error('Error incrementing blog post view count:', error);
+      logger.error('Error incrementing blog post view count:', error);
       // Don't throw error for view count - it's not critical
     }
   }
@@ -905,7 +906,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return tasks;
     } catch (error) {
-      console.error('Error getting collective tasks:', error);
+      logger.error('Error getting collective tasks:', error);
       throw error;
     }
   }
@@ -938,7 +939,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       
       return task;
     } catch (error) {
-      console.error('Error getting collective task by ID:', error);
+      logger.error('Error getting collective task by ID:', error);
       throw error;
     }
   }
@@ -960,7 +961,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return task;
     } catch (error) {
-      console.error('Error creating collective task:', error);
+      logger.error('Error creating collective task:', error);
       throw error;
     }
   }
@@ -978,7 +979,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return task;
     } catch (error) {
-      console.error('Error updating collective task:', error);
+      logger.error('Error updating collective task:', error);
       throw error;
     }
   }
@@ -990,14 +991,14 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .delete(collectiveTasks)
         .where(eq(collectiveTasks.id, taskId));
     } catch (error) {
-      console.error('Error deleting collective task:', error);
+      logger.error('Error deleting collective task:', error);
       throw error;
     }
   }
 
   async getUserTasks(siteId: string, userId: string): Promise<any[]> {
     try {
-      console.log(`getUserTasks called with siteId: ${siteId}, userId: ${userId}`);
+      logger.info(`getUserTasks called with siteId: ${siteId}, userId: ${userId}`);
       
       // Use raw SQL to avoid Drizzle schema import issues
       const result = await db.execute(sql`
@@ -1034,7 +1035,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         ORDER BY ta.created_at DESC
       `);
 
-      console.log(`Query executed successfully, found ${result.rows.length} tasks for user ${userId}`);
+      logger.info(`Query executed successfully, found ${result.rows.length} tasks for user ${userId}`);
       
       // Transform the raw database results to match the expected format
       const tasks = result.rows.map((row: any) => ({
@@ -1063,10 +1064,10 @@ export class DatabaseSiteStorage implements ISiteStorage {
         creatorProfilePicture: row.creatorProfilePicture,
       }));
 
-      console.log('Sample task data:', tasks[0] ? JSON.stringify(tasks[0], null, 2) : 'No tasks found');
+      logger.info('Sample task data:', tasks[0] ? JSON.stringify(tasks[0], null, 2) : 'No tasks found');
       return tasks;
     } catch (error) {
-      console.error('Error getting user tasks:', error);
+      logger.error('Error getting user tasks:', error);
       throw error;
     }
   }
@@ -1083,7 +1084,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return assignment;
     } catch (error) {
-      console.error('Error assigning task to user:', error);
+      logger.error('Error assigning task to user:', error);
       throw error;
     }
   }
@@ -1098,7 +1099,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
           eq(taskAssignments.userId, userId)
         ));
     } catch (error) {
-      console.error('Error unassigning task from user:', error);
+      logger.error('Error unassigning task from user:', error);
       throw error;
     }
   }
@@ -1127,7 +1128,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return assignments;
     } catch (error) {
-      console.error('Error getting task assignments:', error);
+      logger.error('Error getting task assignments:', error);
       throw error;
     }
   }

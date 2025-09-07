@@ -1,4 +1,5 @@
 import { Client } from '@hubspot/api-client';
+import { logger } from './logger';
 
 export interface ContactData {
   firstName?: string;
@@ -69,7 +70,7 @@ export class HubSpotService {
 
       return { id: result.id };
     } catch (error) {
-      console.error('HubSpot contact creation failed:', error);
+      logger.error('HubSpot contact creation failed:', error);
       return null;
     }
   }
@@ -83,7 +84,7 @@ export class HubSpotService {
       await this.client.crm.contacts.basicApi.getPage(1);
       return true;
     } catch (error) {
-      console.error('HubSpot connection test failed:', error);
+      logger.error('HubSpot connection test failed:', error);
       return false;
     }
   }

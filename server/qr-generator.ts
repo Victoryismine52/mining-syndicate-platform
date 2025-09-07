@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import { logger } from './logger';
 
 export class QRCodeGenerator {
   async generateQRCode(url: string, siteId: string): Promise<string> {
@@ -17,7 +18,7 @@ export class QRCodeGenerator {
       // Return the data URL directly
       return qrCodeDataUrl;
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      logger.error('Error generating QR code:', error);
       throw new Error('Failed to generate QR code');
     }
   }
@@ -36,7 +37,7 @@ export class QRCodeGenerator {
       
       return qrCodeBuffer;
     } catch (error) {
-      console.error('Error generating QR code buffer:', error);
+      logger.error('Error generating QR code buffer:', error);
       throw new Error('Failed to generate QR code');
     }
   }

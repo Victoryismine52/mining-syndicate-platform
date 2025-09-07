@@ -12,26 +12,27 @@ import { functionIndex } from "./function-index";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import rateLimit from "express-rate-limit";
+import { logger } from './logger';
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  console.log('Registering routes...');
+  logger.info('Registering routes...');
   
   // Setup Google authentication (includes session middleware)
   await setupAuth(app);
-  console.log('Google authentication setup complete');
+  logger.info('Google authentication setup complete');
   
   // Test HubSpot connection if API key is available
   if (process.env.HUBSPOT_API_KEY) {
-    console.log('Testing HubSpot API connection...');
+    logger.info('Testing HubSpot API connection...');
     const hubspotConnected = await testHubSpotConnection();
     if (hubspotConnected) {
-      console.log('HubSpot integration: Connected successfully');
+      logger.info('HubSpot integration: Connected successfully');
     } else {
-      console.log('HubSpot integration: Failed - leads will still be saved locally');
-      console.log('Please check your HubSpot API key and permissions');
+      logger.info('HubSpot integration: Failed - leads will still be saved locally');
+      logger.info('Please check your HubSpot API key and permissions');
     }
   } else {
-    console.log('HubSpot API key not found - lead sync disabled');
+    logger.info('HubSpot API key not found - lead sync disabled');
   }
 
   // Basic health check endpoint to verify DB connectivity
@@ -94,9 +95,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Submit to HubSpot forms instead of creating contacts directly
             await submitToHubSpotForm(hubspotContact.formType || 'learn-more', hubspotContact);
-            console.log(`Lead ${lead.email} successfully submitted to HubSpot form: ${lead.formType}`);
+            logger.info(`Lead ${lead.email} successfully submitted to HubSpot form: ${lead.formType}`);
           } catch (hubspotError) {
-            console.error('Failed to submit lead to HubSpot form:', hubspotError);
+            logger.error('Failed to submit lead to HubSpot form:', hubspotError);
             // Don't fail the request if HubSpot integration fails
           }
         });
@@ -220,7 +221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const users = await storage.getAllUsers();
       res.json(users);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      logger.error("Error fetching users:", error);
       res.status(500).json({ error: "Failed to fetch users" });
     }
   });
@@ -228,24 +229,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new admin user directly  
   app.post('/api/users/admin', requireAuth, requireAdmin, async (req: any, res, next) => {
     try {
-      console.log('Admin creation endpoint hit with:', req.body);
-      console.log('User authenticated:', req.isAuthenticated());
-      console.log('User details:', req.user);
+      logger.info('Admin creation endpoint hit with:', req.body);
+      logger.info('User authenticated:', req.isAuthenticated());
+      logger.info('User details:', req.user);
       
       const { email, firstName, lastName } = req.body;
       if (!email || !firstName || !lastName) {
-        console.log('Missing required fields');
+        logger.info('Missing required fields');
         return res.status(400).json({ error: 'Email, first name, and last name are required' });
       }
       
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
-        console.log('User already exists:', email);
+        logger.info('User already exists:', email);
         return res.status(400).json({ error: 'User with this email already exists' });
       }
 
-      console.log('Creating new admin user:', { email, firstName, lastName });
+      logger.info('Creating new admin user:', { email, firstName, lastName });
       const newUser = await storage.createUser({
         email,
         firstName,
@@ -254,10 +255,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isAdmin: true
       });
       
-      console.log('Admin user created successfully:', newUser.email);
+      logger.info('Admin user created successfully:', newUser.email);
       res.json(newUser);
     } catch (error) {
-      console.error("Error creating admin user:", error);
+      logger.error("Error creating admin user:", error);
       res.status(500).json({ error: "Failed to create admin user" });
     }
   });
@@ -379,17 +380,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/site-form-assignments/:id", requireAuth, async (req, res, next) => {
     try {
-      console.log(`Updating site form assignment ${req.params.id} with data:`, req.body);
+      logger.info(`Updating site form assignment ${req.params.id} with data:`, req.body);
 
       // Look up the existing assignment with its template
       const existingAssignment = await storage.getSiteFormAssignmentById(req.params.id);
 
       if (!existingAssignment) {
-        console.log(`Form assignment ${req.params.id} not found`);
+        logger.info(`Form assignment ${req.params.id} not found`);
         return res.status(404).json({ error: "Form assignment not found" });
       }
 
-      console.log(`Found existing assignment:`, existingAssignment);
+      logger.info(`Found existing assignment:`, existingAssignment);
 
       // Prevent deactivating Join Cards on collective sites
       if (req.body.isActive === false &&
@@ -405,10 +406,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const assignment = await storage.updateSiteFormAssignment(req.params.id, req.body);
-      console.log(`Updated assignment:`, assignment);
+      logger.info(`Updated assignment:`, assignment);
       res.json(assignment);
     } catch (error) {
-      console.error('Error updating site form assignment:', error);
+      logger.error('Error updating site form assignment:', error);
       next(error);
     }
   });
@@ -581,7 +582,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register multi-site routes
   registerSiteRoutes(app, storage);
-  console.log('Site management routes registered');
+  logger.info('Site management routes registered');
 
   const httpServer = createServer(app);
   return httpServer;

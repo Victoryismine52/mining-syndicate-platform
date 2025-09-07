@@ -1,4 +1,5 @@
 import { storage } from "../storage";
+import { logger } from '../logger';
 
 export async function createDefaultPitchSiteSetup(siteId: string) {
   try {
@@ -25,9 +26,9 @@ export async function createDefaultPitchSiteSetup(siteId: string) {
       }
     }
 
-    console.log(`Created default form assignments for pitch site: ${siteId}`);
+    logger.info(`Created default form assignments for pitch site: ${siteId}`);
   } catch (error) {
-    console.error('Error setting up default pitch site forms:', error);
+    logger.error('Error setting up default pitch site forms:', error);
   }
 }
 

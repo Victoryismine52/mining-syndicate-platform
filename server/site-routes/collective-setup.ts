@@ -1,5 +1,6 @@
 import { siteStorage } from "../site-storage";
 import { storage } from "../storage";
+import { logger } from '../logger';
 
 export async function createDefaultCollectiveSetup(siteId: string) {
   try {
@@ -39,14 +40,14 @@ export async function createDefaultCollectiveSetup(siteId: string) {
           description: 'Click to join this collective and gain access to member-only content and features.'
         }
       });
-      console.log(`Added Join Card template to collective site: ${siteId}`);
+      logger.info(`Added Join Card template to collective site: ${siteId}`);
     } else {
       console.warn('Join Card template not found - collective site created without automatic join card');
     }
 
-    console.log(`Created default collective setup for site: ${siteId}`);
+    logger.info(`Created default collective setup for site: ${siteId}`);
   } catch (error) {
-    console.error('Error setting up default collective setup:', error);
+    logger.error('Error setting up default collective setup:', error);
   }
 }
 

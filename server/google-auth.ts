@@ -4,6 +4,7 @@ import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import { logger } from './logger';
 
 const AUTH_DISABLED = process.env.AUTH_DISABLED === "true";
 
@@ -104,7 +105,7 @@ export async function setupAuth(app: Express) {
 
           const email = profile.emails?.[0]?.value;
           if (!email) {
-            console.error('No email found in Google profile');
+            logger.error('No email found in Google profile');
             return done(new Error('No email found in Google profile'), false);
           }
 
@@ -127,13 +128,13 @@ export async function setupAuth(app: Express) {
             profilePicture: profile.photos?.[0]?.value,
           };
 
-          console.log('Upserting user:', userData.email);
+          logger.info('Upserting user:', userData.email);
           const user = await storage.upsertUser(userData);
           
-          console.log('User authenticated successfully:', user.email);
+          logger.info('User authenticated successfully:', user.email);
           return done(null, user);
         } catch (error) {
-          console.error('Error in Google OAuth strategy:', error);
+          logger.error('Error in Google OAuth strategy:', error);
           return done(error, false);
         }
       }
@@ -142,34 +143,34 @@ export async function setupAuth(app: Express) {
 
   // Serialize user for session
   passport.serializeUser((user: any, done) => {
-    console.log('Serializing user:', user.id);
+    logger.info('Serializing user:', user.id);
     done(null, user.id);
   });
 
   // Deserialize user from session
   passport.deserializeUser(async (id: string, done) => {
     try {
-      console.log('Deserializing user:', id);
+      logger.info('Deserializing user:', id);
       const user = await storage.getUser(id);
       if (!user) {
-        console.log('User not found during deserialization:', id);
+        logger.info('User not found during deserialization:', id);
         return done(null, false);
       }
-      console.log('Deserializing user:', user);
+      logger.info('Deserializing user:', user);
       done(null, user);
     } catch (error) {
-      console.error('Error deserializing user:', error);
+      logger.error('Error deserializing user:', error);
       done(error, false);
     }
   });
 
   // Google OAuth routes
   app.get('/api/auth/google', (req, res, next) => {
-    console.log('Initiating Google OAuth...');
+    logger.info('Initiating Google OAuth...');
     // Store redirect path in session if provided
     if (req.query.redirect) {
       req.session.redirectPath = req.query.redirect as string;
-      console.log('Stored redirect path:', req.session.redirectPath);
+      logger.info('Stored redirect path:', req.session.redirectPath);
     }
     
     passport.authenticate('google', { 
@@ -183,12 +184,12 @@ export async function setupAuth(app: Express) {
       failureRedirect: '/login?error=access_denied' 
     }),
     (req, res) => {
-      console.log('Google OAuth callback successful');
+      logger.info('Google OAuth callback successful');
       // Get redirect path from session or default to /sites
       const redirectPath = req.session.redirectPath || '/sites';
       delete req.session.redirectPath; // Clean up
       
-      console.log('Redirecting user to:', redirectPath);
+      logger.info('Redirecting user to:', redirectPath);
       res.redirect(redirectPath);
     }
   );
@@ -206,12 +207,12 @@ export async function setupAuth(app: Express) {
   app.post('/api/logout', (req, res) => {
     req.logout((err) => {
       if (err) {
-        console.error('Logout error:', err);
+        logger.error('Logout error:', err);
         return res.status(500).json({ error: 'Logout failed' });
       }
       req.session.destroy((err) => {
         if (err) {
-          console.error('Session destroy error:', err);
+          logger.error('Session destroy error:', err);
           return res.status(500).json({ error: 'Session cleanup failed' });
         }
         res.clearCookie('connect.sid');
@@ -220,7 +221,7 @@ export async function setupAuth(app: Express) {
     });
   });
 
-  console.log('Google OAuth setup complete');
+  logger.info('Google OAuth setup complete');
 }
 
 // Middleware to check if user is authenticated
