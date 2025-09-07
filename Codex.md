@@ -4,6 +4,7 @@
 
 ## Summary of Recent Changes
 
+2025-09-07: Removed sqlite references and documented Postgres URI requirements – clarify mandatory Postgres backend – prevents misconfiguration with unsupported databases.
 2025-09-09: Added AUTH_DISABLED flag for mock sessions – support local development without OAuth – developers can bypass login.
 
 2025-09-07: Documented mock-auth onboarding steps – clarify .env setup and auth toggle – developers start locally faster.
