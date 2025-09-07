@@ -11,4 +11,6 @@
 - Validated dynamic form fields before schema and default value construction, skipping malformed entries to avoid runtime errors.
 - Introduced `publicApiRequest` helper to fetch form fields without cookies and updated form modals to use it.
 
+- 2025-09-07: persisted HubSpot contact IDs on site leads via new `updateSiteLead` helper for CRM integration consistency; analytics collection remains unchanged, but marketing workflows can now cross-reference local leads with HubSpot contacts.
+
 

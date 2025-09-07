@@ -328,9 +328,18 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           const result = await hubspotService.createContact(contactData);
           if (result) {
             console.log(`Contact created/updated in HubSpot with ID: ${result.id}`);
-            
             // Update the lead with HubSpot contact ID
-            // TODO: Implement updateSiteLead method if needed
+            try {
+              await siteStorage.updateSiteLead(lead.id, {
+                hubspotContactId: result.id,
+              });
+              console.log(`Lead ${lead.id} updated with HubSpot contact ID ${result.id}`);
+            } catch (updateError) {
+              console.error(
+                "Failed to update lead with HubSpot contact ID:",
+                updateError
+              );
+            }
           }
         } catch (hubspotError) {
           console.error("HubSpot contact creation failed:", hubspotError);
