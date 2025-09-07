@@ -3,6 +3,7 @@
 > **Entry Template:** `YYYY-MM-DD: summary – reason – impact`
 
 ## Summary of Recent Changes
+2025-09-14: Added site creation tests for standard, pitch, and collective setups – verify default content added – ensures new sites start with expected slides, forms, and sections.
 
 2025-09-13: Added fallback in-memory object storage when REPLIT_SIDECAR_ENDPOINT is missing – support Replit-independent local development – uploads persist only for the process lifetime.
 2025-09-12: Introduced pino-based JSON logger with per-request IDs – unify structured logging and enable traceability – downstream log consumers must parse JSON and respect the `reqId` field for correlation.
