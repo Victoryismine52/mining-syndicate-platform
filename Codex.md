@@ -4,6 +4,8 @@
 
 ## Summary of Recent Changes
 
+2025-09-12: Introduced pino-based JSON logger with per-request IDs – unify structured logging and enable traceability – downstream log consumers must parse JSON and respect the `reqId` field for correlation.
+
 2025-09-07: Added rate limiting and stricter lead validation – throttle spam and enforce clean contact data – marketing analytics receive higher fidelity lead metrics.
 2025-09-07: Split site routes into site-create, pitch-setup, and collective-setup modules – shrink monolith and enable focused ownership – Code-Explorer and Card-Builder may need to update any deep imports relying on old site-routes internals.
 2025-09-11: Externalized default slide metadata to seeds with object storage paths – centralize configuration for branding – Replit styling and Card-Builder exports can swap slide assets per deployment.

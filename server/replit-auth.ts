@@ -6,6 +6,7 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import { logger } from './logger';
 
 const AUTH_DISABLED = process.env.AUTH_DISABLED === "true";
 
@@ -34,7 +35,7 @@ const getOidcConfig = memoize(
       );
       return config;
     } catch (error) {
-      console.error('Failed to load OIDC config:', error);
+      logger.error('Failed to load OIDC config:', error);
       throw error;
     }
   },
@@ -78,12 +79,12 @@ function updateUserSession(
 
 async function upsertUser(claims: any) {
   const email = claims["email"];
-  console.log('Checking access for user:', email);
+  logger.info('Checking access for user:', email);
   
   // Check if user is in the access list
   const hasAccess = await storage.checkUserAccess(email);
   if (!hasAccess) {
-    console.log('Access denied for user:', email);
+    logger.info('Access denied for user:', email);
     throw new Error('Access denied. Please contact an administrator for access.');
   }
   
@@ -114,14 +115,14 @@ export async function setupReplitAuth(app: Express) {
     return;
   }
 
-  console.log('Setting up Replit authentication...');
+  logger.info('Setting up Replit authentication...');
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
 
   const config = await getOidcConfig();
-  console.log('OIDC config retrieved, setting up strategies...');
+  logger.info('OIDC config retrieved, setting up strategies...');
 
   const verify: VerifyFunction = async (
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
@@ -133,7 +134,7 @@ export async function setupReplitAuth(app: Express) {
         throw new Error('No claims found in tokens');
       }
       
-      console.log('OAuth verify called with claims:', claims);
+      logger.info('OAuth verify called with claims:', claims);
       
       const userSession = {
         id: claims.sub,
@@ -142,11 +143,11 @@ export async function setupReplitAuth(app: Express) {
       updateUserSession(userSession, tokens);
       
       const user = await upsertUser(claims);
-      console.log('User upserted:', user.email);
+      logger.info('User upserted:', user.email);
       
       verified(null, userSession as any);
     } catch (error) {
-      console.error('Authentication error:', error);
+      logger.error('Authentication error:', error);
       verified(error, false);
     }
   };
@@ -154,7 +155,7 @@ export async function setupReplitAuth(app: Express) {
   for (const domain of process.env.REPLIT_DOMAINS!.split(",")) {
     const strategyName = `replitauth:${domain}`;
     const callbackURL = `https://${domain}/api/callback`;
-    console.log(`Setting up strategy: ${strategyName} with callback: ${callbackURL}`);
+    logger.info(`Setting up strategy: ${strategyName} with callback: ${callbackURL}`);
     
     const strategy = new Strategy(
       {
@@ -166,10 +167,10 @@ export async function setupReplitAuth(app: Express) {
       verify,
     );
     passport.use(strategy);
-    console.log(`Strategy ${strategyName} registered successfully`);
+    logger.info(`Strategy ${strategyName} registered successfully`);
   }
   
-  console.log('All authentication strategies registered');
+  logger.info('All authentication strategies registered');
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
@@ -177,20 +178,20 @@ export async function setupReplitAuth(app: Express) {
   app.get("/api/login", (req, res, next) => {
     // Use the correct strategy name that matches the hostname
     const hostname = req.get('host') || req.hostname;
-    console.log(`Login request for hostname: ${hostname}`);
+    logger.info(`Login request for hostname: ${hostname}`);
     
     // Find the matching strategy for this specific hostname
     const strategyName = `replitauth:${hostname}`;
-    console.log(`Using auth strategy: ${strategyName}`);
-    console.log('Available strategies:', Object.keys((passport as any)._strategies || {}));
+    logger.info(`Using auth strategy: ${strategyName}`);
+    logger.info('Available strategies:', Object.keys((passport as any)._strategies || {}));
     
     // Check if the strategy exists
     if (!(passport as any)._strategies[strategyName]) {
-      console.error(`Strategy ${strategyName} not found!`);
+      logger.error(`Strategy ${strategyName} not found!`);
       return res.status(500).json({ error: 'Authentication strategy not found' });
     }
     
-    console.log('Initiating authentication with strategy:', strategyName);
+    logger.info('Initiating authentication with strategy:', strategyName);
     passport.authenticate(strategyName, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
@@ -201,28 +202,28 @@ export async function setupReplitAuth(app: Express) {
     // Use the correct strategy name that matches the hostname
     const hostname = req.get('host') || req.hostname;
     const strategyName = `replitauth:${hostname}`;
-    console.log(`Auth callback received - strategy: ${strategyName}, hostname: ${hostname}`);
-    console.log('Callback query params:', req.query);
+    logger.info(`Auth callback received - strategy: ${strategyName}, hostname: ${hostname}`);
+    logger.info('Callback query params:', req.query);
     
     passport.authenticate(strategyName, (err: any, user: any, info: any) => {
       if (err) {
-        console.error('Auth callback error:', err);
+        logger.error('Auth callback error:', err);
         return res.redirect("/auth?error=auth_error");
       }
       
       if (!user) {
-        console.log('Auth callback failed - no user:', info);
+        logger.info('Auth callback failed - no user:', info);
         return res.redirect("/auth?error=access_denied");
       }
       
-      console.log('Auth callback success - logging in user');
+      logger.info('Auth callback success - logging in user');
       req.logIn(user, (loginErr) => {
         if (loginErr) {
-          console.error('Login error during callback:', loginErr);
+          logger.error('Login error during callback:', loginErr);
           return res.redirect("/auth?error=login_error");
         }
         
-        console.log('User successfully logged in via callback, redirecting to /dev');
+        logger.info('User successfully logged in via callback, redirecting to /dev');
         return res.redirect("/dev");
       });
     })(req, res, next);
@@ -242,22 +243,22 @@ export async function setupReplitAuth(app: Express) {
   // Get current user
   app.get("/api/user", isAuthenticated, async (req: any, res) => {
     try {
-      console.log('API user called, req.user:', req.user);
-      console.log('req.isAuthenticated():', req.isAuthenticated());
+      logger.info('API user called, req.user:', req.user);
+      logger.info('req.isAuthenticated():', req.isAuthenticated());
       
       const userId = req.user?.claims?.sub || req.user?.id;
-      console.log('Looking up user with ID:', userId);
+      logger.info('Looking up user with ID:', userId);
       
       if (!userId) {
-        console.log('No user ID found in session');
+        logger.info('No user ID found in session');
         return res.status(401).json({ message: "No user ID in session" });
       }
       
       const user = await storage.getUser(userId);
-      console.log('Found user:', user?.email);
+      logger.info('Found user:', user?.email);
       res.json(user);
     } catch (error) {
-      console.error("Error fetching user:", error);
+      logger.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
@@ -387,37 +388,37 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     return next();
   }
 
-  console.log('isAuthenticated middleware called');
-  console.log('req.isAuthenticated():', req.isAuthenticated());
-  console.log('req.user:', req.user);
+  logger.info('isAuthenticated middleware called');
+  logger.info('req.isAuthenticated():', req.isAuthenticated());
+  logger.info('req.user:', req.user);
 
   if (!req.isAuthenticated()) {
-    console.log('Request not authenticated');
+    logger.info('Request not authenticated');
     return res.status(401).json({ message: "Unauthorized - not authenticated" });
   }
 
   const user = req.user as any;
   if (!user) {
-    console.log('No user in session');
+    logger.info('No user in session');
     return res.status(401).json({ message: "Unauthorized - no user" });
   }
 
   // If no expires_at, just continue (might be a fresh session)
   if (!user.expires_at) {
-    console.log('No expiration time, allowing access');
+    logger.info('No expiration time, allowing access');
     return next();
   }
 
   const now = Math.floor(Date.now() / 1000);
   if (now <= user.expires_at) {
-    console.log('Token still valid');
+    logger.info('Token still valid');
     return next();
   }
 
-  console.log('Token expired, attempting refresh');
+  logger.info('Token expired, attempting refresh');
   const refreshToken = user.refresh_token;
   if (!refreshToken) {
-    console.log('No refresh token available');
+    logger.info('No refresh token available');
     res.status(401).json({ message: "Unauthorized - token expired" });
     return;
   }
@@ -426,10 +427,10 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     const config = await getOidcConfig();
     const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
     updateUserSession(user, tokenResponse);
-    console.log('Token refreshed successfully');
+    logger.info('Token refreshed successfully');
     return next();
   } catch (error) {
-    console.log('Token refresh failed:', error);
+    logger.info('Token refresh failed:', error);
     res.status(401).json({ message: "Unauthorized - refresh failed" });
     return;
   }

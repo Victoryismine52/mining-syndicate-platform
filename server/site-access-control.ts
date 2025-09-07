@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { siteStorage } from "./site-storage";
+import { logger } from './logger';
 
 // Extend the Request interface to include siteAccess
 declare global {
@@ -34,11 +35,11 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
     // Check if user is global admin (check both new role field and legacy isAdmin)
     const isAdmin = user.role === 'admin' || user.isAdmin || false;
     
-    console.log(`Site access check for ${siteId}: user=${user.email}, isAdmin=${isAdmin}`);
+    logger.info(`Site access check for ${siteId}: user=${user.email}, isAdmin=${isAdmin}`);
 
     // Global admins have access to all sites, no need to check site manager status
     if (isAdmin) {
-      console.log(`Global admin ${user.email} granted access to site ${siteId}`);
+      logger.info(`Global admin ${user.email} granted access to site ${siteId}`);
       // Add access info to request object
       req.siteAccess = {
         canManage: true,
@@ -50,7 +51,7 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
 
     // Check if user is site manager for this specific site (only for non-admins)
     const isSiteManager = await siteStorage.isSiteManager(siteId, user.email);
-    console.log(`Site manager check for ${siteId}: user=${user.email}, isSiteManager=${isSiteManager}`);
+    logger.info(`Site manager check for ${siteId}: user=${user.email}, isSiteManager=${isSiteManager}`);
 
     // User has access if they are site manager
     const canManage = isSiteManager;
@@ -70,7 +71,7 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
 
     next();
   } catch (error) {
-    console.error("Error checking site access:", error);
+    logger.error("Error checking site access:", error);
     res.status(500).json({ error: "Failed to check site access" });
   }
 };

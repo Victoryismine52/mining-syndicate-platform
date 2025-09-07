@@ -9,6 +9,7 @@ import { insertSiteSchema } from "@shared/site-schema";
 import { z } from "zod";
 import { createDefaultPitchSiteSetup } from "./pitch-setup";
 import { createDefaultCollectiveSetup } from "./collective-setup";
+import { logger } from '../logger';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -53,23 +54,23 @@ export function registerSiteCreateRoutes(app: Express) {
 
       if (validatedData.siteType === "pitch-site") {
         if (mode === "coming-soon") {
-          console.log(`Pitch site created with coming-soon mode - landing page ready for customization`);
+          logger.info(`Pitch site created with coming-soon mode - landing page ready for customization`);
         } else if (mode === "configure-now") {
           await createDefaultPitchSiteSetup(site.siteId);
-          console.log(`Pitch site created with configure-now mode - redirecting to admin panel`);
+          logger.info(`Pitch site created with configure-now mode - redirecting to admin panel`);
         }
       } else if (validatedData.siteType === "collective") {
         if (mode === "coming-soon") {
-          console.log(`Collective site created with coming-soon mode - landing page ready for customization`);
+          logger.info(`Collective site created with coming-soon mode - landing page ready for customization`);
         } else if (mode === "configure-now") {
           await createDefaultCollectiveSetup(site.siteId);
-          console.log(`Collective site created with configure-now mode - redirecting to admin panel`);
+          logger.info(`Collective site created with configure-now mode - redirecting to admin panel`);
         }
       } else {
         if (mode === "default") {
           await createDefaultSlides(site.siteId);
         } else if (mode === "load-later" || mode === "load-immediately") {
-          console.log(`Site created with ${mode} mode - no content slides added`);
+          logger.info(`Site created with ${mode} mode - no content slides added`);
         }
       }
 
@@ -81,7 +82,7 @@ export function registerSiteCreateRoutes(app: Express) {
 
       res.json(updatedSite);
     } catch (error) {
-      console.error("Error creating site:", error);
+      logger.error("Error creating site:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }

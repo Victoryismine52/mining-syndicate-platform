@@ -2,6 +2,7 @@ import { users, leads, slideSettings, accessRequests, accessList, formTemplates,
 import { siteLeads, sites, type SiteLead } from "@shared/site-schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
+import { logger } from './logger';
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -217,7 +218,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    console.log('Upserting user with data:', userData);
+    logger.info('Upserting user with data:', userData);
     
     // Determine role based on email and access list
     let userRole = "generic"; // Default role for all users
@@ -238,7 +239,7 @@ export class DatabaseStorage implements IStorage {
       isAdmin: userData.email === "bnelson523@gmail.com" || false, // Keep for backward compatibility
     };
     
-    console.log('Final user data:', userDataWithDefaults);
+    logger.info('Final user data:', userDataWithDefaults);
     
     const [user] = await db
       .insert(users)

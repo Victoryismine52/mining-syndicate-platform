@@ -2,8 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite, serveStatic } from "./vite";
 import { setSiteStorage } from "./site-storage";
+import { logger } from './logger';
+import pinoHttp from 'pino-http';
+import { randomUUID } from 'crypto';
 
 const BASE_DEV_URL = process.env.BASE_DEV_URL || "http://0.0.0.0:5000/api";
 const BASE_CODEX_URL = process.env.BASE_CODEX_URL || `https://conduit.replit.app/api`;
@@ -16,7 +19,7 @@ async function init() {
     }
     // Connected to local API
   } catch (error: any) {
-    console.error("Falling back to Codex API:", error.message);
+    logger.error("Falling back to Codex API:", error.message);
     try {
       const response = await fetch(`${BASE_CODEX_URL}/visible-slides`);
       if (!response.ok) {
@@ -24,7 +27,7 @@ async function init() {
       }
       // Connected to Codex API
     } catch (error) {
-      console.error("Failed to connect to the Codex API:", error);
+      logger.error("Failed to connect to the Codex API:", error);
     }
   }
 }
@@ -32,6 +35,10 @@ async function init() {
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(pinoHttp({
+  logger,
+  genReqId: () => randomUUID(),
+}));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -56,7 +63,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      req.log.info(logLine);
     }
   });
 
@@ -68,7 +75,7 @@ app.use((req, res, next) => {
   if (process.env.STORAGE_MODE === 'memory') {
     const { memorySiteStorage } = await import('./memory-storage');
     setSiteStorage(memorySiteStorage);
-    log('Using in-memory site storage');
+    logger.info('Using in-memory site storage');
   }
 
   const server = await registerRoutes(app);
@@ -77,8 +84,8 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    logger.error({ err }, 'Unhandled error');
     res.status(status).json({ message });
-    throw err;
   });
 
   // importantly only setup vite in development and after
@@ -100,7 +107,7 @@ app.use((req, res, next) => {
     host: "0.0.0.0",
     reusePort: true,
   }, async () => {
-    log(`serving on port ${port}`);
+    logger.info(`serving on port ${port}`);
     await init();
   });
 })();
