@@ -6,4 +6,6 @@
 - Added a unit test confirming the endpoint’s sanitized output and public accessibility without authentication.
 - Captured `isError` and `error` from the form field query so the modal can detect when loading fails.
 - Displayed a descriptive error message with retry and close options instead of form fields when the query fails.
+- Memoized the dynamic schema and default value calculations with `useMemo`, keyed by `formFields`, to avoid unnecessary recomputation and improve dynamic field handling.
+- Added a `useEffect` hook to reset the form and refresh the Zod resolver whenever `formFields` change, ensuring dynamic fields register correctly on both desktop and mobile.
 
