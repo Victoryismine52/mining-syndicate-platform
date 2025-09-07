@@ -178,6 +178,7 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
     onSuccess: () => {
       setShowSuccess(true);
       form.reset();
+      onClose(); // Close the main modal when success modal opens
     },
     onError: (error: any) => {
       toast({
@@ -681,7 +682,9 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
 
       <SuccessConfirmation 
         isOpen={showSuccess}
-        onClose={() => setShowSuccess(false)}
+        onClose={() => {
+          setShowSuccess(false);
+        }}
         title="Thank You!"
         description={config.successMessage || "We've received your submission and will be in touch soon."}
       />
