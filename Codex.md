@@ -4,6 +4,8 @@
 
 ## Summary of Recent Changes
 
+2025-09-07: Switched database driver based on URL host – local DB support – enables all teams to run against local Postgres without Neon.
+
 2025-09-07: Added db:migrate script and test-aware drizzle config – streamline schema updates across environments – teams run migrations consistently without polluting production data.
 2025-09-07: Added dockerized Postgres with db:up/down scripts – standardize local DB setup – enables cross-team isolated testing.
 2025-09-07: Removed sqlite references and documented Postgres URI requirements – clarify mandatory Postgres backend – prevents misconfiguration with unsupported databases.
