@@ -14,6 +14,6 @@
 2025-09-07: Memoized dynamic schema and default value calculations with `useMemo` – reduce redundant computations – improved performance for dynamic fields.
 2025-09-07: Validated dynamic form fields before schema and default value construction – skip malformed entries – avoid runtime errors from invalid definitions.
 2025-09-07: Introduced `publicApiRequest` helper for cookie-free field fetches – support unauthenticated retrieval – consistent public API usage in modals.
-2025-09-07: Persisted HubSpot contact IDs on site leads via `updateSiteLead` – align CRM integration – marketing can cross-reference leads with HubSpot.
+2025-09-07: Persisted HubSpot contact IDs on site leads via `updateSiteLead` – CRM ID persistence – marketing analytics can cross-reference leads with HubSpot.
 2025-09-07: Enabled internal analytics tracking with consent checks – centralize event logging while respecting user consent – Replit and Card-Builder must configure `VITE_ANALYTICS_PROVIDER` before collecting analytics.
 2025-09-07: Added `TaskRepo` interface and Express stub generator – decouple task creation and allow repo injection – teams can swap in Snowflake or in-memory implementations as needed.

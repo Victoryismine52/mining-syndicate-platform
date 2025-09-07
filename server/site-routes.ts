@@ -1,7 +1,7 @@
 import type { Express, Response } from "express";
 import express from "express";
 import path from "path";
-import { siteStorage } from "./site-storage";
+import { siteStorage, updateSiteLead } from "./site-storage";
 import { storage } from "./storage";
 import { qrGenerator } from "./qr-generator";
 import { submitToHubSpotForm } from "./hubspot";
@@ -330,9 +330,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
             console.log(`Contact created/updated in HubSpot with ID: ${result.id}`);
             // Update the lead with HubSpot contact ID
             try {
-              await siteStorage.updateSiteLead(lead.id, {
-                hubspotContactId: result.id,
-              });
+              await updateSiteLead(lead.id, result.id);
               console.log(`Lead ${lead.id} updated with HubSpot contact ID ${result.id}`);
             } catch (updateError) {
               console.error(
