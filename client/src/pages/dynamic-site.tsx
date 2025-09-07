@@ -167,8 +167,12 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   // Memoize dynamic schema based on actual fields
   const formSchema = useMemo(() => {
     let schemaFields: any = {};
-
-    formFields.forEach((field) => {
+    
+    formFields.forEach((field, index) => {
+      if (!field?.fieldLibrary || !field.fieldLibrary.name) {
+        console.warn('Skipping malformed field entry', { index, field });
+        return;
+      }
       const fieldName = field.fieldLibrary.name;
       let fieldSchema: any;
 
@@ -274,8 +278,12 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   // Memoize default values based on form fields
   const defaultValues = useMemo(() => {
     let defaultValues: any = {};
-
-    formFields.forEach((field) => {
+    
+    formFields.forEach((field, index) => {
+      if (!field?.fieldLibrary || !field.fieldLibrary.name) {
+        console.warn('Skipping malformed field entry', { index, field });
+        return;
+      }
       const fieldName = field.fieldLibrary.name;
       // Array fields should default to empty array, others to empty string
       defaultValues[fieldName] = field.fieldLibrary.dataType === 'array' ? [] : "";
