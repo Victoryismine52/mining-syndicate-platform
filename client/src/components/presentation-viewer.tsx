@@ -9,6 +9,7 @@ import { LendingPoolModal } from "./lending-pool-modal";
 import { FinalActionSlide } from "./final-action-slide";
 import { SimpleFormModal } from "./simple-form-modal";
 import type { SiteSlide, GlobalSlide } from "@shared/site-schema";
+import type { Site } from "@shared/site-schema";
 
 interface PresentationViewerProps {
   siteId: string;
@@ -54,11 +55,12 @@ function getFormColorTheme(colorOverride?: string) {
 interface DynamicFormsSlideProps {
   forms: any[];
   siteId: string;
+  siteLanguage: string;
   onPrevSlide: () => void;
   onNextSlide: () => void;
 }
 
-function DynamicFormsSlide({ forms, siteId, onPrevSlide, onNextSlide }: DynamicFormsSlideProps) {
+function DynamicFormsSlide({ forms, siteId, siteLanguage, onPrevSlide, onNextSlide }: DynamicFormsSlideProps) {
   const [selectedFormAssignment, setSelectedFormAssignment] = useState<any>(null);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
@@ -206,7 +208,7 @@ function DynamicFormsSlide({ forms, siteId, onPrevSlide, onNextSlide }: DynamicF
             formTemplate={selectedFormAssignment.formTemplate}
             siteId={siteId}
             colorTheme={getFormColor(selectedFormAssignment.overrideConfig?.color || selectedFormAssignment.formTemplate.config?.color || 'blue')}
-            selectedLanguage={selectedFormAssignment.selectedLanguage}
+            selectedLanguage={selectedFormAssignment.selectedLanguage || siteLanguage}
           />
         )}
 
@@ -241,6 +243,12 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [isMiningPoolModalOpen, setIsMiningPoolModalOpen] = useState(false);
   const [isLendingPoolModalOpen, setIsLendingPoolModalOpen] = useState(false);
+
+  const { data: site } = useQuery<Site>({
+    queryKey: [`/api/sites/${siteId}`],
+    enabled: !!siteId,
+  });
+  const siteLanguage = site?.landingConfig?.language || 'en';
 
   // Fetch slides from the database
   const { data: dbSlides = [], isLoading: slidesLoading } = useQuery<SiteSlide[]>({
@@ -511,6 +519,7 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
           <DynamicFormsSlide
             forms={(currentSlideData as any).forms}
             siteId={siteId}
+            siteLanguage={siteLanguage}
             onPrevSlide={prevSlide}
             onNextSlide={nextSlide}
           />
