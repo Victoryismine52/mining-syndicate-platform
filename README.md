@@ -51,6 +51,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `REPL_ID` | Replit workspace identifier required for OIDC. |
 | `REPLIT_DEV_DOMAIN` | Default Replit domain during development. |
 | `REPLIT_DOMAINS` | Comma-separated list of domains allowed for OIDC callbacks. |
+| `STORAGE_MODE` | Set to `memory` to use in-memory JSON storage for sites. |
 
 
 Switch between Postgres databases by editing `.env`:
@@ -59,6 +60,12 @@ Switch between Postgres databases by editing `.env`:
 - Define `TEST_DATABASE_URL` for a dedicated test Postgres database (e.g., `postgres://user:pass@localhost:5432/testdb`). When present, test runners use this value, keeping test data isolated from the remote database.
 
 `git` must be available in your PATH for repository cloning.
+
+### Memory storage mode
+
+Setting `STORAGE_MODE=memory` launches the API using JSON files loaded into RAM
+instead of Postgres. Seed data lives in `server/data/seed.json`. Because changes
+aren't persisted, restart the server to reset to the contents of that file.
 
 ## Self-Contained Tools
 

@@ -1133,7 +1133,11 @@ export class DatabaseSiteStorage implements ISiteStorage {
   }
 }
 
-export const siteStorage = new DatabaseSiteStorage();
+export let siteStorage: ISiteStorage = new DatabaseSiteStorage();
+
+export function setSiteStorage(storage: ISiteStorage) {
+  siteStorage = storage;
+}
 
 export async function updateSiteLead(
   leadId: string,

@@ -1,0 +1,21 @@
+{
+  "sites": [
+    {
+      "id": "demo-id",
+      "siteId": "demo",
+      "name": "Demo Site",
+      "siteType": "standard",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "siteLeads": [],
+  "siteAnalytics": [],
+  "siteManagers": [],
+  "legalDisclaimers": [],
+  "siteDisclaimers": [],
+  "siteSlides": [],
+  "globalSlides": [],
+  "siteSections": [],
+  "siteMemberships": []
+}
