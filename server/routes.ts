@@ -9,6 +9,8 @@ import { insertSiteLeadSchema } from "@shared/site-schema";
 import { createHubSpotContact, submitToHubSpotForm, testHubSpotConnection, type HubSpotContact } from "./hubspot";
 import { registerSiteRoutes } from "./site-routes";
 import { functionIndex } from "./function-index";
+import { db } from "./db";
+import { sql } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log('Registering routes...');
@@ -30,6 +32,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   } else {
     console.log('HubSpot API key not found - lead sync disabled');
   }
+
+  // Basic health check endpoint to verify DB connectivity
+  app.get("/api/health", async (_req, res) => {
+    try {
+      await db.execute(sql`select 1`);
+      res.json({ ok: true });
+    } catch {
+      res.status(500).json({ ok: false });
+    }
+  });
 
   // Lead generation endpoint (for main site)
   app.post("/api/leads", async (req, res, next) => {
