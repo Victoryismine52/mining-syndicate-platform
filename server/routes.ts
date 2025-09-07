@@ -11,6 +11,7 @@ import { registerSiteRoutes } from "./site-routes";
 import { functionIndex } from "./function-index";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
+import rateLimit from "express-rate-limit";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log('Registering routes...');
@@ -44,7 +45,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Lead generation endpoint (for main site)
-  app.post("/api/leads", async (req, res, next) => {
+  const leadsLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 2,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  app.post("/api/leads", leadsLimiter, async (req, res, next) => {
     try {
       // Extract email as identifier and store dynamic form data
       const { email, siteId = 'main-site', ...formData } = req.body;
@@ -57,11 +65,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const leadData = insertSiteLeadSchema.parse({
         email,
         identifier: email, // Use email as primary identifier for aggregation
-        firstName: formData.firstName || null,
-        lastName: formData.lastName || null,
-        phone: formData.phone || null,
-        company: formData.company || null,
-        message: formData.message || null,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        company: formData.company,
+        message: formData.message,
         formType: formData.formType || 'contact',
         formData: formData, // Store all dynamic form data
         siteId
