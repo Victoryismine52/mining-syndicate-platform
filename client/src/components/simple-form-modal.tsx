@@ -21,6 +21,7 @@ interface DynamicFormModalProps {
   formTemplate: any;
   siteId: string;
   colorTheme?: any;
+  selectedLanguage?: string;
 }
 
 // Helper function for form icons
@@ -40,7 +41,7 @@ const getFormIcon = (iconName: string) => {
   }
 };
 
-export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }: DynamicFormModalProps) {
+export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, selectedLanguage = 'en' }: DynamicFormModalProps) {
   const { toast } = useToast();
   const [showSuccess, setShowSuccess] = useState(false);
   
@@ -351,11 +352,10 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
       return null;
     }
     
-    // Get language from formAssignment or default to 'en'
-    const selectedLanguage = 'en'; // TODO: Get from site form assignment
-    
+    const language = selectedLanguage || 'en';
+
     // Use translations if available, otherwise fall back to default
-    const translation = field.fieldLibrary.translations?.[selectedLanguage];
+    const translation = field.fieldLibrary.translations?.[language];
     const label = field.customLabel || translation?.label || field.fieldLibrary.label || fieldName;
     const placeholder = field.placeholder || translation?.placeholder || field.fieldLibrary.defaultPlaceholder || '';
     const description = translation?.description || field.fieldLibrary.defaultValidation?.description;
