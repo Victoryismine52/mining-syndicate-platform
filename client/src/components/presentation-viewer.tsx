@@ -206,6 +206,7 @@ function DynamicFormsSlide({ forms, siteId, onPrevSlide, onNextSlide }: DynamicF
             formTemplate={selectedFormAssignment.formTemplate}
             siteId={siteId}
             colorTheme={getFormColor(selectedFormAssignment.overrideConfig?.color || selectedFormAssignment.formTemplate.config?.color || 'blue')}
+            selectedLanguage={selectedFormAssignment.selectedLanguage}
           />
         )}
 

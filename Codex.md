@@ -2,6 +2,7 @@
 
 ## Summary of Recent Changes
 
+- 2025-09-07: resolved form field language from each site's configuration, updating dynamic and simple form modals to honor translations with graceful English fallbacks; improves localized UX across sites.
 - 2025-09-07: added `.env.example` and documented environment variables to improve developer onboarding; all teams must keep the sample file updated when new variables are introduced.
 - Enabled unauthenticated retrieval of form template fields and sanitized the response to expose only public field data, excluding internal attributes like system flags and timestamps.
 - Added a unit test confirming the endpoint’s sanitized output and public accessibility without authentication.
