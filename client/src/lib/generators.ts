@@ -1,4 +1,5 @@
 import { CreateTaskInput } from "../../shared/schema";
+export type { TaskRepo } from "../../shared/taskRepo";
 
 export function downloadText(filename: string, content: string) {
   const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -20,21 +21,24 @@ export const ${constName}: CreateTaskInput = ${JSON.stringify(task, null, 2)} as
 export function genExpressStub(route: string) {
   return `// Auto-generated minimal Express route stub
 import { Router } from "express";
-const r = Router();
+import type { TaskRepo } from "./taskRepo";
 
-// TODO: wire to Snowflake procs or your TaskRepo
-r.post("${'${route}'}", async (req, res) => {
-  try {
-    // const input = req.body; validate if needed
-    // const result = await TaskRepo.create(input);
-    res.status(201).json({ ok: true /*, result */ });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "failed" });
-  }
-});
+export default function makeRoute(repo: TaskRepo) {
+  const r = Router();
 
-export default r;
+  r.post("${route}", async (req, res) => {
+    try {
+      // const input = req.body; validate if needed
+      const result = await repo.create(req.body);
+      res.status(201).json({ ok: true, result });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: "failed" });
+    }
+  });
+
+  return r;
+}
 `;
 }
 
