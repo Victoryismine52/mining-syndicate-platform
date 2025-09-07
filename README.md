@@ -37,6 +37,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials for login. |
 | `GOOGLE_OAUTH_CALLBACK_URL` | Callback URL used by Google during OAuth. |
 | `DATABASE_URL` | Postgres connection string for application data and sessions. |
+| `TEST_DATABASE_URL` | Overrides `DATABASE_URL` during tests for an isolated database. |
 | `SESSION_SECRET` | Secret used to sign Express session cookies. |
 | `HUBSPOT_API_KEY` | Token for submitting forms to HubSpot. |
 | `PORT` | Port for the combined Express and Vite servers (defaults to `5000`). |
@@ -49,6 +50,12 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `REPL_ID` | Replit workspace identifier required for OIDC. |
 | `REPLIT_DEV_DOMAIN` | Default Replit domain during development. |
 | `REPLIT_DOMAINS` | Comma-separated list of domains allowed for OIDC callbacks. |
+
+
+Switch between remote and local databases by editing `.env`:
+
+- Set `DATABASE_URL` to your remote Postgres instance.
+- Define `TEST_DATABASE_URL` for local or in-memory databases when running tests. When present, test runners use this value, keeping test data isolated from the remote database.
 
 `git` must be available in your PATH for repository cloning.
 
