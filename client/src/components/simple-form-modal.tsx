@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import { ExternalLink, Mail, Users, Phone, FileText, Info, DollarSign, Pickaxe, Star, Heart, Shield, Plus, Minus, HelpCircle } from 'lucide-react';
 import { SuccessConfirmation } from '@/components/success-confirmation';
+import { validationMessages } from '@/lib/validationMessages';
 
 interface DynamicFormModalProps {
   isOpen: boolean;
@@ -68,19 +69,20 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
       return z.object({});
     }
 
+    const msgs = validationMessages[selectedLanguage] || validationMessages.en;
     let schemaFields: any = {};
-    
+
     formFields.forEach((field) => {
       try {
         const fieldName = field.fieldLibrary?.name;
         if (!fieldName) return;
 
         let fieldSchema: any;
-        
+
         // Handle extensible_list fields
         if (field.fieldLibrary.dataType === 'extensible_list') {
           if (field.isRequired) {
-            fieldSchema = z.array(z.string()).min(1, "At least one item is required");
+            fieldSchema = z.array(z.string()).min(1, msgs.atLeastOne);
           } else {
             fieldSchema = z.array(z.string()).optional();
           }
@@ -91,38 +93,38 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
           if (options.length > 0) {
             if (field.isRequired) {
               fieldSchema = z.string()
-                .min(1, "Please select an option")
+                .min(1, msgs.selectOption)
                 .refine(
                   (value) => options.includes(value),
-                  { message: "Please select one of the available options" }
+                  { message: msgs.selectOneOption }
                 );
             } else {
               fieldSchema = z.string()
                 .optional()
                 .refine(
                   (value) => !value || value === "" || options.includes(value),
-                  { message: "Please select one of the available options" }
+                  { message: msgs.selectOneOption }
                 );
             }
           } else {
-            fieldSchema = field.isRequired ? z.string().min(1, "This field is required") : z.string().optional();
+            fieldSchema = field.isRequired ? z.string().min(1, msgs.required) : z.string().optional();
           }
         } else {
           // Handle standard string fields
           fieldSchema = z.string();
-          
+
           // Apply validation based on field type
           if (field.fieldLibrary.dataType === 'email') {
-            fieldSchema = z.string().email("Please enter a valid email address");
+            fieldSchema = z.string().email(msgs.invalidEmail);
           } else if (field.fieldLibrary.dataType === 'phone') {
-            fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
+            fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, msgs.invalidPhone);
           } else if (field.fieldLibrary.dataType === 'number') {
-            fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
+            fieldSchema = z.string().regex(/^\d+$/, msgs.invalidNumber);
           }
 
           // Apply required validation
           if (field.isRequired) {
-            fieldSchema = fieldSchema.min(1, "This field is required");
+            fieldSchema = fieldSchema.min(1, msgs.required);
           } else {
             fieldSchema = fieldSchema.optional();
           }
@@ -135,7 +137,7 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
     });
 
     return z.object(schemaFields);
-  }, [formFields]);
+  }, [formFields, selectedLanguage]);
 
   // Create default values based on form fields - memoized
   const defaultValues = useMemo(() => {

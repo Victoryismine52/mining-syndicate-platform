@@ -4,6 +4,7 @@
 
 ## Summary of Recent Changes
 
+2025-09-08: Localized form modals using site language – fetch preferred language and translate labels, placeholders, and validation errors – non-English users see correct text; Replit must supply translations for new locales.
 2025-09-07: Introduced GitHub Actions CI with caching – automate tests and builds to gate merges – Replit, Code-Explorer, and Card-Builder gain faster feedback and protected main branch.
 2025-09-07: Honored site-specific form field translations – ensure forms reflect language configuration with fallbacks – improved localized UX across sites.
 2025-09-07: Added `.env.example` documenting environment variables – guide onboarding and track required variables – teams maintain sample file to stay synced.

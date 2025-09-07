@@ -29,6 +29,7 @@ import { YouTubeCard } from '@/components/youtube-card';
 import { useAuth } from '@/hooks/use-auth';
 import { useAnalyticsConsent } from '@/components/analytics-consent-modal';
 import type { Site } from '@shared/site-schema';
+import { validationMessages } from '@/lib/validationMessages';
 
 const ANALYTICS_PROVIDER = import.meta.env.VITE_ANALYTICS_PROVIDER || 'internal';
 
@@ -127,7 +128,7 @@ interface DynamicFormModalProps {
   selectedLanguage?: string;
 }
 
-function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, selectedLanguage = 'en' }: DynamicFormModalProps) {
+export function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, selectedLanguage = 'en' }: DynamicFormModalProps) {
   const { toast } = useToast();
   const [showSuccess, setShowSuccess] = useState(false);
   
@@ -172,8 +173,9 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, s
 
   // Memoize dynamic schema based on actual fields
   const formSchema = useMemo(() => {
+    const msgs = validationMessages[selectedLanguage] || validationMessages.en;
     let schemaFields: any = {};
-    
+
     formFields.forEach((field, index) => {
       if (!field?.fieldLibrary || !field.fieldLibrary.name) {
         console.warn('Skipping malformed field entry', { index, field });
@@ -194,15 +196,15 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, s
 
           // Apply min constraint BEFORE refine
           if (field.isRequired && minItems > 0) {
-            fieldSchema = fieldSchema.min(minItems, `Please select at least ${minItems} option${minItems > 1 ? 's' : ''}`);
+            fieldSchema = fieldSchema.min(minItems, msgs.selectOption);
           } else if (field.isRequired) {
-            fieldSchema = fieldSchema.min(1, "Please select at least one option");
+            fieldSchema = fieldSchema.min(1, msgs.selectOption);
           }
 
           // Apply refine constraint AFTER min
           fieldSchema = fieldSchema.refine(
             (values: string[]) => values.every((value: string) => options.includes(value)),
-            { message: "Please select only from the available options" }
+            { message: msgs.selectOneOption }
           );
         } else {
           // For array fields without predefined options (extensible lists)
@@ -210,9 +212,9 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, s
           fieldSchema = z.array(z.string());
 
           if (field.isRequired && minItems > 0) {
-            fieldSchema = fieldSchema.min(minItems, `Please add at least ${minItems} item${minItems > 1 ? 's' : ''}`);
+            fieldSchema = fieldSchema.min(minItems, msgs.atLeastOne);
           } else if (field.isRequired) {
-            fieldSchema = fieldSchema.min(1, "Please add at least one item");
+            fieldSchema = fieldSchema.min(1, msgs.atLeastOne);
           }
         }
       }
@@ -223,10 +225,10 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, s
           if (field.isRequired) {
             // For required radio fields, ensure a value is selected and it's valid
             fieldSchema = z.string()
-              .min(1, "Please select an option")
+              .min(1, msgs.selectOption)
               .refine(
                 (value) => options.includes(value),
-                { message: "Please select one of the available options" }
+                { message: msgs.selectOneOption }
               );
           } else {
             // For optional radio fields
@@ -234,22 +236,22 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, s
               .optional()
               .refine(
                 (value) => !value || value === "" || options.includes(value),
-                { message: "Please select one of the available options" }
+                { message: msgs.selectOneOption }
               );
           }
         } else {
-          fieldSchema = field.isRequired ? z.string().min(1, "This field is required") : z.string().optional();
+          fieldSchema = field.isRequired ? z.string().min(1, msgs.required) : z.string().optional();
         }
       }
       // Handle all other field types (string-based)
       else {
         // Start with basic string validation
         if (field.fieldLibrary.dataType === 'email') {
-          fieldSchema = z.string().email("Please enter a valid email address");
+          fieldSchema = z.string().email(msgs.invalidEmail);
         } else if (field.fieldLibrary.dataType === 'phone') {
-          fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, "Please enter a valid phone number");
+          fieldSchema = z.string().regex(/^[\+]?[1-9][\d]{0,14}$/, msgs.invalidPhone);
         } else if (field.fieldLibrary.dataType === 'number') {
-          fieldSchema = z.string().regex(/^\d+$/, "Please enter a valid number");
+          fieldSchema = z.string().regex(/^\d+$/, msgs.invalidNumber);
         } else {
           fieldSchema = z.string();
         }
@@ -257,19 +259,19 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, s
         // Apply custom validation
         if (field.customValidation) {
           if (field.customValidation.minLength) {
-            fieldSchema = fieldSchema.min(field.customValidation.minLength, `Minimum ${field.customValidation.minLength} characters required`);
+            fieldSchema = fieldSchema.min(field.customValidation.minLength, msgs.required);
           }
           if (field.customValidation.maxLength) {
-            fieldSchema = fieldSchema.max(field.customValidation.maxLength, `Maximum ${field.customValidation.maxLength} characters allowed`);
+            fieldSchema = fieldSchema.max(field.customValidation.maxLength, msgs.required);
           }
           if (field.customValidation.pattern) {
-            fieldSchema = fieldSchema.regex(new RegExp(field.customValidation.pattern), "Please enter a valid format");
+            fieldSchema = fieldSchema.regex(new RegExp(field.customValidation.pattern), msgs.invalidNumber);
           }
         }
 
         // Apply required validation
         if (field.isRequired) {
-          fieldSchema = fieldSchema.min(1, "This field is required");
+          fieldSchema = fieldSchema.min(1, msgs.required);
         } else {
           fieldSchema = fieldSchema.optional();
         }
@@ -279,7 +281,7 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, s
     });
 
     return z.object(schemaFields);
-  }, [formFields]);
+  }, [formFields, selectedLanguage]);
 
   // Memoize default values based on form fields
   const defaultValues = useMemo(() => {
@@ -1394,7 +1396,7 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
           formTemplate={selectedFormAssignment.formTemplate}
           siteId={siteId || ''}
           colorTheme={getFormColor(selectedFormAssignment.overrideConfig?.color || selectedFormAssignment.formTemplate.config?.color || 'blue')}
-          selectedLanguage={selectedFormAssignment.selectedLanguage}
+          selectedLanguage={selectedFormAssignment.selectedLanguage || siteLanguage}
         />
       )}
 
@@ -1444,6 +1446,8 @@ export function DynamicSite() {
     queryKey: [`/api/sites/${siteId}`],
     enabled: !!siteId,
   });
+
+  const siteLanguage = site?.landingConfig?.language || 'en';
 
   // Query to check if user is a site manager for this site
   const { data: siteManagers = [], isLoading: managersLoading } = useQuery<any[]>({
