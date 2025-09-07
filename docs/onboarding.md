@@ -19,11 +19,16 @@ This guide covers setting up the project locally, running tests, and establishin
    ```
    Required packages include `libnss3`, `libatk-1.0-0`, and `fonts-liberation`.
    > **Note:** A `403 Domain forbidden` error during `npx playwright install` usually means the CDN is blocked or requires credentials, while `403`s during test execution typically come from anti-bot measures on the target website.
-4. **Start the development servers**
+4. **Start the database**
+   ```bash
+   npm run db:up
+   ```
+   Uses port `5432`. Run `npm run db:down` to stop it.
+5. **Start the development servers**
    ```bash
    npm run dev
    ```
-   Visit `http://localhost:5000` to view the app.
+   Runs on port `5000`. Visit `http://localhost:5000` to view the app.
 
 ## Quick start with mock auth
 
@@ -32,7 +37,11 @@ This guide covers setting up the project locally, running tests, and establishin
    cp .env.example .env
    ```
 2. Set `AUTH_DISABLED=true` in `.env` to bypass OAuth.
-3. Start your local database if the app uses one.
+3. Start the local Postgres service.
+   ```bash
+   npm run db:up
+   ```
+   Uses port `5432`. Stop with `npm run db:down` when finished.
 4. Run the development server.
    ```bash
    npm run dev

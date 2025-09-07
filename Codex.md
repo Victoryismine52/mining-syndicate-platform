@@ -4,6 +4,7 @@
 
 ## Summary of Recent Changes
 
+2025-09-07: Added dockerized Postgres with db:up/down scripts – standardize local DB setup – enables cross-team isolated testing.
 2025-09-07: Removed sqlite references and documented Postgres URI requirements – clarify mandatory Postgres backend – prevents misconfiguration with unsupported databases.
 2025-09-09: Added AUTH_DISABLED flag for mock sessions – support local development without OAuth – developers can bypass login.
 
