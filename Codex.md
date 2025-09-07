@@ -23,3 +23,4 @@
 2025-09-07: Added form refresh controls and offline safeguards – allow refetching form fields and block submissions while offline – Replit must display the new refresh button and offline warnings in modals.
 2025-09-07: Added `TaskRepo` interface and Express stub generator – decouple task creation and allow repo injection – teams can swap in Snowflake or in-memory implementations as needed.
 2025-09-07: Deployed analytics consent modal with timestamped storage and server validation – capture explicit user permission before logging – Replit and Card-Builder pipelines only ingest opted-in data.
+2025-09-07: Added `TEST_DATABASE_URL` for test database isolation – avoid cross-environment data pollution – Playwright tests run against ephemeral databases.
