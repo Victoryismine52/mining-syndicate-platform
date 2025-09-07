@@ -168,7 +168,11 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   const createDynamicSchema = () => {
     let schemaFields: any = {};
     
-    formFields.forEach((field) => {
+    formFields.forEach((field, index) => {
+      if (!field?.fieldLibrary || !field.fieldLibrary.name) {
+        console.warn('Skipping malformed field entry', { index, field });
+        return;
+      }
       const fieldName = field.fieldLibrary.name;
       let fieldSchema: any;
       
@@ -275,7 +279,11 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   const createDefaultValues = () => {
     let defaultValues: any = {};
     
-    formFields.forEach((field) => {
+    formFields.forEach((field, index) => {
+      if (!field?.fieldLibrary || !field.fieldLibrary.name) {
+        console.warn('Skipping malformed field entry', { index, field });
+        return;
+      }
       const fieldName = field.fieldLibrary.name;
       // Array fields should default to empty array, others to empty string
       defaultValues[fieldName] = field.fieldLibrary.dataType === 'array' ? [] : "";
