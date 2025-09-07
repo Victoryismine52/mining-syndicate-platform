@@ -131,6 +131,20 @@ interface DynamicFormModalProps {
 export function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, selectedLanguage = 'en' }: DynamicFormModalProps) {
   const { toast } = useToast();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   
   const config = formTemplate.config || {};
 
@@ -160,11 +174,16 @@ export function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorT
                 : "An unexpected error occurred while loading the form."}
             </DialogDescription>
           </DialogHeader>
+          {!isOnline && (
+            <div className="bg-yellow-500 text-black p-2 rounded text-center mb-4" data-testid="offline-warning">
+              You are offline. Form submissions are disabled.
+            </div>
+          )}
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button onClick={() => refetch()}>Retry</Button>
+            <Button onClick={() => refetch()} data-testid="refresh-form-button">Refresh Form</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -763,6 +782,28 @@ export function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorT
           </DialogHeader>
 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                data-testid="refresh-form-button"
+                className="text-slate-300"
+              >
+                Refresh Form
+              </Button>
+            </div>
+
+            {!isOnline && (
+              <div
+                className="bg-yellow-500 text-black p-2 rounded text-center mb-4"
+                data-testid="offline-warning"
+              >
+                You are offline. Form submissions are disabled.
+              </div>
+            )}
+
             {/* Loading State */}
             {isLoading && (
               <div className="flex items-center justify-center py-8">
@@ -803,7 +844,12 @@ export function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorT
               </Button>
               <Button
                 type="submit"
-                disabled={submitFormMutation.isPending}
+                disabled={
+                  submitFormMutation.isPending ||
+                  isLoading ||
+                  formFields.length === 0 ||
+                  !isOnline
+                }
                 className={`${colorTheme?.button || 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'} text-white font-semibold min-w-[120px] transition-all duration-300`}
               >
                 {submitFormMutation.isPending ? 'Submitting...' : (config.buttonText || 'Submit')}
