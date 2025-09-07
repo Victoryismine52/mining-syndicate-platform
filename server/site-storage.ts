@@ -1134,3 +1134,10 @@ export class DatabaseSiteStorage implements ISiteStorage {
 }
 
 export const siteStorage = new DatabaseSiteStorage();
+
+export async function updateSiteLead(
+  leadId: string,
+  hubspotContactId: string
+) {
+  return siteStorage.updateSiteLead(leadId, { hubspotContactId });
+}
