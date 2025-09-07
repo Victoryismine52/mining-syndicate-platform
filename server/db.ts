@@ -1,5 +1,7 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
+import { Pool as NeonPool, neonConfig } from "@neondatabase/serverless";
+import { drizzle as neonDrizzle } from "drizzle-orm/neon-serverless";
+import { Pool as PgPool } from "pg";
+import { drizzle as pgDrizzle } from "drizzle-orm/node-postgres";
 import ws from "ws";
 import * as schema from "@shared/schema";
 import * as siteSchema from "@shared/site-schema";
@@ -17,5 +19,22 @@ if (!connectionString) {
   );
 }
 
-export const pool = new Pool({ connectionString });
-export const db = drizzle({ client: pool, schema: { ...schema, ...siteSchema } });
+const url = new URL(connectionString);
+const isLocal = ["localhost", "127.0.0.1"].includes(url.hostname);
+
+const schemas = { ...schema, ...siteSchema };
+
+let pool: NeonPool | PgPool;
+let db:
+  | ReturnType<typeof neonDrizzle>
+  | ReturnType<typeof pgDrizzle>;
+
+if (isLocal) {
+  pool = new PgPool({ connectionString });
+  db = pgDrizzle(pool, { schema: schemas });
+} else {
+  pool = new NeonPool({ connectionString });
+  db = neonDrizzle({ client: pool, schema: schemas });
+}
+
+export { pool, db };
