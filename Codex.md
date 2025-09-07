@@ -4,6 +4,7 @@
 
 ## Summary of Recent Changes
 
+2025-09-09: Added in-memory site storage mode – dev-only JSON seed storage; resets on restart – allows running without Postgres.
 2025-09-07: Switched database driver based on URL host – local DB support – enables all teams to run against local Postgres without Neon.
 
 2025-09-07: Added db:migrate script and test-aware drizzle config – streamline schema updates across environments – teams run migrations consistently without polluting production data.

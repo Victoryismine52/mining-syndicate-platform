@@ -51,6 +51,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `REPL_ID` | Replit workspace identifier required for OIDC. |
 | `REPLIT_DEV_DOMAIN` | Default Replit domain during development. |
 | `REPLIT_DOMAINS` | Comma-separated list of domains allowed for OIDC callbacks. |
+| `STORAGE_MODE` | Set to `memory` to use in-memory JSON storage for sites. |
 
 
 Switch between Postgres databases by editing `.env`:
@@ -69,6 +70,12 @@ npm run db:seed
 This command applies pending schema changes and inserts records from `server/seeds/`.
 
 `git` must be available in your PATH for repository cloning.
+
+### Memory storage mode
+
+Setting `STORAGE_MODE=memory` launches the API using JSON files loaded into RAM
+instead of Postgres. Seed data lives in `server/data/seed.json`. Because changes
+aren't persisted, restart the server to reset to the contents of that file.
 
 ## Self-Contained Tools
 

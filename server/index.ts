@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setSiteStorage } from "./site-storage";
 
 const BASE_DEV_URL = process.env.BASE_DEV_URL || "http://0.0.0.0:5000/api";
 const BASE_CODEX_URL = process.env.BASE_CODEX_URL || `https://conduit.replit.app/api`;
@@ -64,6 +65,12 @@ app.use((req, res, next) => {
 
 
 (async () => {
+  if (process.env.STORAGE_MODE === 'memory') {
+    const { memorySiteStorage } = await import('./memory-storage');
+    setSiteStorage(memorySiteStorage);
+    log('Using in-memory site storage');
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
