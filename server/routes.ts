@@ -483,10 +483,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Form Template Fields routes
-  app.get("/api/form-templates/:formTemplateId/fields", requireAuth, async (req, res, next) => {
+  app.get("/api/form-templates/:formTemplateId/fields", async (req, res, next) => {
     try {
       const fields = await storage.getFormTemplateFields(req.params.formTemplateId);
-      res.json(fields);
+
+      // Sanitize response to expose only public field data
+      const sanitizedFields = fields.map(field => ({
+        id: field.id,
+        formTemplateId: field.formTemplateId,
+        fieldLibraryId: field.fieldLibraryId,
+        isRequired: field.isRequired,
+        order: field.order,
+        customValidation: field.customValidation,
+        customLabel: field.customLabel,
+        placeholder: field.placeholder,
+        fieldLibrary: {
+          id: field.fieldLibrary.id,
+          name: field.fieldLibrary.name,
+          label: field.fieldLibrary.label,
+          dataType: field.fieldLibrary.dataType,
+          defaultPlaceholder: field.fieldLibrary.defaultPlaceholder,
+          defaultValidation: field.fieldLibrary.defaultValidation,
+          translations: field.fieldLibrary.translations,
+        }
+      }));
+
+      res.json(sanitizedFields);
     } catch (error) {
       next(error);
     }
