@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, publicApiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import { ExternalLink, Mail, Users, Phone, FileText, Info, DollarSign, Pickaxe, Star, Heart, Shield, Plus, Minus, HelpCircle } from 'lucide-react';
@@ -47,11 +47,18 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
   const config = formTemplate.config || {};
 
   // Fetch the actual form template fields
-  const { data: formFields = [], isLoading, isError, error } = useQuery<any[]>({
-    queryKey: [`/api/form-templates/${formTemplate.id}/fields`],
+  const formFieldsUrl = `/api/form-templates/${formTemplate.id}/fields`;
+  const {
+    data: formFields = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery<any[]>({
+    queryKey: [formFieldsUrl],
     enabled: !!formTemplate.id && isOpen,
     retry: 2, // Retry failed requests
     retryDelay: 1000, // Wait 1 second between retries
+    queryFn: () => publicApiRequest('GET', formFieldsUrl).then((res) => res.json()),
   });
 
   // Create dynamic form schema based on actual fields - memoized to prevent recreations
