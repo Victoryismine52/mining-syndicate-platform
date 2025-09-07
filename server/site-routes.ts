@@ -7,7 +7,7 @@ import { qrGenerator } from "./qr-generator";
 import { submitToHubSpotForm } from "./hubspot";
 import { createHubSpotService, type ContactData } from "./hubspot-service";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, insertSiteDisclaimerSchema, insertSiteSlideSchema, insertGlobalSlideSchema } from "@shared/site-schema";
+import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, insertSiteDisclaimerSchema, insertSiteSlideSchema, insertGlobalSlideSchema, insertSiteAnalyticsSchema } from "@shared/site-schema";
 import { checkSiteAccess, requireAdmin } from "./site-access-control";
 import { isAuthenticated } from "./google-auth";
 import { z } from "zod";
@@ -395,6 +395,26 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
       res.status(500).json({ error: "Failed to submit lead" });
+    }
+  });
+
+  // Track analytics events for a site
+  app.post("/api/sites/:siteId/analytics", async (req, res, next) => {
+    try {
+      const { siteId } = req.params;
+      const analyticsData = insertSiteAnalyticsSchema.parse({
+        siteId,
+        eventType: req.body.eventType || 'page_view',
+        eventData: req.body.eventData || {},
+        sessionId: req.body.sessionId,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        referrer: req.get('Referrer'),
+      });
+      const analytics = await siteStorage.createSiteAnalytics(analyticsData);
+      res.status(201).json(analytics);
+    } catch (error) {
+      next(error);
     }
   });
 

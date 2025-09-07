@@ -29,6 +29,8 @@ import { YouTubeCard } from '@/components/youtube-card';
 import { useAuth } from '@/hooks/use-auth';
 import type { Site } from '@shared/site-schema';
 
+const ANALYTICS_PROVIDER = import.meta.env.VITE_ANALYTICS_PROVIDER || 'internal';
+
 // Helper function for form icons
 const getFormIcon = (iconName: string) => {
   switch (iconName) {
@@ -1463,9 +1465,18 @@ export function DynamicSite() {
   // Track page view analytics
   useEffect(() => {
     if (site && isAuthenticated) {
-      // TODO: Implement analytics tracking
+      const consentGiven = localStorage.getItem('analytics-consent') === 'granted';
+      const doNotTrack = navigator.doNotTrack === '1';
+      if (ANALYTICS_PROVIDER === 'internal' && consentGiven && !doNotTrack) {
+        apiRequest('POST', `/api/sites/${siteId}/analytics`, {
+          eventType: 'page_view',
+          eventData: { path: window.location.pathname },
+        }).catch((err) => {
+          console.error('Analytics tracking failed', err);
+        });
+      }
     }
-  }, [site, isAuthenticated]);
+  }, [site, isAuthenticated, siteId]);
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
