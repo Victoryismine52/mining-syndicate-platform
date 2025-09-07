@@ -45,6 +45,20 @@ const getFormIcon = (iconName: string) => {
 export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme, selectedLanguage = 'en' }: DynamicFormModalProps) {
   const { toast } = useToast();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   
   const config = formTemplate.config || {};
 
@@ -55,6 +69,7 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery<any[]>({
     queryKey: [formFieldsUrl],
     enabled: !!formTemplate.id && isOpen,
@@ -626,6 +641,28 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
           </DialogHeader>
 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                data-testid="refresh-form-button"
+                className="text-slate-300"
+              >
+                Refresh Form
+              </Button>
+            </div>
+
+            {!isOnline && (
+              <div
+                className="bg-yellow-500 text-black p-2 rounded text-center mb-4"
+                data-testid="offline-warning"
+              >
+                You are offline. Form submissions are disabled.
+              </div>
+            )}
+
             {/* Loading State */}
             {isLoading && (
               <div className="flex items-center justify-center py-8">
@@ -644,11 +681,12 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
                 </p>
                 <div className="flex justify-center mt-4">
                   <Button
-                    onClick={() => window.location.reload()}
+                    onClick={() => refetch()}
                     variant="outline"
                     className="border-red-500 text-red-400 hover:bg-red-500/10"
+                    data-testid="refresh-form-button"
                   >
-                    Refresh Page
+                    Refresh Form
                   </Button>
                 </div>
               </div>
@@ -704,7 +742,12 @@ export function SimpleFormModal({ isOpen, onClose, formTemplate, siteId, colorTh
                 </Button>
                 <Button
                   type="submit"
-                  disabled={submitFormMutation.isPending || isLoading || formFields.length === 0}
+                  disabled={
+                    submitFormMutation.isPending ||
+                    isLoading ||
+                    formFields.length === 0 ||
+                    !isOnline
+                  }
                   className={`${colorTheme?.button || 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'} text-white font-semibold min-w-[120px] transition-all duration-300`}
                 >
                   {submitFormMutation.isPending ? 'Submitting...' : (config.buttonText || 'Submit')}

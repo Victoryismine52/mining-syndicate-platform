@@ -17,5 +17,6 @@
 2025-09-07: Introduced `publicApiRequest` helper for cookie-free field fetches – support unauthenticated retrieval – consistent public API usage in modals.
 2025-09-07: Persisted HubSpot contact IDs on site leads via `updateSiteLead` – CRM ID persistence – marketing analytics can cross-reference leads with HubSpot.
 2025-09-07: Enabled internal analytics tracking with consent checks – centralize event logging while respecting user consent – Replit and Card-Builder must configure `VITE_ANALYTICS_PROVIDER` before collecting analytics.
+2025-09-07: Added form refresh controls and offline safeguards – allow refetching form fields and block submissions while offline – Replit must display the new refresh button and offline warnings in modals.
 2025-09-07: Added `TaskRepo` interface and Express stub generator – decouple task creation and allow repo injection – teams can swap in Snowflake or in-memory implementations as needed.
 2025-09-07: Deployed analytics consent modal with timestamped storage and server validation – capture explicit user permission before logging – Replit and Card-Builder pipelines only ingest opted-in data.

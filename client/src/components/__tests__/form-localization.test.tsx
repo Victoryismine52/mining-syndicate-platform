@@ -1,7 +1,6 @@
 /** @vitest-environment jsdom */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import '@testing-library/jest-dom/vitest';
 import { SimpleFormModal } from '../simple-form-modal';
 import { DynamicFormModal } from '../../pages/dynamic-site';
 
@@ -50,8 +49,8 @@ describe('form localization', () => {
     );
 
     const input = await screen.findByLabelText(/Correo Electrónico/i);
-    expect(input).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('tu@ejemplo.com')).toBeInTheDocument();
+    expect(input).toBeTruthy();
+    expect(screen.getByPlaceholderText('tu@ejemplo.com')).toBeTruthy();
   });
 
   test('DynamicFormModal renders Spanish labels and messages', async () => {
@@ -68,6 +67,6 @@ describe('form localization', () => {
     );
 
     const input = await screen.findByLabelText(/Correo Electrónico/i);
-    expect(input).toBeInTheDocument();
+    expect(input).toBeTruthy();
   });
 });
