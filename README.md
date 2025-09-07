@@ -58,6 +58,16 @@ Switch between Postgres databases by editing `.env`:
 - Set `DATABASE_URL` to your primary Postgres instance.
 - Define `TEST_DATABASE_URL` for a dedicated test Postgres database (e.g., `postgres://user:pass@localhost:5432/testdb`). When present, test runners use this value, keeping test data isolated from the remote database.
 
+### Database migrations and seeds
+
+Run migrations and load baseline data with:
+
+```
+npm run db:seed
+```
+
+This command applies pending schema changes and inserts records from `server/seeds/`.
+
 `git` must be available in your PATH for repository cloning.
 
 ## Self-Contained Tools
