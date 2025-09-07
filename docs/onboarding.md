@@ -22,6 +22,7 @@ This guide covers setting up the project locally, running tests, and establishin
 4. **Start the database**
    ```bash
    npm run db:up
+   npm run db:migrate
    ```
    Uses port `5432`. Run `npm run db:down` to stop it.
 5. **Start the development servers**
@@ -40,6 +41,7 @@ This guide covers setting up the project locally, running tests, and establishin
 3. Start the local Postgres service.
    ```bash
    npm run db:up
+   npm run db:migrate
    ```
    Uses port `5432`. Stop with `npm run db:down` when finished.
 4. Run the development server.
