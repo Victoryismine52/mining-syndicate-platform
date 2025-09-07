@@ -130,10 +130,39 @@ function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorTheme }:
   const config = formTemplate.config || {};
 
   // Fetch the actual form template fields
-  const { data: formFields = [], isLoading } = useQuery<any[]>({
+  const {
+    data: formFields = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<any[]>({
     queryKey: [`/api/form-templates/${formTemplate.id}/fields`],
     enabled: !!formTemplate.id && isOpen,
   });
+
+  if (isError) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Failed to load form</DialogTitle>
+            <DialogDescription>
+              {error instanceof Error
+                ? error.message
+                : "An unexpected error occurred while loading the form."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
+            <Button onClick={() => refetch()}>Retry</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   // Create dynamic form schema based on actual fields
   const createDynamicSchema = () => {
