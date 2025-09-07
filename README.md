@@ -54,7 +54,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `PORT` | Port for the combined Express and Vite servers (defaults to `5000`). |
 | `BASE_DEV_URL` | Local API base URL used during initialization. |
 | `BASE_CODEX_URL` | Fallback Codex API endpoint when the local API is unavailable. |
-| `REPLIT_SIDECAR_ENDPOINT` | Internal endpoint for object storage auth on Replit. |
+| `REPLIT_SIDECAR_ENDPOINT` | Internal endpoint for object storage auth on Replit; when absent, storage falls back to an in-memory filesystem for local development. |
 | `PUBLIC_OBJECT_SEARCH_PATHS` | Comma-separated object storage paths for public assets. |
 | `PRIVATE_OBJECT_DIR` | Object storage path for private uploads. |
 | `ISSUER_URL` | OIDC issuer for Replit authentication. |
@@ -85,7 +85,9 @@ This command applies pending schema changes and inserts records from `server/see
 
 Default presentation slides are listed in `server/seeds/slides.json` using relative
 file names. At runtime, the server prefixes each entry with the first path from
-`PUBLIC_OBJECT_SEARCH_PATHS` to build full URLs.
+`PUBLIC_OBJECT_SEARCH_PATHS` to build full URLs. If the Replit sidecar isn't
+available, uploads are stored in an in-memory filesystem and are cleared on
+restart.
 
 To customize slides for a deployment:
 
