@@ -8,6 +8,8 @@ See our key guides:
 - [Documentation Style Guide](docs/style-guide.md) outlines tone and formatting.
 
 Install CodeMirror and its language packages with `npm install` so code snippets can be highlighted.
+Afterwards, run `npx playwright install --with-deps` to fetch browsers and system libraries.
+Required packages include `libnss3`, `libatk-1.0-0`, and `fonts-liberation`.
 
 ## Team roster
 

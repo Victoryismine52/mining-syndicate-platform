@@ -13,7 +13,12 @@ This guide covers setting up the project locally, running tests, and establishin
    ```bash
    npm install
    ```
-3. **Start the development servers**
+3. **Install Playwright browsers and system dependencies**
+   ```bash
+   npx playwright install --with-deps
+   ```
+   Required packages include `libnss3`, `libatk-1.0-0`, and `fonts-liberation`.
+4. **Start the development servers**
    ```bash
    npm run dev
    ```
