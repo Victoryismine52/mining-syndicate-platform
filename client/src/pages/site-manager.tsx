@@ -244,6 +244,8 @@ export function SiteManager() {
       siteType: selectedSiteType,
       hubspotFormIds: {},
       landingConfig: {},
+      // Ensure new sites start as Coming Soon
+      isLaunched: false,
     };
 
     // Store presentation mode for later use
@@ -826,7 +828,7 @@ export function SiteManager() {
                             )}
                             <div className="flex items-center gap-2 px-2 py-1 rounded-full border border-slate-600 bg-slate-700/30">
                               <Switch
-                                checked={site.isLaunched !== false}
+                                checked={site.isLaunched === true}
                                 onCheckedChange={(checked) => 
                                   toggleLaunchedMutation.mutate({ 
                                     siteId: site.siteId, 
@@ -838,7 +840,7 @@ export function SiteManager() {
                                 data-testid={`switch-launched-${site.siteId}`}
                               />
                               <span className="text-xs font-medium text-slate-300">
-                                {site.isLaunched !== false ? '🚀 Launched' : '⏳ Coming Soon'}
+                                {site.isLaunched === true ? '🚀 Launched' : '⏳ Coming Soon'}
                               </span>
                             </div>
                           </div>

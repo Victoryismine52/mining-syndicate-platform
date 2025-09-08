@@ -1628,7 +1628,8 @@ export function DynamicSite() {
   }
 
   // Check if site is launched and user has access
-  if (site.isLaunched === false) {
+  // Treat only explicit true as launched; otherwise show Coming Soon (unless admin/manager)
+  if (site.isLaunched !== true) {
     // Wait for authentication and manager data to load before making access decision
     if (!user || managersLoading) {
       return (

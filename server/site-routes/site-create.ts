@@ -43,13 +43,15 @@ export function registerSiteCreateRoutes(app: Express) {
       }
 
       const validatedData = insertSiteSchema.parse(siteData);
+      // Ensure new sites are not launched by default
+      const toCreate = { ...validatedData, isLaunched: validatedData.isLaunched ?? false };
 
       const existingSite = await siteStorage.getSite(validatedData.siteId);
       if (existingSite) {
         return res.status(400).json({ error: "Site ID already exists" });
       }
 
-      const site = await siteStorage.createSite(validatedData);
+      const site = await siteStorage.createSite(toCreate);
       const mode = presentationMode || "default";
 
       if (validatedData.siteType === "pitch-site") {

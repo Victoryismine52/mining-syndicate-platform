@@ -68,6 +68,8 @@ export class MemorySiteStorage implements ISiteStorage {
   async createSite(site: InsertSite): Promise<Site> {
     const newSite: Site = {
       ...(site as any),
+      // Default to not launched unless explicitly set
+      isLaunched: (site as any).isLaunched ?? false,
       id: randomUUID(),
       createdAt: new Date(),
       updatedAt: new Date(),
