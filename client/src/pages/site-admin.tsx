@@ -416,6 +416,7 @@ export function SiteAdmin(props: SiteAdminProps) {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isAddManagerOpen, setIsAddManagerOpen] = useState(false);
+  const [isInviteManagerOpen, setIsInviteManagerOpen] = useState(false);
   const [isCreateSectionOpen, setIsCreateSectionOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<any>(null);
   const [isAttachDisclaimerOpen, setIsAttachDisclaimerOpen] = useState(false);
@@ -596,6 +597,28 @@ export function SiteAdmin(props: SiteAdminProps) {
       toast({
         title: "Success",
         description: "Site manager added successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const inviteManagerMutation = useMutation({
+    mutationFn: async (userEmail: string) => {
+      const response = await apiRequest('POST', `/api/sites/${siteId}/managers`, { userEmail });
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/sites/${siteId}/managers`] });
+      setIsInviteManagerOpen(false);
+      toast({
+        title: "Success",
+        description: "Invitation sent successfully",
       });
     },
     onError: (error) => {
@@ -923,6 +946,15 @@ export function SiteAdmin(props: SiteAdminProps) {
     const userEmail = formData.get('userEmail') as string;
     if (userEmail) {
       addManagerMutation.mutate(userEmail);
+    }
+  };
+
+  const handleInviteManager = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const userEmail = formData.get('inviteEmail') as string;
+    if (userEmail) {
+      inviteManagerMutation.mutate(userEmail);
     }
   };
 
@@ -2328,72 +2360,120 @@ export function SiteAdmin(props: SiteAdminProps) {
                         Manage who can access this site's admin panel
                       </CardDescription>
                     </div>
-                    <Dialog open={isAddManagerOpen} onOpenChange={setIsAddManagerOpen}>
-                      <DialogTrigger asChild>
-                        <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-add-manager">
-                          <UserPlus className="w-4 h-4 mr-2" />
-                          Add Manager
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-slate-800 text-white border-slate-600">
-                        <DialogHeader>
-                          <DialogTitle>Add Site Manager</DialogTitle>
-                          <DialogDescription className="text-slate-400">
-                            Select a user to add as a site manager.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <form onSubmit={handleAddManager} className="space-y-4">
-                          <div>
-                            <Label htmlFor="userEmail">Select User</Label>
-                            <Select name="userEmail" required>
-                              <SelectTrigger className="bg-slate-700 border-slate-600">
-                                <SelectValue placeholder="Choose a user to add as site manager" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-slate-700 border-slate-600">
-                                {(allUsers || [])
-                                  .filter((u: any) => !managers.some(m => m.userEmail === u.email))
-                                  .map((user: any) => (
-                                  <SelectItem key={user.id} value={user.email}>
-                                    <div className="flex items-center gap-2">
-                                      {user.profilePicture && (
-                                        <img 
-                                          src={user.profilePicture} 
-                                          alt={`${user.firstName} ${user.lastName}`}
-                                          className="w-6 h-6 rounded-full"
-                                        />
-                                      )}
-                                      <div>
-                                        <div className="font-medium">{user.firstName} {user.lastName}</div>
-                                        <div className="text-sm text-slate-400">{user.email}</div>
+                    <div className="flex items-center gap-2">
+                      <Dialog open={isAddManagerOpen} onOpenChange={setIsAddManagerOpen}>
+                        <DialogTrigger asChild>
+                          <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-add-manager">
+                            <UserPlus className="w-4 h-4 mr-2" />
+                            Add Manager
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-slate-800 text-white border-slate-600">
+                          <DialogHeader>
+                            <DialogTitle>Add Site Manager</DialogTitle>
+                            <DialogDescription className="text-slate-400">
+                              Select a user to add as a site manager.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <form onSubmit={handleAddManager} className="space-y-4">
+                            <div>
+                              <Label htmlFor="userEmail">Select User</Label>
+                              <Select name="userEmail" required>
+                                <SelectTrigger className="bg-slate-700 border-slate-600">
+                                  <SelectValue placeholder="Choose a user to add as site manager" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-700 border-slate-600">
+                                  {(allUsers || [])
+                                    .filter((u: any) => !managers.some(m => m.userEmail === u.email))
+                                    .map((user: any) => (
+                                    <SelectItem key={user.id} value={user.email}>
+                                      <div className="flex items-center gap-2">
+                                        {user.profilePicture && (
+                                          <img
+                                            src={user.profilePicture}
+                                            alt={`${user.firstName} ${user.lastName}`}
+                                            className="w-6 h-6 rounded-full"
+                                          />
+                                        )}
+                                        <div>
+                                          <div className="font-medium">{user.firstName} {user.lastName}</div>
+                                          <div className="text-sm text-slate-400">{user.email}</div>
+                                        </div>
                                       </div>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="flex justify-end gap-3 pt-6 border-t border-slate-700">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              onClick={() => setIsAddManagerOpen(false)}
-                              className="text-slate-400 hover:text-slate-200"
-                              data-testid="button-cancel"
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              type="submit"
-                              className="bg-blue-600 hover:bg-blue-700 min-w-[120px]"
-                              disabled={addManagerMutation.isPending}
-                              data-testid="button-submit"
-                            >
-                              {addManagerMutation.isPending ? 'Adding...' : 'Add Manager'}
-                            </Button>
-                          </div>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex justify-end gap-3 pt-6 border-t border-slate-700">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setIsAddManagerOpen(false)}
+                                className="text-slate-400 hover:text-slate-200"
+                                data-testid="button-cancel"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                type="submit"
+                                className="bg-blue-600 hover:bg-blue-700 min-w-[120px]"
+                                disabled={addManagerMutation.isPending}
+                                data-testid="button-submit"
+                              >
+                                {addManagerMutation.isPending ? 'Adding...' : 'Add Manager'}
+                              </Button>
+                            </div>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog open={isInviteManagerOpen} onOpenChange={setIsInviteManagerOpen}>
+                        <DialogTrigger asChild>
+                          <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-invite-manager">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Invite Site Manager
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-slate-800 text-white border-slate-600">
+                          <DialogHeader>
+                            <DialogTitle>Invite Site Manager</DialogTitle>
+                            <DialogDescription className="text-slate-400">
+                              Enter the email address of the user to invite as a site manager.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <form onSubmit={handleInviteManager} className="space-y-4">
+                            <div>
+                              <Label htmlFor="inviteEmail">Email</Label>
+                              <Input
+                                id="inviteEmail"
+                                type="email"
+                                name="inviteEmail"
+                                required
+                                className="bg-slate-700 border-slate-600"
+                              />
+                            </div>
+                            <div className="flex justify-end gap-3 pt-6 border-t border-slate-700">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setIsInviteManagerOpen(false)}
+                                className="text-slate-400 hover:text-slate-200"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                type="submit"
+                                className="bg-blue-600 hover:bg-blue-700 min-w-[120px]"
+                                disabled={inviteManagerMutation.isPending}
+                              >
+                                {inviteManagerMutation.isPending ? 'Inviting...' : 'Send Invite'}
+                              </Button>
+                            </div>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
