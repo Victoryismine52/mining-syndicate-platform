@@ -35,8 +35,9 @@ variables like `DATABASE_URL`, `SESSION_SECRET`, and others listed below.
 
 - **Docker Postgres**: `npm run db:up`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`
   - Spins up a Postgres container and loads seed data from `server/seeds/`.
-- **In-memory**: set `AUTH_DISABLED=true` and `STORAGE_MODE=memory`, then `npm run dev`
+- **In-memory**: see [dev:mem workflow](docs/dev-mem.md) or set `AUTH_DISABLED=true` and `STORAGE_MODE=memory`, then `npm run dev`
   - Bypasses authentication and uses `server/data/seed.json` for ephemeral data.
+  - Optional flags: `--monitor`, `--metrics`, `--debug` to enable logging and metrics.
 
 ### Environment variables
 

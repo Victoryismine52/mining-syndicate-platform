@@ -21,3 +21,11 @@ jobs:
       - run: npx playwright install --with-deps
       - run: npm test
       - run: npm run build
+      - name: dev:mem health check
+        run: |
+          npm run dev:mem &> devmem.log &
+          pid=$!
+          npx wait-on http://localhost:5000/api/health
+          curl -f http://localhost:5000/api/health
+          kill $pid
+          cat devmem.log

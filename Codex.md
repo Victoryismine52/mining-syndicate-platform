@@ -3,6 +3,13 @@
 > **Entry Template:** `YYYY-MM-DD: summary – reason – impact`
 
 ## Summary of Recent Changes
+2025-09-17: Seeded memory mode with full domain objects – enable full dev:mem seed coverage – Replit & Card-Builder consume new data
+2025-09-17: Added StorageOptions and StorageContext runtime selection – allow memory vs cloud storage per request – shared services align across teams
+2025-09-17: Fixed /uploads routing and added regression tests – eliminate path-to-regexp errors – improves asset flows for Replit UI
+2025-09-17: Automated seed generation scripts – enable npm run seed:mem and dev:mem auto-seeding – developers get consistent memory seeds
+2025-09-17: CI health check for dev:mem – gate merges on memory mode startup – Code-Explorer & Card-Builder aware of failures
+2025-09-17: Optional monitoring toggles for dev:mem – allow pino-http and prom-client via flags – Card-Builder can consume logs
+2025-09-17: Documented dev:mem workflow – guide prerequisites, seeding, and flags – follow-ups may refine docs
 2025-09-08: Fixed TypeScript errors and addressed missing dependency issues – Enables dev:mem mode testing – Temporary workarounds for package conflicts
 - Resolved TypeScript compilation errors in site-storage.ts:
   - Fixed schema property mismatches (createdBy vs createdById)
