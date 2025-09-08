@@ -208,12 +208,17 @@ export async function setupAuth(app: Express) {
 
   // Logout endpoint
   app.post('/api/logout', (req, res) => {
+    const hasCookie = req.headers.cookie?.includes('connect.sid=');
+
+    if (!req.session && !hasCookie) {
+      return res.json({ message: 'Logged out successfully' });
+    }
+
     req.logout((err) => {
       if (err) {
         logger.error('Logout error:', err);
         return res.status(500).json({ error: 'Logout failed' });
       }
-      const hasCookie = req.headers.cookie?.includes('connect.sid=');
 
       if (!req.session) {
         if (hasCookie) {
