@@ -11,7 +11,7 @@ import { registerSiteRoutes } from "./site-routes";
 import { functionIndex } from "./function-index";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
-// import rateLimit from "express-rate-limit"; // TODO: Fix missing package issue
+import rateLimit from "express-rate-limit";
 import { logger } from './logger';
 import { config } from './config';
 
@@ -47,15 +47,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Lead generation endpoint (for main site)
-  // TODO: Re-enable rate limiting when package issue is fixed
-  // const leadsLimiter = rateLimit({
-  //   windowMs: 60 * 1000,
-  //   max: 2,
-  //   standardHeaders: true,
-  //   legacyHeaders: false,
-  // });
+  const leadsLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 2,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
 
-  app.post("/api/leads", /* leadsLimiter, */ async (req, res, next) => {
+  app.post("/api/leads", leadsLimiter, async (req, res, next) => {
     try {
       // Extract email as identifier and store dynamic form data
       const { email, siteId = 'main-site', ...formData } = req.body;
