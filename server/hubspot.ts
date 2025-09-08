@@ -1,7 +1,8 @@
 import { Client } from "@hubspot/api-client";
 import { logger } from './logger';
+import { config } from './config';
 
-const hubspotClient = new Client({ accessToken: process.env.HUBSPOT_API_KEY });
+const hubspotClient = new Client({ accessToken: config.hubspotApiKey });
 
 export interface HubSpotContact {
   email: string;
@@ -114,7 +115,7 @@ export async function submitToHubSpotForm(formId: string, contactData: any): Pro
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.HUBSPOT_API_KEY}`
+        'Authorization': `Bearer ${config.hubspotApiKey}`
       },
       body: JSON.stringify(formData)
     });
@@ -285,7 +286,7 @@ export async function listContactProperties(): Promise<void> {
 export async function testHubSpotConnection(): Promise<boolean> {
   try {
     logger.info('Testing HubSpot API connection...');
-    logger.info('API Key format:', process.env.HUBSPOT_API_KEY ? `${process.env.HUBSPOT_API_KEY.substring(0, 10)}...` : 'Not found');
+    logger.info('API Key format:', config.hubspotApiKey ? `${config.hubspotApiKey.substring(0, 10)}...` : 'Not found');
     
     const response = await hubspotClient.crm.contacts.basicApi.getPage(1, undefined, undefined, undefined, undefined, false);
     logger.info('HubSpot connection test successful');

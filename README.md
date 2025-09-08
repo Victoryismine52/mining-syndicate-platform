@@ -40,7 +40,7 @@ variables like `DATABASE_URL`, `SESSION_SECRET`, and others listed below.
 
 ### Environment variables
 
-Environment configuration is managed through Replit's Secrets manager. For local development, copy `.env.example` to `.env` and provide values. Keep this sample file in sync whenever new variables are introduced. Database URLs must use the standard Postgres URI format (e.g., `postgres://user:pass@localhost:5432/db`).
+Environment configuration is managed through Replit's Secrets manager. For local development, copy `.env.example` to `.env` and provide values. The server reads settings through `server/config.ts`, which validates required variables at startup and throws descriptive errors when they're missing. Keep this sample file in sync whenever new variables are introduced. Database URLs must use the standard Postgres URI format (e.g., `postgres://user:pass@localhost:5432/db`).
 
 | Variable | Purpose |
 |----------|---------|
@@ -63,6 +63,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `REPLIT_DOMAINS` | Comma-separated list of domains allowed for OIDC callbacks. |
 | `STORAGE_MODE` | Set to `memory` to use in-memory JSON storage for sites. |
 
+The server exits on startup if `DATABASE_URL` is missing. When `AUTH_DISABLED` is not `true`, Google and Replit auth credentials (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `REPL_ID`) must also be provided.
 
 Switch between Postgres databases by editing `.env`:
 

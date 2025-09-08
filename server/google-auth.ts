@@ -5,8 +5,9 @@ import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 import { logger } from './logger';
+import { config } from './config';
 
-const AUTH_DISABLED = process.env.AUTH_DISABLED === "true";
+const AUTH_DISABLED = config.authDisabled;
 
 const mockUser = {
   id: "dev-user",
@@ -19,8 +20,8 @@ const mockUser = {
 
 // Validate environment variables
 function validateGoogleOAuthConfig() {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const clientId = config.google.clientId;
+  const clientSecret = config.google.clientSecret;
   
   if (!clientId) {
     throw new Error("GOOGLE_CLIENT_ID environment variable is required");
@@ -46,16 +47,13 @@ export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
-    conString:
-      process.env.NODE_ENV === "test"
-        ? process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL
-        : process.env.DATABASE_URL,
+    conString: config.databaseUrl,
     createTableIfMissing: true,
     ttl: sessionTtl,
     tableName: "sessions",
   });
   return session({
-    secret: process.env.SESSION_SECRET || "mining-syndicate-dev-secret-2025-very-secure-random-string-32chars-minimum",
+    secret: config.sessionSecret || "mining-syndicate-dev-secret-2025-very-secure-random-string-32chars-minimum",
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
@@ -89,7 +87,7 @@ export async function setupAuth(app: Express) {
   const { clientId, clientSecret } = validateGoogleOAuthConfig();
   
   // Google OAuth Strategy - Use environment variable or build from host
-  const callbackURL = process.env.GOOGLE_OAUTH_CALLBACK_URL || `https://conduit.replit.app/api/auth/google/callback`;
+  const callbackURL = config.google.oauthCallbackUrl || `https://conduit.replit.app/api/auth/google/callback`;
   // Google OAuth configured with callback URL
   
   passport.use(

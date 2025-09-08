@@ -11,6 +11,7 @@ import { setupViteFor, log } from "./vite";
 import { buildFileTree } from "../packages/code-explorer/file-tree.js";
 import { applyPatchToFile } from "./save";
 import { createFunctionsRouter } from "./functions";
+import { config } from './config';
 const exec = promisify(execCb);
 
 const app = express();
@@ -113,7 +114,7 @@ const server = createServer(app);
   const rootDir = path.resolve(import.meta.dirname, "..", "packages", "code-explorer");
   await setupViteFor(app, server, rootDir, "/code-explorer");
 
-  const port = parseInt(process.env.PORT || "5000", 10);
+  const port = config.port;
   server.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
     log(`explorer dev server running on port ${port}`);
     void open(`http://localhost:${port}/code-explorer`, { wait: false }).catch(

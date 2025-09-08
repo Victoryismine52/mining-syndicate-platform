@@ -7,8 +7,9 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 import { logger } from './logger';
+import { config } from './config';
 
-const AUTH_DISABLED = process.env.AUTH_DISABLED === "true";
+const AUTH_DISABLED = config.authDisabled;
 
 const mockUser = {
   id: "dev-user",
@@ -19,21 +20,14 @@ const mockUser = {
   isAdmin: true,
 };
 
-// Set default for development - will be overridden in production
-if (!process.env.REPLIT_DOMAINS) {
-  process.env.REPLIT_DOMAINS = process.env.REPLIT_DEV_DOMAIN || "conduit.replit.app";
-}
-
-// REPLIT_DOMAINS configured
-
 const getOidcConfig = memoize(
   async () => {
     try {
-      const config = await client.discovery(
-        new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-        process.env.REPL_ID!
+      const oidc = await client.discovery(
+        new URL(config.replit.issuerUrl),
+        config.replit.replId!
       );
-      return config;
+      return oidc;
     } catch (error) {
       logger.error('Failed to load OIDC config:', error);
       throw error;
@@ -46,16 +40,13 @@ export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
-    conString:
-      process.env.NODE_ENV === "test"
-        ? process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL
-        : process.env.DATABASE_URL,
+    conString: config.databaseUrl,
     createTableIfMissing: true,
     ttl: sessionTtl,
     tableName: "sessions",
   });
   return session({
-    secret: process.env.SESSION_SECRET!,
+    secret: config.sessionSecret!,
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
@@ -152,7 +143,7 @@ export async function setupReplitAuth(app: Express) {
     }
   };
 
-  for (const domain of process.env.REPLIT_DOMAINS!.split(",")) {
+  for (const domain of config.replit.domains) {
     const strategyName = `replitauth:${domain}`;
     const callbackURL = `https://${domain}/api/callback`;
     logger.info(`Setting up strategy: ${strategyName} with callback: ${callbackURL}`);
@@ -233,7 +224,7 @@ export async function setupReplitAuth(app: Express) {
     req.logout(() => {
       res.redirect(
         client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
+          client_id: config.replit.replId!,
           post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
         }).href
       );

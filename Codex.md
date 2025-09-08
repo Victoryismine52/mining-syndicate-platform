@@ -3,6 +3,7 @@
 > **Entry Template:** `YYYY-MM-DD: summary – reason – impact`
 
 ## Summary of Recent Changes
+2025-09-15: Centralized environment config with startup validation – catch misconfiguration early – consolidates server settings and removes scattered `process.env` usage.
 2025-09-14: Added site creation tests for standard, pitch, and collective setups – verify default content added – ensures new sites start with expected slides, forms, and sections.
 
 2025-09-13: Added fallback in-memory object storage when REPLIT_SIDECAR_ENDPOINT is missing – support Replit-independent local development – uploads persist only for the process lifetime.
