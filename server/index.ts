@@ -3,10 +3,10 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { setSiteStorage } from "./site-storage";
 import { logger } from './logger';
-import pinoHttp from 'pino-http';
+// import pinoHttp from 'pino-http'; // TODO: Fix missing package issue
 import { randomUUID } from 'crypto';
 import { config } from './config';
-import { collectDefaultMetrics, Counter, Histogram, Registry } from 'prom-client';
+// import { collectDefaultMetrics, Counter, Histogram, Registry } from 'prom-client'; // TODO: Fix missing package issue
 import fs from 'fs';
 import path from 'path';
 import { ensureLocalAssetsDir } from './local-assets';
@@ -38,64 +38,31 @@ async function init() {
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(pinoHttp({
-  logger,
-  genReqId: () => randomUUID(),
-}));
+// TODO: Re-enable pino-http when package issue is fixed
+// app.use(pinoHttp({
+//   logger,
+//   genReqId: () => randomUUID(),
+// }));
 
-// Metrics setup
-const register = new Registry();
-collectDefaultMetrics({ register });
+// TODO: Re-enable metrics when package issue is fixed
+// const register = new Registry();
+// collectDefaultMetrics({ register });
+// const httpRequestDuration = new Histogram(...);
+// const httpRequestErrors = new Counter(...);
+// app.get('/metrics', async (_req, res) => { ... });
 
-const httpRequestDuration = new Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP requests in seconds',
-  labelNames: ['method', 'path', 'status_code'],
-});
+// TODO: Re-enable request logging when pino-http is fixed
+// app.use((req, res, next) => { ... });
 
-const httpRequestErrors = new Counter({
-  name: 'http_request_errors_total',
-  help: 'Total number of HTTP requests resulting in errors',
-  labelNames: ['method', 'path', 'status_code'],
-});
-
-app.get('/metrics', async (_req, res) => {
-  res.set('Content-Type', register.contentType);
-  res.end(await register.metrics());
-});
-
+// Simple request logging fallback
 app.use((req, res, next) => {
   const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-  const endTimer = httpRequestDuration.startTimer({ method: req.method, path });
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
   res.on("finish", () => {
     const duration = Date.now() - start;
-    endTimer({ status_code: res.statusCode });
-    if (res.statusCode >= 500) {
-      httpRequestErrors.inc({ method: req.method, path, status_code: res.statusCode });
-    }
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      req.log.info(logLine);
+    if (req.path.startsWith("/api")) {
+      logger.info(`${req.method} ${req.path} ${res.statusCode} in ${duration}ms`);
     }
   });
-
   next();
 });
 
