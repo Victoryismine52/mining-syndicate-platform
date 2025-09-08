@@ -1,6 +1,4 @@
 import express, { type Request, Response, NextFunction } from "express";
-import path from "path";
-import fs from "fs";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { setSiteStorage } from "./site-storage";
@@ -8,6 +6,7 @@ import { logger } from './logger';
 import pinoHttp from 'pino-http';
 import { randomUUID } from 'crypto';
 import { config } from './config';
+import { collectDefaultMetrics, Counter, Histogram, Registry } from 'prom-client';
 
 const BASE_DEV_URL = config.baseDevUrl;
 const BASE_CODEX_URL = config.baseCodexUrl;
@@ -41,10 +40,32 @@ app.use(pinoHttp({
   genReqId: () => randomUUID(),
 }));
 
+// Metrics setup
+const register = new Registry();
+collectDefaultMetrics({ register });
+
+const httpRequestDuration = new Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'path', 'status_code'],
+});
+
+const httpRequestErrors = new Counter({
+  name: 'http_request_errors_total',
+  help: 'Total number of HTTP requests resulting in errors',
+  labelNames: ['method', 'path', 'status_code'],
+});
+
+app.get('/metrics', async (_req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  const endTimer = httpRequestDuration.startTimer({ method: req.method, path });
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -54,6 +75,10 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
+    endTimer({ status_code: res.statusCode });
+    if (res.statusCode >= 500) {
+      httpRequestErrors.inc({ method: req.method, path, status_code: res.statusCode });
+    }
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
