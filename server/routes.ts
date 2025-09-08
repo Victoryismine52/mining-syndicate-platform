@@ -13,6 +13,7 @@ import { db } from "./db";
 import { sql } from "drizzle-orm";
 import rateLimit from "express-rate-limit";
 import { logger } from './logger';
+import { config } from './config';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   logger.info('Registering routes...');
@@ -22,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   logger.info('Google authentication setup complete');
   
   // Test HubSpot connection if API key is available
-  if (process.env.HUBSPOT_API_KEY) {
+  if (config.hubspotApiKey) {
     logger.info('Testing HubSpot API connection...');
     const hubspotConnected = await testHubSpotConnection();
     if (hubspotConnected) {
@@ -80,7 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const lead = await siteStorage.createSiteLead(leadData);
       
       // Send to HubSpot forms asynchronously (don't block the response)
-      if (process.env.HUBSPOT_API_KEY) {
+      if (config.hubspotApiKey) {
         setImmediate(async () => {
           try {
             const hubspotContact: HubSpotContact = {

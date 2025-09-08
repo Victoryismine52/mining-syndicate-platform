@@ -7,9 +7,10 @@ import { setSiteStorage } from "./site-storage";
 import { logger } from './logger';
 import pinoHttp from 'pino-http';
 import { randomUUID } from 'crypto';
+import { config } from './config';
 
-const BASE_DEV_URL = process.env.BASE_DEV_URL || "http://0.0.0.0:5000/api";
-const BASE_CODEX_URL = process.env.BASE_CODEX_URL || `https://conduit.replit.app/api`;
+const BASE_DEV_URL = config.baseDevUrl;
+const BASE_CODEX_URL = config.baseCodexUrl;
 
 async function init() {
   try {
@@ -72,7 +73,7 @@ app.use((req, res, next) => {
 
 
 (async () => {
-  if (process.env.STORAGE_MODE === 'memory') {
+  if (config.storageMode === 'memory') {
     const { memorySiteStorage } = await import('./memory-storage');
     setSiteStorage(memorySiteStorage);
     logger.info('Using in-memory site storage');
@@ -101,7 +102,7 @@ app.use((req, res, next) => {
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
+  const port = config.port;
   server.listen({
     port,
     host: "0.0.0.0",

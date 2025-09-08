@@ -3,8 +3,9 @@ import { Response } from "express";
 import { randomUUID } from "crypto";
 import { Readable } from "stream";
 import { logger } from './logger';
+import { config } from './config';
 
-const REPLIT_SIDECAR_ENDPOINT = process.env.REPLIT_SIDECAR_ENDPOINT;
+const REPLIT_SIDECAR_ENDPOINT = config.objectStorage.replitSidecarEndpoint;
 
 class MemoryFile {
   private content?: Buffer;
@@ -92,7 +93,7 @@ export class ObjectStorageService {
 
   // Gets the public object search paths.
   getPublicObjectSearchPaths(): Array<string> {
-    const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
+    const pathsStr = config.objectStorage.publicObjectSearchPaths || "";
     const paths = Array.from(
       new Set(
         pathsStr
@@ -112,7 +113,7 @@ export class ObjectStorageService {
 
   // Gets the private object directory.
   getPrivateObjectDir(): string {
-    const dir = process.env.PRIVATE_OBJECT_DIR || "";
+    const dir = config.objectStorage.privateObjectDir || "";
     if (!dir) {
       throw new Error(
         "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
