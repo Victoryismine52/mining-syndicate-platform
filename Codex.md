@@ -3,6 +3,111 @@
 > **Entry Template:** `YYYY-MM-DD: summary – reason – impact`
 
 ## Summary of Recent Changes
+2025-09-08: Express.js Route Pattern Investigation – Memory mode file serving issues – Requires Replit team review. -8o8
+- Multiple route pattern approaches attempted:
+  - Standard wildcards (/*) 
+  - Path parameters (/:path)
+  - Regex patterns (/^\/uploads\/(.*)$/)
+  - Parameterized wildcards (/:path(*))
+  - Middleware-based routing
+- Each attempt resulted in path-to-regexp errors
+- File serving implementations impacted
+- Potential Replit-specific environment constraints identified
+
+## Replit Review Request: Express.js Route Pattern Investigation
+
+**Assessment Date:** 2025-09-08  
+**Evaluator:** GitHub Copilot  
+**Scope:** Express.js routing patterns in memory mode development
+
+### 🚨 **CURRENT CHALLENGES:**
+
+**Route Pattern Issues (Critical)**
+- Multiple routing approaches attempted without success
+- path-to-regexp errors occurring consistently
+- Static file serving affected
+- Memory mode file operations impacted
+
+**Attempted Solutions:**
+1. Standard Wildcards
+   ```javascript
+   app.get('/*', handler)
+   ```
+   - Result: path-to-regexp errors
+
+2. Path Parameters
+   ```javascript
+   app.get('/:path', handler)
+   ```
+   - Result: path-to-regexp errors
+
+3. Regex Patterns
+   ```javascript
+   app.get(/^\/uploads\/(.*)$/, handler)
+   ```
+   - Result: path-to-regexp errors
+
+4. Parameterized Wildcards
+   ```javascript
+   app.get('/:path(*)', handler)
+   ```
+   - Result: path-to-regexp errors
+
+5. Middleware Approach
+   ```javascript
+   app.use((req, res, next) => {
+     if (req.path.startsWith('/uploads/')) {
+       // handle file
+     } else {
+       next()
+     }
+   })
+   ```
+   - Result: path-to-regexp errors persist
+
+### 🔍 **INVESTIGATION NEEDED:**
+
+**Environment-Specific Questions:**
+1. Are there Replit-specific constraints on Express.js routing patterns?
+2. Is there a recommended approach for file serving in the Replit environment?
+3. Are there known compatibility issues between Express.js and the Replit runtime?
+
+**Technical Clarification Needed:**
+1. Proper pattern syntax for Replit environment
+2. Recommended static file serving approach
+3. Best practices for wildcard routes in this context
+
+### 📋 **NEXT STEPS:**
+
+1. **Replit Team Review**
+   - Share attempted approaches
+   - Get environment-specific guidance
+   - Understand any platform constraints
+
+2. **Documentation**
+   - Document all attempted approaches
+   - Note error patterns
+   - Record any environment-specific findings
+
+3. **Implementation Plan**
+   - Await Replit team guidance
+   - Implement recommended approach
+   - Test across different file types
+
+### 🎯 **REVIEW REQUEST:**
+
+**Priority: HIGH**
+- Blocking memory mode development
+- Impacts file serving functionality
+- Requires environment-specific expertise
+
+**Review Focus:**
+1. Express.js routing patterns in Replit environment
+2. Static file serving best practices
+3. Path-to-regexp compatibility issues
+
+## Summary of Recent Changes
+2025-09-16: Added robust start-memory-mode.js script for dev:mem command — handles environment setup, server launch, and auto-browser navigation — provides stable dev environment with memory storage and auth bypass. -8o8
 2025-09-16: Enable full in-memory dev mode via `npm run dev:mem` — remove DB/session requirements, seed from server/data/seed.json — faster local testing with isolated, disposable state. -8o8
 2025-09-16: Add local uploads in memory mode — mounts `/uploads` with filesystem storage (prefers `../ms-assets`, falls back to `./local-assets`) and supports PUT to `/uploads/*` — enables visual testing of file uploads without cloud storage. -8o8
 2025-09-08: Default new sites to Coming Soon and fix isLaunched handling — prevent undefined from being treated as launched — new sites remain private until explicitly launched. -8o8
