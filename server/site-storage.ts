@@ -358,7 +358,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
   async reorderSiteSlides(siteId: string, slideOrders: Array<{ id: string; slideOrder: string }>): Promise<void> {
     // Update each slide's order in a transaction
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
       for (const { id, slideOrder } of slideOrders) {
         await tx
           .update(siteSlides)
@@ -703,7 +703,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
             eq(collectiveBlogPosts.visibility, 'members_only'),
             eq(collectiveBlogPosts.visibility, 'brehons_only'),
             eq(collectiveBlogPosts.visibility, 'public')
-          )
+          ) as any
         );
       }
       // site_managers and admins can see all posts (no additional filter)
@@ -887,8 +887,8 @@ export class DatabaseSiteStorage implements ISiteStorage {
           status: collectiveTasks.status,
           priority: collectiveTasks.priority,
           dueDate: collectiveTasks.dueDate,
-          createdById: collectiveTasks.createdById,
-          completedAt: collectiveTasks.completedAt,
+          createdBy: collectiveTasks.createdBy,
+          
           createdAt: collectiveTasks.createdAt,
           updatedAt: collectiveTasks.updatedAt,
           // Creator info
@@ -923,8 +923,8 @@ export class DatabaseSiteStorage implements ISiteStorage {
           status: collectiveTasks.status,
           priority: collectiveTasks.priority,
           dueDate: collectiveTasks.dueDate,
-          createdById: collectiveTasks.createdById,
-          completedAt: collectiveTasks.completedAt,
+          createdBy: collectiveTasks.createdBy,
+          
           createdAt: collectiveTasks.createdAt,
           updatedAt: collectiveTasks.updatedAt,
           // Creator info
@@ -1113,8 +1113,8 @@ export class DatabaseSiteStorage implements ISiteStorage {
           id: taskAssignments.id,
           taskId: taskAssignments.taskId,
           userId: taskAssignments.userId,
-          assignedById: taskAssignments.assignedById,
-          assignedAt: taskAssignments.assignedAt,
+          assignedBy: taskAssignments.assignedBy,
+          assignedAt: taskAssignments.createdAt,
           // User info
           userFirstName: users.firstName,
           userLastName: users.lastName,

@@ -292,7 +292,6 @@ export const insertSiteSchema = createInsertSchema(sites).omit({
 export const insertSiteLeadSchema = createInsertSchema(siteLeads).omit({
   id: true,
   createdAt: true,
-  hubspotContactId: true,
   ipAddress: true,
   userAgent: true,
   referrer: true,
