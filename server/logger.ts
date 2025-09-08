@@ -1,6 +1,10 @@
-import pino from 'pino';
+// import pino from 'pino'; // TODO: Fix missing package issue
 import { config } from './config';
 
-export const logger = pino({
-  level: config.logLevel,
-});
+// Simple console logger fallback
+export const logger = {
+  info: (message: string, ...args: any[]) => console.log(`[INFO] ${message}`, ...args),
+  error: (message: string, ...args: any[]) => console.error(`[ERROR] ${message}`, ...args),
+  warn: (message: string, ...args: any[]) => console.warn(`[WARN] ${message}`, ...args),
+  debug: (message: string, ...args: any[]) => console.debug(`[DEBUG] ${message}`, ...args),
+};
