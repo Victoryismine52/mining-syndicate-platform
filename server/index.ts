@@ -7,6 +7,9 @@ import pinoHttp from 'pino-http';
 import { randomUUID } from 'crypto';
 import { config } from './config';
 import { collectDefaultMetrics, Counter, Histogram, Registry } from 'prom-client';
+import fs from 'fs';
+import path from 'path';
+import { ensureLocalAssetsDir } from './local-assets';
 
 const BASE_DEV_URL = config.baseDevUrl;
 const BASE_CODEX_URL = config.baseCodexUrl;
@@ -102,6 +105,26 @@ app.use((req, res, next) => {
     const { memorySiteStorage } = await import('./memory-storage');
     setSiteStorage(memorySiteStorage);
     logger.info('Using in-memory site storage');
+
+    // Setup local filesystem-backed uploads for assets in memory mode
+    const assetsDir = ensureLocalAssetsDir();
+    const uploadsRoot = '/uploads';
+    logger.info(`Serving local uploads from ${assetsDir} at ${uploadsRoot}`);
+    // Serve uploaded files
+    app.use(uploadsRoot, express.static(assetsDir));
+    // Accept raw binary uploads to /uploads/*
+    app.put(`${uploadsRoot}/*`, express.raw({ type: '*/*', limit: '50mb' }), (req, res) => {
+      try {
+        const rel = req.path.substring(uploadsRoot.length); // e.g., /slides/abc.jpg
+        const target = path.join(assetsDir, rel);
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        fs.writeFileSync(target, req.body);
+        res.status(201).json({ ok: true, path: `${uploadsRoot}${rel}` });
+      } catch (err: any) {
+        logger.error('Failed to write upload:', err);
+        res.status(500).json({ error: 'Failed to store upload' });
+      }
+    });
   }
 
   const server = await registerRoutes(app);

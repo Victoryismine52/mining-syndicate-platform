@@ -93,7 +93,8 @@ export class ObjectStorageService {
 
   // Gets the public object search paths.
   getPublicObjectSearchPaths(): Array<string> {
-    const pathsStr = config.objectStorage.publicObjectSearchPaths || "";
+    // In memory mode, default to local public and uploads buckets
+    const pathsStr = config.objectStorage.publicObjectSearchPaths || (config.storageMode === 'memory' ? '/public,/uploads' : "");
     const paths = Array.from(
       new Set(
         pathsStr
@@ -113,7 +114,8 @@ export class ObjectStorageService {
 
   // Gets the private object directory.
   getPrivateObjectDir(): string {
-    const dir = config.objectStorage.privateObjectDir || "";
+    // In memory mode, default to /uploads
+    const dir = config.objectStorage.privateObjectDir || (config.storageMode === 'memory' ? '/uploads' : "");
     if (!dir) {
       throw new Error(
         "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
