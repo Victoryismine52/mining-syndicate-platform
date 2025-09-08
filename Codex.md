@@ -3,6 +3,7 @@
 > **Entry Template:** `YYYY-MM-DD: summary – reason – impact`
 
 ## Summary of Recent Changes
+2025-09-16: Enable full in-memory dev mode via `npm run dev:mem` — remove DB/session requirements, seed from server/data/seed.json — faster local testing with isolated, disposable state. -8o8
 2025-09-08: Default new sites to Coming Soon and fix isLaunched handling — prevent undefined from being treated as launched — new sites remain private until explicitly launched. -8o8
 2025-09-16: Exposed Prometheus metrics and provided Grafana alerts – track latency and error spikes – enables proactive monitoring.
 2025-09-15: Centralized environment config with startup validation – catch misconfiguration early – consolidates server settings and removes scattered `process.env` usage.

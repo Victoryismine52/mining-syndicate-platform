@@ -34,7 +34,9 @@ const databaseUrl = env.NODE_ENV === 'test'
   ? env.TEST_DATABASE_URL ?? env.DATABASE_URL
   : env.DATABASE_URL;
 
-if (!databaseUrl) {
+// Allow memory mode without a database URL
+const isMemoryMode = env.STORAGE_MODE === 'memory';
+if (!databaseUrl && !isMemoryMode) {
   throw new Error('DATABASE_URL must be set. Did you forget to provision a database?');
 }
 
@@ -59,7 +61,7 @@ const config = {
   authDisabled,
   storageMode: env.STORAGE_MODE,
   sessionSecret: env.SESSION_SECRET,
-  databaseUrl,
+  databaseUrl: databaseUrl as string,
   replit: {
     domains: (env.REPLIT_DOMAINS ?? env.REPLIT_DEV_DOMAIN ?? 'conduit.replit.app')
       .split(',')

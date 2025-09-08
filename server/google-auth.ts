@@ -3,6 +3,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
+import createMemoryStore from "memorystore";
 import { storage } from "./storage";
 import { logger } from './logger';
 import { config } from './config';
@@ -45,13 +46,17 @@ declare module "express-session" {
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: config.databaseUrl,
-    createTableIfMissing: true,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  // Use in-memory session store in memory mode; otherwise use Postgres-backed store
+  const MemoryStore = createMemoryStore(session);
+  const useMemoryStore = config.storageMode === 'memory';
+  const sessionStore = useMemoryStore
+    ? new MemoryStore({ checkPeriod: sessionTtl })
+    : new (connectPg(session))({
+        conString: config.databaseUrl,
+        createTableIfMissing: true,
+        ttl: sessionTtl,
+        tableName: "sessions",
+      });
   return session({
     secret: config.sessionSecret || "mining-syndicate-dev-secret-2025-very-secure-random-string-32chars-minimum",
     store: sessionStore,

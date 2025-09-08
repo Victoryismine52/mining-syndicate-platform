@@ -10,24 +10,35 @@ import { config } from "./config";
 
 neonConfig.webSocketConstructor = ws;
 
-const connectionString = config.databaseUrl;
-
-const url = new URL(connectionString);
-const isLocal = ["localhost", "127.0.0.1"].includes(url.hostname);
-
 const schemas = { ...schema, ...siteSchema };
 
-let pool: NeonPool | PgPool;
+let pool: NeonPool | PgPool | undefined;
 let db:
   | ReturnType<typeof neonDrizzle>
-  | ReturnType<typeof pgDrizzle>;
+  | ReturnType<typeof pgDrizzle>
+  | any;
 
-if (isLocal) {
-  pool = new PgPool({ connectionString });
-  db = pgDrizzle(pool, { schema: schemas });
+if (config.storageMode === 'memory') {
+  // In memory mode, avoid initializing any database connections.
+  // Export a proxy that throws on use to make accidental DB calls obvious.
+  pool = undefined;
+  db = new Proxy({}, {
+    get() {
+      throw new Error('Database is disabled in memory mode (STORAGE_MODE=memory)');
+    },
+  });
 } else {
-  pool = new NeonPool({ connectionString });
-  db = neonDrizzle({ client: pool, schema: schemas });
+  const connectionString = config.databaseUrl as string;
+  const url = new URL(connectionString);
+  const isLocal = ["localhost", "127.0.0.1"].includes(url.hostname);
+
+  if (isLocal) {
+    pool = new PgPool({ connectionString });
+    db = pgDrizzle(pool, { schema: schemas });
+  } else {
+    pool = new NeonPool({ connectionString });
+    db = neonDrizzle({ client: pool, schema: schemas });
+  }
 }
 
 export { pool, db };

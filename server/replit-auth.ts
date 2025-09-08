@@ -5,6 +5,7 @@ import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
+import createMemoryStore from "memorystore";
 import { storage } from "./storage";
 import { logger } from './logger';
 import { config } from './config';
@@ -38,13 +39,16 @@ const getOidcConfig = memoize(
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: config.databaseUrl,
-    createTableIfMissing: true,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  const MemoryStore = createMemoryStore(session);
+  const useMemoryStore = config.storageMode === 'memory';
+  const sessionStore = useMemoryStore
+    ? new MemoryStore({ checkPeriod: sessionTtl })
+    : new (connectPg(session))({
+        conString: config.databaseUrl,
+        createTableIfMissing: true,
+        ttl: sessionTtl,
+        tableName: "sessions",
+      });
   return session({
     secret: config.sessionSecret!,
     store: sessionStore,
