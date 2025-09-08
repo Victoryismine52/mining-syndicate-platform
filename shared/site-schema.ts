@@ -358,6 +358,7 @@ export type InsertSiteLead = z.infer<typeof insertSiteLeadSchema>;
 export type SiteAnalytics = typeof siteAnalytics.$inferSelect;
 export type InsertSiteAnalytics = z.infer<typeof insertSiteAnalyticsSchema>;
 export type SiteManager = typeof siteManagers.$inferSelect;
+export type SiteManagerWithAccount = SiteManager & { hasAccount: boolean };
 export type InsertSiteManager = z.infer<typeof insertSiteManagerSchema>;
 export type LegalDisclaimer = typeof legalDisclaimers.$inferSelect;
 export type InsertLegalDisclaimer = z.infer<typeof insertLegalDisclaimerSchema>;

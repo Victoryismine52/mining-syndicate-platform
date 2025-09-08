@@ -7,7 +7,10 @@ import { qrGenerator } from "../qr-generator";
 import { submitToHubSpotForm } from "../hubspot";
 import { createHubSpotService, type ContactData } from "../hubspot-service";
 import { ObjectStorageService, ObjectNotFoundError } from "../objectStorage";
-import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, insertSiteDisclaimerSchema, insertSiteSlideSchema, insertGlobalSlideSchema, insertSiteAnalyticsSchema } from "@shared/site-schema";
+import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, insertSiteDisclaimerSchema, insertSiteSlideSchema, insertGlobalSlideSchema, insertSiteAnalyticsSchema, siteManagers, type SiteManagerWithAccount } from "@shared/site-schema";
+import { users } from "@shared/schema";
+import { db } from "../db";
+import { eq } from "drizzle-orm";
 import { checkSiteAccess, requireAdmin } from "../site-access-control";
 import { isAuthenticated } from "../google-auth";
 import { z } from "zod";
@@ -280,7 +283,27 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Get site managers (admin or site managers can view)
   app.get("/api/sites/:siteId/managers", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const managers = await siteStorage.getSiteManagers(req.params.siteId);
+      const { siteId } = req.params;
+      const rows = await db
+        .select({
+          id: siteManagers.id,
+          siteId: siteManagers.siteId,
+          userEmail: siteManagers.userEmail,
+          createdAt: siteManagers.createdAt,
+          existingEmail: users.email,
+        })
+        .from(siteManagers)
+        .leftJoin(users, eq(siteManagers.userEmail, users.email))
+        .where(eq(siteManagers.siteId, siteId));
+
+      const managers: SiteManagerWithAccount[] = rows.map((row) => ({
+        id: row.id,
+        siteId: row.siteId,
+        userEmail: row.userEmail,
+        createdAt: row.createdAt,
+        hasAccount: !!row.existingEmail,
+      }));
+
       res.json(managers);
     } catch (error) {
       logger.error("Error fetching site managers:", error);
