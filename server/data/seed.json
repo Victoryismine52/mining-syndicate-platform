@@ -9,8 +9,29 @@
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
   ],
-  "siteLeads": [],
-  "siteAnalytics": [],
+  "siteLeads": [
+    {
+      "id": "lead-1",
+      "siteId": "demo",
+      "identifier": "lead@example.com",
+      "identifierType": "email",
+      "formType": "learn-more",
+      "submissionCount": "1",
+      "lastFormSubmission": "2024-01-01T00:00:00.000Z",
+      "formData": {},
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "siteAnalytics": [
+    {
+      "id": "analytic-1",
+      "siteId": "demo",
+      "eventType": "page_view",
+      "eventData": {},
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
   "siteManagers": [
     {
       "id": "admin-manager-id",
@@ -20,10 +41,64 @@
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
   ],
-  "legalDisclaimers": [],
-  "siteDisclaimers": [],
-  "siteSlides": [],
-  "globalSlides": [],
-  "siteSections": [],
-  "siteMemberships": []
+  "legalDisclaimers": [
+    {
+      "id": "disclaimer-1",
+      "title": "Terms",
+      "content": "Sample disclaimer text",
+      "siteTypes": ["standard"],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "siteDisclaimers": [
+    {
+      "id": "site-disclaimer-1",
+      "siteId": "demo",
+      "disclaimerId": "disclaimer-1",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "siteSlides": [
+    {
+      "id": "slide-1",
+      "siteId": "demo",
+      "title": "Welcome",
+      "imageUrl": "/uploads/intro.jpg",
+      "slideOrder": "1",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "globalSlides": [
+    {
+      "id": "global-slide-1",
+      "slideKey": "global-intro",
+      "title": "Global Intro",
+      "imageUrl": "/uploads/global-intro.jpg",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "siteSections": [
+    {
+      "id": "section-1",
+      "siteId": "demo",
+      "title": "Overview",
+      "slug": "overview",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "siteMemberships": [
+    {
+      "id": "membership-1",
+      "siteId": "demo",
+      "userId": "user-1",
+      "role": "member",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
 }

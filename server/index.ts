@@ -140,27 +140,26 @@ app.use(express.urlencoded({ extended: false }));
     logger.info(`Serving local uploads from ${assetsDir} at ${uploadsRoot}`);
     // Serve uploaded files
     app.use(uploadsRoot, express.static(assetsDir));
-    // Handle uploads using middleware
-    app.use('/uploads', express.raw({ type: '*/*', limit: '50mb' }), (req, res, next) => {
-      if (req.method !== 'PUT') {
-        return next();
-      }
-      try {
-        // Get everything after /uploads/
-        const rel = req.url.replace('/uploads/', '');
-        if (!rel) {
-          return res.status(400).json({ error: 'Invalid upload path' });
+    // Handle uploads using regex route to avoid path-to-regexp errors
+    app.put(/^\/uploads\/(.+)$/,
+      express.raw({ type: '*/*', limit: '50mb' }),
+      (req, res) => {
+        try {
+          const rel = req.params[0];
+          if (!rel) {
+            return res.status(400).json({ error: 'Invalid upload path' });
+          }
+
+          const target = path.join(assetsDir, rel);
+          fs.mkdirSync(path.dirname(target), { recursive: true });
+          fs.writeFileSync(target, req.body);
+          res.status(201).json({ ok: true, path: `/uploads/${rel}` });
+        } catch (err: any) {
+          logger.error('Failed to write upload:', err);
+          res.status(500).json({ error: 'Failed to store upload' });
         }
-        
-        const target = path.join(assetsDir, rel);
-        fs.mkdirSync(path.dirname(target), { recursive: true });
-        fs.writeFileSync(target, req.body);
-        res.status(201).json({ ok: true, path: `/uploads/${rel}` });
-      } catch (err: any) {
-        logger.error('Failed to write upload:', err);
-        res.status(500).json({ error: 'Failed to store upload' });
       }
-    });
+    );
   }
 
   const server = await registerRoutes(app);

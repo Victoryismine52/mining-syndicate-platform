@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
     "dev:mem": "node scripts/start-memory-mode.js",
+    "seed:mem": "tsx scripts/seed-memory.ts",
     "dev:explorer": "cross-env NODE_ENV=development tsx server/explorer.ts",
     "dev:card": "cross-env NODE_ENV=development tsx server/card-builder.ts",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
@@ -148,6 +149,7 @@
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
+    "wait-on": "^7.0.1",
     "vite": "^7.1.5",
     "vitest": "^0.12.6"
   },

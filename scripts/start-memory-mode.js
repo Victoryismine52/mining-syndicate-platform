@@ -8,7 +8,7 @@
  * - Provides stable dev environment for rapid prototyping
  */
 
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
@@ -22,7 +22,6 @@ console.log('');
 
 // Check for required files
 const requiredFiles = [
-  'server/data/seed.json',
   'server/memory-storage.ts',
   'server/index.ts'
 ];
@@ -32,6 +31,21 @@ for (const file of requiredFiles) {
   if (!fs.existsSync(filePath)) {
     console.error(`❌ Required file missing: ${file}`);
     process.exit(1);
+  }
+}
+
+// Ensure seed file exists; generate if missing
+const seedPath = join(projectRoot, 'server/data/seed.json');
+if (!fs.existsSync(seedPath)) {
+  console.log('⚙️  Seed file not found, generating via npm run seed:mem');
+  const result = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'seed:mem'], {
+    cwd: projectRoot,
+    stdio: 'inherit',
+    shell: true
+  });
+  if (result.status !== 0) {
+    console.error('❌ Failed to generate seed data');
+    process.exit(result.status || 1);
   }
 }
 
@@ -70,6 +84,12 @@ const env = {
   GOOGLE_CLIENT_SECRET: '',
   GOOGLE_OAUTH_CALLBACK_URL: ''
 };
+
+// Allow toggling features via CLI flags
+const args = process.argv.slice(2);
+if (args.includes('--monitor')) env.ENABLE_MONITORING = 'true';
+if (args.includes('--metrics')) env.ENABLE_METRICS = 'true';
+if (args.includes('--debug')) env.ENABLE_DETAILED_LOGGING = 'true';
 
 console.log('🔧 Memory Mode Configuration:');
 console.log('   Core Settings:');
