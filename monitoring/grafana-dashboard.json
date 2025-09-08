@@ -1,0 +1,37 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "type": "dashboard"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Request Duration p95",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Error Rate",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(http_request_errors_total[5m]))",
+          "legendFormat": "errors/s"
+        }
+      ]
+    }
+  ],
+  "title": "Mining Syndicate Monitoring",
+  "uid": "ms-metrics",
+  "version": 1
+}

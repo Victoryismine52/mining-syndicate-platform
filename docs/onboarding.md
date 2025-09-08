@@ -85,8 +85,16 @@ This guide covers setting up the project locally, running tests, and establishin
 - The `FunctionBrowser` panel uses this endpoint to enable search, tag filtering, and drag-and-drop:
   1. Open the browser from the explorer sidebar.
   2. Use the tag filter or search field to find a function by name or `@tag`.
-  3. Drag the function onto the `CompositionCanvas` to begin a new flow.
+   3. Drag the function onto the `CompositionCanvas` to begin a new flow.
 
+## Monitoring
+
+- **Prometheus metrics**
+  - The server exposes metrics at `http://localhost:5000/metrics` using `prom-client`.
+  - Point your Prometheus scrape config at this endpoint.
+- **Grafana dashboard & alerts**
+  - Import `monitoring/grafana-dashboard.json` into Grafana for request latency and error rate panels.
+  - Load `monitoring/alert-rules.yml` into your Prometheus Alertmanager for basic latency/error spike alerts.
 
 ## Profile Conventions
 
