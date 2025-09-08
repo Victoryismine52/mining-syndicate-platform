@@ -206,19 +206,30 @@ export async function setupAuth(app: Express) {
     }
   });
 
-  // Logout endpoint  
+  // Logout endpoint
   app.post('/api/logout', (req, res) => {
     req.logout((err) => {
       if (err) {
         logger.error('Logout error:', err);
         return res.status(500).json({ error: 'Logout failed' });
       }
+      const hasCookie = req.headers.cookie?.includes('connect.sid=');
+
+      if (!req.session) {
+        if (hasCookie) {
+          res.clearCookie('connect.sid');
+        }
+        return res.json({ message: 'Logged out successfully' });
+      }
+
       req.session.destroy((err) => {
         if (err) {
           logger.error('Session destroy error:', err);
           return res.status(500).json({ error: 'Session cleanup failed' });
         }
-        res.clearCookie('connect.sid');
+        if (hasCookie) {
+          res.clearCookie('connect.sid');
+        }
         res.json({ message: 'Logged out successfully' });
       });
     });
