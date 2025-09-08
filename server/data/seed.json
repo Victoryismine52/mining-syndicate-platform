@@ -21,6 +21,36 @@
       "formData": {},
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "lead-2",
+      "siteId": "demo",
+      "identifier": "investor@example.com",
+      "identifierType": "email",
+      "formType": "mining-pool",
+      "submissionCount": "1",
+      "lastFormSubmission": "2024-01-02T00:00:00.000Z",
+      "formData": {
+        "miningAmount": "50000",
+        "investmentHorizon": "12-months"
+      },
+      "createdAt": "2024-01-02T00:00:00.000Z",
+      "updatedAt": "2024-01-02T00:00:00.000Z"
+    },
+    {
+      "id": "lead-3",
+      "siteId": "demo",
+      "identifier": "lender@example.com",
+      "identifierType": "email",
+      "formType": "lending-pool",
+      "submissionCount": "1",
+      "lastFormSubmission": "2024-01-03T00:00:00.000Z",
+      "formData": {
+        "lendingAmount": "25000",
+        "interestRate": "8.5%"
+      },
+      "createdAt": "2024-01-03T00:00:00.000Z",
+      "updatedAt": "2024-01-03T00:00:00.000Z"
     }
   ],
   "siteAnalytics": [
@@ -28,7 +58,32 @@
       "id": "analytic-1",
       "siteId": "demo",
       "eventType": "page_view",
-      "eventData": {},
+      "eventData": {
+        "page": "/presentation",
+        "timestamp": "2024-01-01T10:00:00.000Z",
+        "userAgent": "Mozilla/5.0 Test Browser"
+      },
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "analytic-2",
+      "siteId": "demo",
+      "eventType": "form_submission",
+      "eventData": {
+        "formType": "learn-more",
+        "submissionId": "lead-1"
+      },
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "analytic-3",
+      "siteId": "demo",
+      "eventType": "slide_view",
+      "eventData": {
+        "slideId": "slide-3",
+        "slideTitle": "Investment Opportunities",
+        "viewDuration": 45
+      },
       "createdAt": "2024-01-01T00:00:00.000Z"
     }
   ],
@@ -39,14 +94,43 @@
       "userEmail": "admin@local.dev",
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "manager-2",
+      "siteId": "demo",
+      "userEmail": "manager@local.dev",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
     }
   ],
   "legalDisclaimers": [
     {
       "id": "disclaimer-1",
-      "title": "Terms",
-      "content": "Sample disclaimer text",
-      "siteTypes": ["standard"],
+      "title": "Investment Risk Disclaimer",
+      "content": "All investments involve risk and potential loss of principal. Mining operations are subject to regulatory, environmental, and market risks.",
+      "siteTypes": [
+        "standard"
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disclaimer-2",
+      "title": "Privacy Policy",
+      "content": "We collect and process personal information in accordance with applicable privacy laws and regulations.",
+      "siteTypes": [
+        "standard"
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disclaimer-3",
+      "title": "Terms of Service",
+      "content": "By accessing this site, you agree to our terms of service and conditions of use.",
+      "siteTypes": [
+        "standard"
+      ],
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
@@ -57,15 +141,205 @@
       "siteId": "demo",
       "disclaimerId": "disclaimer-1",
       "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "site-disclaimer-2",
+      "siteId": "demo",
+      "disclaimerId": "disclaimer-2",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "site-disclaimer-3",
+      "siteId": "demo",
+      "disclaimerId": "disclaimer-3",
+      "createdAt": "2024-01-01T00:00:00.000Z"
     }
   ],
   "siteSlides": [
     {
       "id": "slide-1",
       "siteId": "demo",
-      "title": "Welcome",
-      "imageUrl": "/uploads/intro.jpg",
+      "title": "Welcome to Mining Syndicate",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-1_1755027297237.jpg",
       "slideOrder": "1",
+      "description": "Introduction slide",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-2",
+      "siteId": "demo",
+      "title": "Mining Infrastructure Overview",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-2_1755027297237.jpg",
+      "slideOrder": "2",
+      "description": "Infrastructure overview",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-3",
+      "siteId": "demo",
+      "title": "Investment Opportunities",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-3_1755027297237.jpg",
+      "slideOrder": "3",
+      "description": "Investment details",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-4",
+      "siteId": "demo",
+      "title": "Technology Stack",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-4_1755027297238.jpg",
+      "slideOrder": "4",
+      "description": "Technology overview",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-5",
+      "siteId": "demo",
+      "title": "Market Analysis",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-5_1755027297238.jpg",
+      "slideOrder": "5",
+      "description": "Market analysis",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-6",
+      "siteId": "demo",
+      "title": "Financial Projections",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-6_1755027297238.jpg",
+      "slideOrder": "6",
+      "description": "Financial projections",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-7",
+      "siteId": "demo",
+      "title": "Risk Management",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-7_1755027297238.jpg",
+      "slideOrder": "7",
+      "description": "Risk management",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-8",
+      "siteId": "demo",
+      "title": "Partnership Strategy",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-8_1755027297239.jpg",
+      "slideOrder": "8",
+      "description": "Partnership strategy",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-9",
+      "siteId": "demo",
+      "title": "Operational Excellence",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-9_1755027297239.jpg",
+      "slideOrder": "9",
+      "description": "Operational excellence",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-10",
+      "siteId": "demo",
+      "title": "Sustainability Focus",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-10_1755027297239.jpg",
+      "slideOrder": "10",
+      "description": "Sustainability focus",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-11",
+      "siteId": "demo",
+      "title": "Community Impact",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-11_1755027297239.jpg",
+      "slideOrder": "11",
+      "description": "Community impact",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-12",
+      "siteId": "demo",
+      "title": "Innovation Pipeline",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-12_1755027297240.jpg",
+      "slideOrder": "12",
+      "description": "Innovation pipeline",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-13",
+      "siteId": "demo",
+      "title": "Global Expansion",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-13_1755027297240.jpg",
+      "slideOrder": "13",
+      "description": "Global expansion",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-14",
+      "siteId": "demo",
+      "title": "Regulatory Compliance",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-14_1755027297240.jpg",
+      "slideOrder": "14",
+      "description": "Regulatory compliance",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-15",
+      "siteId": "demo",
+      "title": "Team Expertise",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-15_1755027297240.jpg",
+      "slideOrder": "15",
+      "description": "Team expertise",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-16",
+      "siteId": "demo",
+      "title": "Success Metrics",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-16_1755027297241.jpg",
+      "slideOrder": "16",
+      "description": "Success metrics",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "slide-17",
+      "siteId": "demo",
+      "title": "Future Vision",
+      "imageUrl": "/uploads/Mining Syndicate Presentation-17_1755027297241.jpg",
+      "slideOrder": "17",
+      "description": "Future vision",
+      "isVisible": true,
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
@@ -74,9 +348,22 @@
     {
       "id": "global-slide-1",
       "slideKey": "global-intro",
-      "title": "Global Intro",
+      "title": "Mining Syndicate Global Introduction",
       "imageUrl": "/uploads/global-intro.jpg",
       "isVisible": true,
+      "slideOrder": "0",
+      "description": "Global introduction slide for all sites",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "global-slide-2",
+      "slideKey": "global-closing",
+      "title": "Thank You & Next Steps",
+      "imageUrl": "/uploads/global-closing.jpg",
+      "isVisible": true,
+      "slideOrder": "999",
+      "description": "Global closing slide for all sites",
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
@@ -85,8 +372,33 @@
     {
       "id": "section-1",
       "siteId": "demo",
-      "title": "Overview",
-      "slug": "overview",
+      "title": "Investment Overview",
+      "slug": "investment-overview",
+      "description": "Overview of mining investment opportunities",
+      "sectionOrder": "1",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "section-2",
+      "siteId": "demo",
+      "title": "Technology & Operations",
+      "slug": "technology-operations",
+      "description": "Technology stack and operational details",
+      "sectionOrder": "2",
+      "isVisible": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "section-3",
+      "siteId": "demo",
+      "title": "Financial Projections",
+      "slug": "financial-projections",
+      "description": "Financial analysis and projections",
+      "sectionOrder": "3",
+      "isVisible": true,
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
     }
@@ -96,9 +408,23 @@
       "id": "membership-1",
       "siteId": "demo",
       "userId": "user-1",
+      "userEmail": "member1@example.com",
       "role": "member",
+      "status": "active",
+      "joinedAt": "2024-01-01T00:00:00.000Z",
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "membership-2",
+      "siteId": "demo",
+      "userId": "user-2",
+      "userEmail": "member2@example.com",
+      "role": "member",
+      "status": "active",
+      "joinedAt": "2024-01-02T00:00:00.000Z",
+      "createdAt": "2024-01-02T00:00:00.000Z",
+      "updatedAt": "2024-01-02T00:00:00.000Z"
     }
   ]
 }

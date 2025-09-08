@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import slides from '../server/seeds/slides.json' assert { type: 'json' };
+import { fileURLToPath } from 'url';
+import slides from '../server/seeds/slides.json' with { type: 'json' };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const seed = {
   sites: [
@@ -249,6 +253,6 @@ const seed = {
   ]
 };
 
-const outPath = path.join(process.cwd(), 'server/data/seed.json');
+const outPath = path.join(__dirname, '..', 'server/data/seed.json');
 fs.writeFileSync(outPath, JSON.stringify(seed, null, 2));
 console.log('Seed data written to', outPath);
