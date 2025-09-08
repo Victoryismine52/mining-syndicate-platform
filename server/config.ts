@@ -5,6 +5,9 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(5000),
   BASE_DEV_URL: z.string().default('http://0.0.0.0:5000/api'),
   BASE_CODEX_URL: z.string().default('https://conduit.replit.app/api'),
+  ENABLE_MONITORING: z.string().optional(),
+  ENABLE_DETAILED_LOGGING: z.string().optional(),
+  ENABLE_METRICS: z.string().optional(),
   DATABASE_URL: z.string().optional(),
   TEST_DATABASE_URL: z.string().optional(),
   SESSION_SECRET: z
@@ -57,6 +60,11 @@ const config = {
   port: env.PORT,
   baseDevUrl: env.BASE_DEV_URL,
   baseCodexUrl: env.BASE_CODEX_URL,
+  features: {
+    monitoring: env.ENABLE_MONITORING === 'true',
+    detailedLogging: env.ENABLE_DETAILED_LOGGING === 'true',
+    metrics: env.ENABLE_METRICS === 'true',
+  },
   hubspotApiKey: env.HUBSPOT_API_KEY,
   authDisabled,
   storageMode: env.STORAGE_MODE,

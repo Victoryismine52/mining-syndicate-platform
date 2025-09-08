@@ -582,10 +582,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(functionIndex);
   });
 
-  // Register multi-site routes
-  registerSiteRoutes(app, storage);
-  logger.info('Site management routes registered');
-
+  // Set up the server
   const httpServer = createServer(app);
   return httpServer;
 }

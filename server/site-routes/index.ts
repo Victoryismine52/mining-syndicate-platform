@@ -6,7 +6,9 @@ import { storage } from "../storage";
 import { qrGenerator } from "../qr-generator";
 import { submitToHubSpotForm } from "../hubspot";
 import { createHubSpotService, type ContactData } from "../hubspot-service";
-import { ObjectStorageService, ObjectNotFoundError } from "../objectStorage";
+import { ObjectStorageService } from "../storage/ObjectStorage";
+import { ObjectNotFoundError } from "../errors";
+import { config } from '../config';
 import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, insertSiteDisclaimerSchema, insertSiteSlideSchema, insertGlobalSlideSchema, insertSiteAnalyticsSchema } from "@shared/site-schema";
 import { checkSiteAccess, requireAdmin } from "../site-access-control";
 import { isAuthenticated } from "../google-auth";
@@ -15,6 +17,18 @@ import { registerSiteCreateRoutes } from "./site-create";
 import { logger } from '../logger';
 export function registerSiteRoutes(app: Express, storage?: any) {
   registerSiteCreateRoutes(app);
+
+  // Storage options middleware (dev override via query param: ?storage=memory|cloud)
+  app.use((req: any, _res, next) => {
+    const override = (req.query?.storage as string) || '';
+    const storageType = override === 'memory' ? 'memory' : override === 'cloud' ? 'cloud' : undefined;
+    req.storageOptions = {
+      useMemoryStorage: storageType ? storageType === 'memory' : (config.storageMode === 'memory'),
+      storageType: storageType,
+      debugMode: config.nodeEnv === 'development'
+    };
+    next();
+  });
 
   // Get site by siteId (no access control for basic site info - admin panel handles its own access control)
   app.get("/api/sites/:siteId", async (req, res) => {
@@ -571,9 +585,10 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get upload URL for new slide
-  app.post("/api/sites/:siteId/slides/upload", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.post("/api/sites/:siteId/slides/upload", isAuthenticated, checkSiteAccess, async (req: any, res) => {
     try {
-      const uploadURL = await objectStorageService.getSlideUploadURL();
+      const uploadURL = await objectStorageService.getSlideUploadURL(req.storageOptions);
+      res.setHeader('X-Storage-Type', (req.storageOptions?.useMemoryStorage ? 'memory' : 'cloud'));
       res.json({ uploadURL });
     } catch (error) {
       logger.error("Error getting upload URL:", error);
@@ -655,45 +670,53 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
-  // Serve static slide images directly from the filesystem
-  app.use('/static', express.static(path.join(process.cwd(), 'client/public/static')));
+    // Create route parameters for slide image paths
+  const extractImagePath = (req: express.Request, _res: express.Response, next: express.NextFunction) => {
+    // Use params.path from the route
+    req.imagePath = req.params.path;
+    next();
+  };
 
-  // Serve slide images from object storage
-  app.get('/slide-images/*', async (req, res) => {
+  // Middleware to serve slide images from object storage
+  const serveSlideImage = async (req: any, res: express.Response, next: express.NextFunction) => {
     try {
-      const objectPath = req.path.replace('/slide-images', '');
-      logger.info('Serving slide image from object storage:', objectPath);
+      if (!req.imagePath) {
+        return res.status(400).json({ error: 'Image path is required' });
+      }
       
-      const file = await objectStorageService.getSlideFile(objectPath);
-      await objectStorageService.downloadObject(file, res);
+      logger.info('Serving slide image from object storage:', req.imagePath);
+      const file = await objectStorageService.getSlideFile(req.imagePath, req.storageOptions);
+      res.setHeader('X-Storage-Type', (req.storageOptions?.useMemoryStorage ? 'memory' : 'cloud'));
+      await objectStorageService.downloadObject(file, res, 3600, req.storageOptions);
     } catch (error: any) {
       logger.error('Error serving slide image:', error);
       
-      // Check if it's a billing/auth error
-      if (error.message && error.message.includes('billing account')) {
+      if (error.message?.includes('billing account')) {
         logger.info('Object storage billing issue detected, serving placeholder');
-        // Serve a placeholder response indicating the image is uploaded but temporarily unavailable
         res.setHeader('Content-Type', 'text/html');
-        res.status(200).send(`
+        return res.status(200).send(`
           <div style="width: 100%; height: 400px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                      display: flex; align-items: center; justify-content: center; color: white; 
-                      font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+                    display: flex; align-items: center; justify-content: center; color: white; 
+                    font-family: Arial, sans-serif; text-align: center; padding: 20px;">
             <div>
               <h3>Slide Image Uploaded</h3>
-              <p>Your slide image has been successfully uploaded but is temporarily unavailable due to a service issue.</p>
-              <p><small>Image path: ${req.path.split('/').pop()}</small></p>
+              <p>Your slide image has been successfully uploaded but is temporarily unavailable.</p>
+              <p><small>Path: ${req.imagePath}</small></p>
             </div>
           </div>
         `);
-        return;
       }
       
       if (error instanceof ObjectNotFoundError) {
         return res.status(404).json({ error: 'Slide image not found' });
       }
-      res.status(500).json({ error: 'Failed to serve slide image' });
+      return res.status(500).json({ error: 'Failed to serve slide image' });
     }
-  });
+  };
+
+  // Serve static content and slide images
+  app.use('/static', express.static(path.join(process.cwd(), 'client/public/static')));
+  app.get('/slide-images/:path', extractImagePath, serveSlideImage);
 
   // ==== GLOBAL SLIDES ROUTES ====
   
@@ -750,10 +773,11 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get upload URL for global slides (admin only)
-  app.post("/api/global-slides/upload", isAuthenticated, requireAdmin, async (req, res) => {
+  app.post("/api/global-slides/upload", isAuthenticated, requireAdmin, async (req: any, res) => {
     try {
       const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getSlideUploadURL();
+      const uploadURL = await objectStorageService.getSlideUploadURL(req.storageOptions);
+      res.setHeader('X-Storage-Type', (req.storageOptions?.useMemoryStorage ? 'memory' : 'cloud'));
       res.json({ uploadURL });
     } catch (error) {
       logger.error("Error generating upload URL:", error);

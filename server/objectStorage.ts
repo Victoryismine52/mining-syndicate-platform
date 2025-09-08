@@ -1,13 +1,33 @@
-import { Storage, File } from "@google-cloud/storage";
+import { File, Storage } from "@google-cloud/storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
 import { Readable } from "stream";
 import { logger } from './logger';
 import { config } from './config';
+import { BaseStorage } from './storage/BaseStorage';
+import { IObjectStorageService } from './interfaces/IObjectStorageService';
+import { StorageOptions as SharedStorageOptions, StorageError } from '@shared/types/storage';
+import { ObjectNotFoundError } from './errors';
+
+const REPLIT_SIDECAR_ENDPOINT = config.objectStorage.replitSidecarEndpoint;le, Storage } from "@google-cloud/storage";
+import { Response } from "express";
+import { randomUUID } from "crypto";
+import { Readable } from "stream";
+import { logger } from './logger';
+import { config } from './config';
+import { BaseStorage } from './storage/BaseStorage';
+import { IObjectStorageService } from './interfaces/IObjectStorageService';
+import { StorageOptions as SharedStorageOptions, StorageError } from '@shared/types/storage';
 
 const REPLIT_SIDECAR_ENDPOINT = config.objectStorage.replitSidecarEndpoint;
 
-class MemoryFile {
+interface FileMetadata {
+  contentType: string;
+  size: number;
+  [key: string]: any;
+}
+
+class MemoryFile implements Partial<File> {
   private content?: Buffer;
 
   constructor(private store: Map<string, Buffer>, private key: string) {}
@@ -16,10 +36,10 @@ class MemoryFile {
     return [this.store.has(this.key)];
   }
 
-  async getMetadata(): Promise<any[]> {
+  async getMetadata(): Promise<[FileMetadata, any]> {
     const data = this.store.get(this.key);
-    if (!data) throw new Error("File not found");
-    return [{ contentType: "application/octet-stream", size: data.length }];
+    if (!data) throw new StorageError('NOT_FOUND', "File not found");
+    return [{ contentType: "application/octet-stream", size: data.length }, {}];
   }
 
   createReadStream() {
@@ -27,8 +47,9 @@ class MemoryFile {
     return Readable.from(data);
   }
 
-  async delete() {
+  async delete(): Promise<[any]> {
     this.store.delete(this.key);
+    return [{}];
   }
 
   async save(data: Buffer) {
@@ -39,7 +60,7 @@ class MemoryFile {
 class MemoryBucket {
   constructor(private store: Map<string, Buffer>, private name: string) {}
 
-  file(objectName: string) {
+  file(objectName: string): MemoryFile {
     const key = `${this.name}/${objectName}`;
     return new MemoryFile(this.store, key);
   }
@@ -48,32 +69,48 @@ class MemoryBucket {
 class MemoryStorage {
   private store = new Map<string, Buffer>();
 
-  bucket(name: string) {
+  bucket(name: string): MemoryBucket {
     return new MemoryBucket(this.store, name);
   }
 }
 
-let objectStorageClient: any = REPLIT_SIDECAR_ENDPOINT
-  ? new Storage({
-      credentials: {
-        audience: "replit",
-        subject_token_type: "access_token",
-        token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-        type: "external_account",
-        credential_source: {
-          url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-          format: {
-            type: "json",
-            subject_token_field_name: "access_token",
-          },
-        },
-        universe_domain: "googleapis.com",
-      },
-      projectId: "",
-    })
-  : new MemoryStorage();
+import { Storage } from '@google-cloud/storage';
 
-export function setObjectStorageClient(client: any) {
+// Create cloud storage client for Replit environment
+function createCloudStorageClient() {
+  if (!REPLIT_SIDECAR_ENDPOINT) return null;
+
+  const storage = new Storage();
+  storage.authClient.configure({
+    credentials: {
+      client_id: "replit",
+      client_secret: "",
+      quota_project_id: "",
+      type: "external_account",
+      audience: "replit",
+      subject_token_type: "access_token",
+      token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+      credential_source: {
+        url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+        format: {
+          type: "json",
+          subject_token_field_name: "access_token"
+        },
+        headers: {}
+      }
+    }
+  });
+
+  return storage;
+}
+
+// Initialize storage client based on environment
+const cloudStorageClient = createCloudStorageClient();
+const memoryStorageClient = new MemoryStorage();
+
+let objectStorageClient: Storage | MemoryStorage = cloudStorageClient || memoryStorageClient;
+
+export function setObjectStorageClient(client: Storage | MemoryStorage) {
   objectStorageClient = client;
 }
 
@@ -88,13 +125,29 @@ export class ObjectNotFoundError extends Error {
 }
 
 // The object storage service is used to interact with the object storage service.
+export interface StorageOptions {
+  useMemoryStorage?: boolean;
+}
+
 export class ObjectStorageService {
-  constructor() {}
+  private memoryStorage: MemoryStorage;
+  
+  constructor() {
+    this.memoryStorage = new MemoryStorage();
+  }
+
+  private getStorageClient(options?: StorageOptions) {
+    if (options?.useMemoryStorage || config.storageMode === 'memory') {
+      return this.memoryStorage;
+    }
+    return objectStorageClient;
+  }
 
   // Gets the public object search paths.
-  getPublicObjectSearchPaths(): Array<string> {
+  getPublicObjectSearchPaths(options?: StorageOptions): Array<string> {
     // In memory mode, default to local public and uploads buckets
-    const pathsStr = config.objectStorage.publicObjectSearchPaths || (config.storageMode === 'memory' ? '/public,/uploads' : "");
+    const useMemory = options?.useMemoryStorage || config.storageMode === 'memory';
+    const pathsStr = config.objectStorage.publicObjectSearchPaths || (useMemory ? '/public,/uploads' : "");
     const paths = Array.from(
       new Set(
         pathsStr
@@ -126,13 +179,14 @@ export class ObjectStorageService {
   }
 
   // Search for a public object from the search paths.
-  async searchPublicObject(filePath: string): Promise<File | null> {
-    for (const searchPath of this.getPublicObjectSearchPaths()) {
+  async searchPublicObject(filePath: string, options?: StorageOptions): Promise<File | null> {
+    const storage = this.getStorageClient(options);
+    for (const searchPath of this.getPublicObjectSearchPaths(options)) {
       const fullPath = `${searchPath}/${filePath}`;
 
       // Full path format: /<bucket_name>/<object_name>
       const { bucketName, objectName } = parseObjectPath(fullPath);
-      const bucket = objectStorageClient.bucket(bucketName);
+      const bucket = storage.bucket(bucketName);
       const file = bucket.file(objectName);
 
       // Check if file exists
@@ -206,13 +260,14 @@ export class ObjectStorageService {
   }
 
   // Gets slide file from object storage path
-  async getSlideFile(objectPath: string): Promise<File> {
+  async getSlideFile(objectPath: string, options?: StorageOptions): Promise<File> {
     if (!objectPath.startsWith("/")) {
       objectPath = `/${objectPath}`;
     }
 
+    const storage = this.getStorageClient(options);
     const { bucketName, objectName } = parseObjectPath(objectPath);
-    const bucket = objectStorageClient.bucket(bucketName);
+    const bucket = storage.bucket(bucketName);
     const file = bucket.file(objectName);
     
     const [exists] = await file.exists();

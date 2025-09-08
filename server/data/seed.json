@@ -11,7 +11,15 @@
   ],
   "siteLeads": [],
   "siteAnalytics": [],
-  "siteManagers": [],
+  "siteManagers": [
+    {
+      "id": "admin-manager-id",
+      "siteId": "demo",
+      "userEmail": "admin@local.dev",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
   "legalDisclaimers": [],
   "siteDisclaimers": [],
   "siteSlides": [],
