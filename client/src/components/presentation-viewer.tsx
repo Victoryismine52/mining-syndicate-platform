@@ -573,7 +573,8 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
           // Render regular image slide
           <>
             <img
-              src={currentSlideData.content || ''}
+              key={`${currentSlideData.id}-${Date.now()}`}
+              src={`${currentSlideData.content}?_cb=${Date.now()}`}
               alt={currentSlideData.title}
               className="max-w-full max-h-full object-contain"
               draggable={false}
@@ -585,7 +586,12 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
                   error: e
                 });
                 console.log('Attempting to fetch image directly to check server response...');
-                fetch(currentSlideData.content || '')
+                // Add cache-busting to get fresh response
+                const testUrl = `${currentSlideData.content}?_t=${Date.now()}`;
+                fetch(testUrl, {
+                  method: 'HEAD',
+                  cache: 'no-cache'
+                })
                   .then(response => {
                     console.log('Direct fetch response:', {
                       url: currentSlideData.content,
