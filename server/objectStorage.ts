@@ -3,10 +3,28 @@ import { Client as ReplitObjectStorageClient } from "@replit/object-storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
 import { Readable } from "stream";
+import path from "path";
 import { logger } from './logger';
 import { config } from './config';
 
 const REPLIT_SIDECAR_ENDPOINT = config.objectStorage.replitSidecarEndpoint;
+
+const MIME_TYPES: Record<string, string> = {
+  ".png": "image/png",
+  ".gif": "image/gif",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".svg": "image/svg+xml",
+};
+
+function detectMimeType(file: any, metadata?: { contentType?: string }): string {
+  const name = file?.objectName || file?.name || "";
+  const ext = path.extname(name).toLowerCase();
+  if (ext && MIME_TYPES[ext]) {
+    return MIME_TYPES[ext];
+  }
+  return metadata?.contentType || "application/octet-stream";
+}
 
 class MemoryFile {
   private content?: Buffer;
@@ -147,12 +165,14 @@ export class ObjectStorageService {
       if (file.type === 'replit') {
         // Handle Replit Object Storage
         logger.info('Replit: Downloading object:', file.objectName);
-        
+
         const buffer = await file.client.downloadAsBytes(file.objectName);
         logger.info('Replit: Downloaded bytes:', buffer.length);
-        
+
+        const mimeType = detectMimeType(file);
+
         res.set({
-          "Content-Type": "image/jpeg",
+          "Content-Type": mimeType,
           "Content-Length": buffer.length,
           "Cache-Control": `public, max-age=${cacheTtlSec}`,
         });
@@ -162,9 +182,11 @@ export class ObjectStorageService {
         // Handle Google Cloud Storage (fallback)
         const [metadata] = await file.getMetadata();
         logger.info('GCS: Downloaded file size:', metadata.size, 'bytes');
-        
+
+        const mimeType = detectMimeType(file, metadata);
+
         res.set({
-          "Content-Type": metadata.contentType || "image/jpeg",
+          "Content-Type": mimeType,
           "Content-Length": metadata.size,
           "Cache-Control": `public, max-age=${cacheTtlSec}`,
         });
