@@ -243,14 +243,14 @@ export class ObjectStorageService {
     }
     // Detect Replit-style paths containing '/.private/'
     if (objectPath.includes('/.private/')) {
-      // Path format: /replit-objstore-{bucket-id}/.private/slides/{file-id}.jpg
       const pathParts = objectPath.split('/');
+      // pathParts = ["", "replit-objstore-<id>", ".private", "slides", "<file>.jpg", ...]
       if (pathParts.length >= 4 && pathParts[2] === '.private') {
-        const objectName = pathParts.slice(2).join('/');
+        // Drop the ".private" segment
+        const objectName = pathParts.slice(3).join('/'); // now "slides/<file>.jpg"
         logger.info('Replit: Looking for object:', objectName);
         return { type: 'replit', objectName, client: objectStorageClient };
       }
-
       logger.error('Replit: Invalid path format:', objectPath);
       throw new ObjectNotFoundError();
     }

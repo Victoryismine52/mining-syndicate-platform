@@ -1,0 +1,48 @@
+Issue: In the Replit branch, slide images render as broken <img> icons. The UI builds URLs like:
+/slide-images/replit-objstore-<bucket-id>/.private/slides/<id>.jpg
+The /slide-images/* route exists and calls objectStorageService.getSlideFile(), but getSlideFile treats ".private" as part of the object name. Replit Object Storage likely expects the object name without the ".private" segment. All slide files are JPEG.
+
+Goal: Make /slide-images/... return the JPEG bytes with Content-Type: image/jpeg so <img> renders inline.
+
+Required changes:
+
+1) Fix path handling for Replit object storage:
+   - File: server/objectStorage.ts
+   - In getSlideFile(objectPath):
+     Current logic uses:
+       const objectName = pathParts.slice(2).join('/');
+       // for paths like /replit-objstore-<id>/.private/slides/<file>.jpg
+     This includes ".private" in the objectName.
+   - Update to strip ".private" from the object name so the stored key resolves correctly:
+
+   --- PATCH (server/objectStorage.ts) ---
+   if (objectPath.includes('/.private/')) {
+     const pathParts = objectPath.split('/');
+     // pathParts = ["", "replit-objstore-<id>", ".private", "slides", "<file>.jpg", ...]
+     if (pathParts.length >= 4 && pathParts[2] === '.private') {
+       // Drop the ".private" segment
+       const objectName = pathParts.slice(3).join('/'); // now "slides/<file>.jpg"
+       logger.info('Replit: Looking for object:', objectName);
+       return { type: 'replit', objectName, client: objectStorageClient };
+     }
+     logger.error('Replit: Invalid path format:', objectPath);
+     throw new ObjectNotFoundError();
+   }
+   --- END PATCH ---
+
+2) Keep MIME simple (JPEG only for now):
+   - Ensure detectMimeType() returns "image/jpeg" for .jpg/.jpeg (already present).
+   - No changes needed for webp/avif.
+
+3) Safety checks (do not remove):
+   - Route order: /slide-images/* must be registered before the SPA catch-all.
+   - Headers set by downloadObject() should include:
+       Content-Type: image/jpeg
+       Cache-Control: public, max-age=3600
+
+4) Verification (run after patch + restart repl):
+   - curl -I "https://<your-repl>/slide-images/replit-objstore-<bucket-id>/.private/slides/<id>.jpg?v=$(date +%s)"
+     Expect: HTTP/2 200 and content-type: image/jpeg
+   - Load the page; the <img> should render (no download dialog, no broken icon).
+
+Please apply the patch, restart the service, and confirm the curl and in-browser checks pass.
