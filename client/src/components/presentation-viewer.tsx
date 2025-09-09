@@ -342,7 +342,7 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
             } else {
               // Handle image slides - use imageUrl and apply same processing as site slides
               let imageUrl = slide.imageUrl;
-              if (imageUrl && !imageUrl.startsWith('http')) {
+              if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
                 imageUrl = `/slide-images${imageUrl}`;
               }
               
@@ -360,7 +360,6 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
         ...finalActionSlide
       ];
   
-  console.log('Final slides array:', slides.length, 'slides - siteSlides:', siteSlides.length, 'finalActionSlide:', finalActionSlide.length);
 
   // All hooks must be defined before any conditional returns
   const nextSlide = useCallback(() => {
