@@ -273,11 +273,10 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     .filter(slide => slide.isVisible)
     .sort((a, b) => parseInt(a.slideOrder || "0") - parseInt(b.slideOrder || "0"))
     .map(slide => {
-      console.log('Processing slide:', slide.title, 'imageUrl:', slide.imageUrl);
       // For non-HTTP paths, use the slide-images endpoint
       let imageUrl = slide.imageUrl;
       if (imageUrl && !imageUrl.startsWith('http')) {
-        imageUrl = `/slide-images${imageUrl}`;
+        imageUrl = `/slide-images/${imageUrl.replace(/^\/+/, '')}`;
       }
       
       return {
@@ -531,8 +530,6 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
               alt={currentSlideData.title}
               className="max-w-full max-h-full object-contain"
               draggable={false}
-              onLoad={() => console.log('Image loaded successfully:', currentSlideData.content || currentSlideData.imageUrl)}
-              onError={() => console.error('Image failed to load:', currentSlideData.content || currentSlideData.imageUrl, 'currentSlideData:', currentSlideData)}
             />
             
             {/* Navigation Overlay for image slides */}
