@@ -274,8 +274,8 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     .map(slide => {
       // For object storage paths, use the slide-images endpoint
       let imageUrl = slide.imageUrl;
-      console.log('Processing slide:', slide.title, 'Original URL:', imageUrl);
-      if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
+      console.log('Processing slide:', slide.title, 'imageUrl:', imageUrl);
+      if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/slide-images')) {
         imageUrl = `/slide-images${imageUrl}`;
         console.log('Transformed URL:', imageUrl);
       }
