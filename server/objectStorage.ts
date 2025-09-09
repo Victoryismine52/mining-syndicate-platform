@@ -1,4 +1,5 @@
 import { Storage, File } from "@google-cloud/storage";
+import { Client as ReplitObjectStorageClient } from "@replit/object-storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
 import { Readable } from "stream";
@@ -57,12 +58,18 @@ class MemoryStorage {
 // Use Replit's native object storage SDK which handles authentication automatically
 let objectStorageClient: any;
 
-// ONLY USE GOOGLE CLOUD STORAGE - this is where your slides are stored
-logger.info('Initializing Google Cloud Storage for bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
+// Use Replit Object Storage SDK - this handles authentication automatically in Replit
+logger.info('Initializing Replit Object Storage for bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
 
-objectStorageClient = new Storage({
-  // Let Google Cloud SDK auto-discover credentials in Replit environment
-});
+if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
+  objectStorageClient = new ReplitObjectStorageClient({
+    bucketId: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID
+  });
+  logger.info('Replit Object Storage client initialized with bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
+} else {
+  logger.error('No bucket ID found - using memory storage');
+  objectStorageClient = new MemoryStorage();
+}
 
 export function setObjectStorageClient(client: any) {
   objectStorageClient = client;
@@ -135,28 +142,42 @@ export class ObjectStorageService {
   }
 
   // Downloads an object to the response.
-  async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
+  async downloadObject(file: any, res: Response, cacheTtlSec: number = 3600) {
     try {
-      // Handle Google Cloud Storage
-      const [metadata] = await file.getMetadata();
-      logger.info('GCS: Downloaded file size:', metadata.size, 'bytes');
-      
-      res.set({
-        "Content-Type": metadata.contentType || "image/jpeg",
-        "Content-Length": metadata.size,
-        "Cache-Control": `public, max-age=${cacheTtlSec}`,
-      });
+      if (file.type === 'replit') {
+        // Handle Replit Object Storage
+        logger.info('Replit: Downloading object:', file.objectName);
+        
+        const buffer = await file.client.downloadAsBytes(file.objectName);
+        logger.info('Replit: Downloaded bytes:', buffer.length);
+        
+        res.set({
+          "Content-Type": "image/jpeg",
+          "Content-Length": buffer.length,
+          "Cache-Control": `public, max-age=${cacheTtlSec}`,
+        });
 
-      const stream = file.createReadStream();
+        res.send(buffer);
+      } else {
+        // Handle Google Cloud Storage (fallback)
+        const [metadata] = await file.getMetadata();
+        logger.info('GCS: Downloaded file size:', metadata.size, 'bytes');
+        
+        res.set({
+          "Content-Type": metadata.contentType || "image/jpeg",
+          "Content-Length": metadata.size,
+          "Cache-Control": `public, max-age=${cacheTtlSec}`,
+        });
 
-      stream.on("error", (err: Error) => {
-        logger.error("Stream error:", { error: err.message });
-        if (!res.headersSent) {
-          res.status(500).json({ error: "Error streaming file" });
-        }
-      });
-
-      stream.pipe(res);
+        const stream = file.createReadStream();
+        stream.on("error", (err: Error) => {
+          logger.error("Stream error:", { error: err.message });
+          if (!res.headersSent) {
+            res.status(500).json({ error: "Error streaming file" });
+          }
+        });
+        stream.pipe(res);
+      }
     } catch (error) {
       logger.error("Error downloading file:", { error: error instanceof Error ? error.message : String(error) });
       if (!res.headersSent) {
@@ -199,21 +220,23 @@ export class ObjectStorageService {
       objectPath = `/${objectPath}`;
     }
 
-    // Use Google Cloud Storage API - this is where your 13 slides are stored
-    const { bucketName, objectName } = parseObjectPath(objectPath);
-    logger.info('GCS: Looking for file in bucket:', bucketName, 'object:', objectName);
+    // Use Replit Object Storage - this accesses your existing slides
+    logger.info('Replit: Full object path:', objectPath);
     
-    const bucket = objectStorageClient.bucket(bucketName);
-    const file = bucket.file(objectName);
+    // Parse the object path to get the actual file path
+    // Path format: /replit-objstore-{bucket-id}/.private/slides/{file-id}.jpg
+    const pathParts = objectPath.split('/');
     
-    const [exists] = await file.exists();
-    if (!exists) {
-      logger.error('GCS: File not found:', objectName);
+    if (pathParts.length >= 4 && pathParts[2] === '.private') {
+      // Extract the file path: ".private/slides/{file-id}.jpg"
+      const objectName = pathParts.slice(2).join('/');
+      logger.info('Replit: Looking for object:', objectName);
+      
+      return { type: 'replit', objectName, client: objectStorageClient };
+    } else {
+      logger.error('Replit: Invalid path format:', objectPath);
       throw new ObjectNotFoundError();
     }
-    
-    logger.info('GCS: File found:', objectName);
-    return file;
   }
 
   normalizeSlideObjectPath(rawPath: string): string {
