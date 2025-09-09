@@ -86,8 +86,16 @@ export async function setupAuth(app: Express) {
   // Validate Google OAuth configuration
   const { clientId, clientSecret } = validateGoogleOAuthConfig();
   
-  // Google OAuth Strategy - Use environment variable or build from host
-  const callbackURL = config.google.oauthCallbackUrl || `https://conduit.replit.app/api/auth/google/callback`;
+  // Google OAuth Strategy - Use environment variable or build from current host
+  const callbackURL = config.google.oauthCallbackUrl || (() => {
+    // In development, use the current Replit dev domain
+    const devDomain = process.env.REPLIT_DEV_DOMAIN;
+    if (devDomain) {
+      return `https://${devDomain}/api/auth/google/callback`;
+    }
+    // Fallback to production
+    return `https://conduit.replit.app/api/auth/google/callback`;
+  })();
   // Google OAuth configured with callback URL
   
   passport.use(
