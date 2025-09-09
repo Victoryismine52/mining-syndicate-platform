@@ -219,22 +219,28 @@ export class ObjectStorageService {
     if (!objectPath.startsWith("/")) {
       objectPath = `/${objectPath}`;
     }
+    // Detect Replit-style paths containing '/.private/'
+    if (objectPath.includes('/.private/')) {
+      // Path format: /replit-objstore-{bucket-id}/.private/slides/{file-id}.jpg
+      const pathParts = objectPath.split('/');
+      if (pathParts.length >= 4 && pathParts[2] === '.private') {
+        const objectName = pathParts.slice(2).join('/');
+        logger.info('Replit: Looking for object:', objectName);
+        return { type: 'replit', objectName, client: objectStorageClient };
+      }
 
-    // Use Replit Object Storage - this accesses your existing slides
-    logger.info('Replit: Full object path:', objectPath);
-    
-    // Parse the object path to get the actual file path
-    // Path format: /replit-objstore-{bucket-id}/.private/slides/{file-id}.jpg
-    const pathParts = objectPath.split('/');
-    
-    if (pathParts.length >= 4 && pathParts[2] === '.private') {
-      // Extract the file path: ".private/slides/{file-id}.jpg"
-      const objectName = pathParts.slice(2).join('/');
-      logger.info('Replit: Looking for object:', objectName);
-      
-      return { type: 'replit', objectName, client: objectStorageClient };
-    } else {
       logger.error('Replit: Invalid path format:', objectPath);
+      throw new ObjectNotFoundError();
+    }
+
+    // Handle standard GCS-style paths: /<bucket>/<object>
+    try {
+      const { bucketName, objectName } = parseObjectPath(objectPath);
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+      return file;
+    } catch (err) {
+      logger.error('Invalid object path:', objectPath, err);
       throw new ObjectNotFoundError();
     }
   }
