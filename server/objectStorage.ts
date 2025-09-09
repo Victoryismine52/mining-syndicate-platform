@@ -60,8 +60,11 @@ let objectStorageClient: any;
 
 if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
   // Use Replit's native object storage SDK - this handles authentication automatically
-  logger.info('Using Replit Object Storage SDK for bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
-  objectStorageClient = new ReplitObjectStorageClient();
+  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+  logger.info('Using Replit Object Storage SDK for bucket:', bucketId);
+  objectStorageClient = new ReplitObjectStorageClient({
+    bucketId: bucketId
+  });
 } else if (REPLIT_SIDECAR_ENDPOINT) {
   // Fallback to Google Cloud Storage with sidecar credentials
   objectStorageClient = new Storage({
