@@ -703,13 +703,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Serve slide images from object storage
   app.get('/slide-images/*', async (req, res) => {
     const objectPath = req.path.replace('/slide-images', '');
+    
+    // Prevent multiple responses to the same request
+    if (res.headersSent) {
+      return;
+    }
+    
     try {
       logger.info('Slide image request:', { 
         originalPath: req.path,
         objectPath,
-        method: req.method,
-        headers: req.headers,
-        query: req.query
+        method: req.method
       });
       
       // Set headers to allow image display in browsers
@@ -724,6 +728,11 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         objectPath 
       });
       
+      // Check again before streaming
+      if (res.headersSent) {
+        return;
+      }
+      
       logger.info('Starting download stream for slide image:', { objectPath });
       await objectStorageService.downloadObject(file, res);
       logger.info('Successfully served slide image:', { objectPath });
@@ -733,16 +742,18 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         stack: error.stack, 
         objectPath,
         originalPath: req.path,
-        errorType: error.constructor.name,
-        errorDetails: error
+        errorType: error.constructor.name
       });
       
-      if (error instanceof ObjectNotFoundError) {
-        logger.warn('Slide image not found in object storage:', { objectPath });
-        return res.status(404).json({ error: 'Slide image not found' });
+      // Only send response if headers haven't been sent
+      if (!res.headersSent) {
+        if (error instanceof ObjectNotFoundError) {
+          logger.warn('Slide image not found in object storage:', { objectPath });
+          return res.status(404).json({ error: 'Slide image not found' });
+        }
+        logger.error('Internal server error serving slide image:', { objectPath, error: error.message });
+        res.status(500).json({ error: 'Failed to serve slide image' });
       }
-      logger.error('Internal server error serving slide image:', { objectPath, error: error.message });
-      res.status(500).json({ error: 'Failed to serve slide image' });
     }
   });
 
