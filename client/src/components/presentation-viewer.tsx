@@ -274,9 +274,9 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     .sort((a, b) => parseInt(a.slideOrder || "0") - parseInt(b.slideOrder || "0"))
     .map(slide => {
       console.log('Processing slide:', slide.title, 'imageUrl:', slide.imageUrl);
-      // For object storage paths, use the slide-images endpoint
+      // For non-HTTP paths, use the slide-images endpoint
       let imageUrl = slide.imageUrl;
-      if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
+      if (imageUrl && !imageUrl.startsWith('http')) {
         imageUrl = `/slide-images${imageUrl}`;
       }
       
@@ -345,7 +345,7 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
             } else {
               // Handle image slides - use imageUrl and apply same processing as site slides
               let imageUrl = slide.imageUrl;
-              if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
+              if (imageUrl && !imageUrl.startsWith('http')) {
                 imageUrl = `/slide-images${imageUrl}`;
               }
               
