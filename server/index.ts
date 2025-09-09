@@ -26,7 +26,7 @@ async function init() {
         throw new Error("Codex API call failed");
       }
       // Connected to Codex API
-    } catch (error) {
+    } catch (error: any) {
       logger.error("Failed to connect to the Codex API:", error);
     }
   }
