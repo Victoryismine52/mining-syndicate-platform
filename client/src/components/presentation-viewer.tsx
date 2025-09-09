@@ -274,8 +274,10 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     .map(slide => {
       // For object storage paths, use the slide-images endpoint
       let imageUrl = slide.imageUrl;
+      console.log('Processing slide:', slide.title, 'Original URL:', imageUrl);
       if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
         imageUrl = `/slide-images${imageUrl}`;
+        console.log('Transformed URL:', imageUrl);
       }
       
       return {
@@ -527,6 +529,8 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
               alt={currentSlideData.title}
               className="max-w-full max-h-full object-contain"
               draggable={false}
+              onLoad={() => console.log('Image loaded successfully:', currentSlideData.content)}
+              onError={(e) => console.error('Image failed to load:', currentSlideData.content, e)}
             />
             
             {/* Navigation Overlay for image slides */}
