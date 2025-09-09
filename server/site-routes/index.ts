@@ -955,18 +955,12 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Serve presentation assets from attached_assets folder via static express middleware
   app.use('/api/assets', express.static('attached_assets', {
     maxAge: '1h',
-    setHeaders: (res, path) => {
-      // Set proper content types for images
-      const ext = path.split('.').pop()?.toLowerCase();
-      if (ext === 'jpg' || ext === 'jpeg') {
-        res.setHeader('Content-Type', 'image/jpeg');
-      } else if (ext === 'png') {
-        res.setHeader('Content-Type', 'image/png');
-      } else if (ext === 'gif') {
-        res.setHeader('Content-Type', 'image/gif');
-      } else if (ext === 'svg') {
-        res.setHeader('Content-Type', 'image/svg+xml');
-      }
+    setHeaders: (res, filePath) => {
+      const ext = filePath.split('.').pop()?.toLowerCase();
+      if (ext === 'jpg' || ext === 'jpeg') res.setHeader('Content-Type', 'image/jpeg');
+      else if (ext === 'png') res.setHeader('Content-Type', 'image/png');
+      else if (ext === 'gif') res.setHeader('Content-Type', 'image/gif');
+      else if (ext === 'svg') res.setHeader('Content-Type', 'image/svg+xml');
     }
   }));
 
