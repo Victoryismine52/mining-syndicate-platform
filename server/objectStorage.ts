@@ -53,25 +53,37 @@ class MemoryStorage {
   }
 }
 
-let objectStorageClient: any = REPLIT_SIDECAR_ENDPOINT
-  ? new Storage({
-      credentials: {
-        audience: "replit",
-        subject_token_type: "access_token",
-        token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-        type: "external_account",
-        credential_source: {
-          url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-          format: {
-            type: "json",
-            subject_token_field_name: "access_token",
-          },
+// Initialize object storage client
+// Check if we have object storage configuration before falling back to memory
+let objectStorageClient: any;
+
+if (REPLIT_SIDECAR_ENDPOINT) {
+  // Use real Google Cloud Storage with Replit credentials
+  objectStorageClient = new Storage({
+    credentials: {
+      audience: "replit",
+      subject_token_type: "access_token",
+      token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+      type: "external_account",
+      credential_source: {
+        url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+        format: {
+          type: "json",
+          subject_token_field_name: "access_token",
         },
-        universe_domain: "googleapis.com",
       },
-      projectId: "",
-    })
-  : new MemoryStorage();
+      universe_domain: "googleapis.com",
+    },
+    projectId: "",
+  });
+} else if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID && process.env.PRIVATE_OBJECT_DIR) {
+  // Object storage is configured but sidecar endpoint is missing
+  // This happens in Replit environments - try to use default Google Cloud Storage
+  objectStorageClient = new Storage();
+} else {
+  // Fallback to memory storage for local development
+  objectStorageClient = new MemoryStorage();
+}
 
 export function setObjectStorageClient(client: any) {
   objectStorageClient = client;
