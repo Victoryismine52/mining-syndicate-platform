@@ -855,6 +855,11 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const objectPath = req.path.replace('/slide-images', '');
       console.log('Serving slide image from object storage:', objectPath);
       
+      // Set headers to allow image display in browsers
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
+      
       const file = await objectStorageService.getSlideFile(objectPath);
       await objectStorageService.downloadObject(file, res);
     } catch (error: any) {
