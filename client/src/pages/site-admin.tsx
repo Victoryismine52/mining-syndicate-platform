@@ -2495,10 +2495,19 @@ export function SiteAdmin(props: SiteAdminProps) {
                                 />
                               )}
                               <div>
-                                <p className="font-medium">
-                                  {managerUser?.firstName} {managerUser?.lastName}
+                                <p className="font-medium flex items-center gap-2">
+                                  {managerUser
+                                    ? `${managerUser.firstName} ${managerUser.lastName}`
+                                    : manager.userEmail}
+                                  {!managerUser && (
+                                    <Badge variant="outline" className="text-xs">
+                                      Invited
+                                    </Badge>
+                                  )}
                                 </p>
-                                <p className="text-sm text-slate-400">{manager.userEmail}</p>
+                                {managerUser && (
+                                  <p className="text-sm text-slate-400">{manager.userEmail}</p>
+                                )}
                                 <p className="text-xs text-slate-500">
                                   Added {manager.createdAt ? new Date(manager.createdAt).toLocaleDateString() : 'Unknown date'}
                                 </p>
