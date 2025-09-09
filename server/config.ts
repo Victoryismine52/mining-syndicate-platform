@@ -28,7 +28,7 @@ const envSchema = z.object({
 
 const env = envSchema.parse(process.env);
 
-const authDisabled = env.AUTH_DISABLED === 'true';
+const authDisabled = env.AUTH_DISABLED === 'true' || env.NODE_ENV === 'development';
 
 const databaseUrl = env.NODE_ENV === 'test'
   ? env.TEST_DATABASE_URL ?? env.DATABASE_URL
