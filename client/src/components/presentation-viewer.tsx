@@ -268,15 +268,14 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
   const isLoading = slidesLoading || globalLoading || formsLoading;
 
   // Convert database slides to presentation format
-  console.log('dbSlides for siteId', siteId, ':', dbSlides);
   const siteSlides = dbSlides
     .filter(slide => slide.isVisible)
     .sort((a, b) => parseInt(a.slideOrder || "0") - parseInt(b.slideOrder || "0"))
     .map(slide => {
-      // For non-HTTP paths, use the slide-images endpoint
+      // For object storage paths, use the slide-images endpoint
       let imageUrl = slide.imageUrl;
-      if (imageUrl && !imageUrl.startsWith('http')) {
-        imageUrl = `/slide-images/${imageUrl.replace(/^\/+/, '')}`;
+      if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
+        imageUrl = `/slide-images${imageUrl}`;
       }
       
       return {
@@ -288,7 +287,6 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
       };
     });
   
-  console.log('Processed siteSlides:', siteSlides.length, 'slides');
 
   // Filter for the final action cards slide that should always appear at the end
   const finalActionSlide = globalSlides
