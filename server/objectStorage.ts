@@ -160,48 +160,31 @@ export class ObjectStorageService {
   }
 
   // Downloads an object to the response.
-  async downloadObject(file: any, res: Response, cacheTtlSec: number = 3600) {
+  async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
     try {
-      if (file.type === 'replit') {
-        // Handle Replit Object Storage
-        logger.info('Replit: Downloading object:', file.objectName);
+      // Get file metadata
+      const [metadata] = await file.getMetadata();
 
-        const buffer = await file.client.downloadAsBytes(file.objectName);
-        logger.info('Replit: Downloaded bytes:', buffer.length);
+      // Set appropriate headers
+      res.set({
+        "Content-Type": metadata.contentType || "application/octet-stream",
+        "Content-Length": metadata.size,
+        "Cache-Control": `public, max-age=${cacheTtlSec}`,
+      });
 
-        const mimeType = detectMimeType(file);
+      // Stream the file to the response
+      const stream = file.createReadStream();
 
-        res.set({
-          "Content-Type": mimeType,
-          "Content-Length": buffer.length,
-          "Cache-Control": `public, max-age=${cacheTtlSec}`,
-        });
+      stream.on("error", (err: Error) => {
+        console.error("Stream error:", err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: "Error streaming file" });
+        }
+      });
 
-        res.send(buffer);
-      } else {
-        // Handle Google Cloud Storage (fallback)
-        const [metadata] = await file.getMetadata();
-        logger.info('GCS: Downloaded file size:', metadata.size, 'bytes');
-
-        const mimeType = detectMimeType(file, metadata);
-
-        res.set({
-          "Content-Type": mimeType,
-          "Content-Length": metadata.size,
-          "Cache-Control": `public, max-age=${cacheTtlSec}`,
-        });
-
-        const stream = file.createReadStream();
-        stream.on("error", (err: Error) => {
-          logger.error("Stream error:", { error: err.message });
-          if (!res.headersSent) {
-            res.status(500).json({ error: "Error streaming file" });
-          }
-        });
-        stream.pipe(res);
-      }
+      stream.pipe(res);
     } catch (error) {
-      logger.error("Error downloading file:", { error: error instanceof Error ? error.message : String(error) });
+      console.error("Error downloading file:", error);
       if (!res.headersSent) {
         res.status(500).json({ error: "Error downloading file" });
       }
@@ -237,34 +220,21 @@ export class ObjectStorageService {
   }
 
   // Gets slide file from object storage path
-  async getSlideFile(objectPath: string): Promise<any> {
+  async getSlideFile(objectPath: string): Promise<File> {
     if (!objectPath.startsWith("/")) {
       objectPath = `/${objectPath}`;
     }
-    // Detect Replit-style paths containing '/.private/'
-    if (objectPath.includes('/.private/')) {
-      const pathParts = objectPath.split('/');
-      // pathParts = ["", "replit-objstore-<id>", ".private", "slides", "<file>.jpg", ...]
-      if (pathParts.length >= 4 && pathParts[2] === '.private') {
-        // Drop the ".private" segment
-        const objectName = pathParts.slice(3).join('/'); // now "slides/<file>.jpg"
-        logger.info('Replit: Looking for object:', objectName);
-        return { type: 'replit', objectName, client: objectStorageClient };
-      }
-      logger.error('Replit: Invalid path format:', objectPath);
+
+    const { bucketName, objectName } = parseObjectPath(objectPath);
+    const bucket = objectStorageClient.bucket(bucketName);
+    const file = bucket.file(objectName);
+
+    const [exists] = await file.exists();
+    if (!exists) {
       throw new ObjectNotFoundError();
     }
 
-    // Handle standard GCS-style paths: /<bucket>/<object>
-    try {
-      const { bucketName, objectName } = parseObjectPath(objectPath);
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
-      return file;
-    } catch (err) {
-      logger.error('Invalid object path:', objectPath, err);
-      throw new ObjectNotFoundError();
-    }
+    return file;
   }
 
   normalizeSlideObjectPath(rawPath: string): string {
