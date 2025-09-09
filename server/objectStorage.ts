@@ -1,99 +1,27 @@
 import { Storage, File } from "@google-cloud/storage";
-import { Client as ReplitObjectStorageClient } from "@replit/object-storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
-import { Readable } from "stream";
-import path from "path";
-import { logger } from './logger';
-import { config } from './config';
 
-const REPLIT_SIDECAR_ENDPOINT = config.objectStorage.replitSidecarEndpoint;
+const REPLIT_SIDECAR_ENDPOINT = process.env.REPLIT_SIDECAR_ENDPOINT || "http://127.0.0.1:1106";
 
-const MIME_TYPES: Record<string, string> = {
-  ".png": "image/png",
-  ".gif": "image/gif",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".svg": "image/svg+xml",
-};
-
-function detectMimeType(file: any, metadata?: { contentType?: string }): string {
-  const name = file?.objectName || file?.name || "";
-  const ext = path.extname(name).toLowerCase();
-  if (ext && MIME_TYPES[ext]) {
-    return MIME_TYPES[ext];
-  }
-  return metadata?.contentType || "application/octet-stream";
-}
-
-class MemoryFile {
-  private content?: Buffer;
-
-  constructor(private store: Map<string, Buffer>, private key: string) {}
-
-  async exists(): Promise<[boolean]> {
-    return [this.store.has(this.key)];
-  }
-
-  async getMetadata(): Promise<any[]> {
-    const data = this.store.get(this.key);
-    if (!data) throw new Error("File not found");
-    return [{ contentType: "application/octet-stream", size: data.length }];
-  }
-
-  createReadStream() {
-    const data = this.store.get(this.key) || Buffer.alloc(0);
-    return Readable.from(data);
-  }
-
-  async delete() {
-    this.store.delete(this.key);
-  }
-
-  async save(data: Buffer) {
-    this.store.set(this.key, data);
-  }
-}
-
-class MemoryBucket {
-  constructor(private store: Map<string, Buffer>, private name: string) {}
-
-  file(objectName: string) {
-    const key = `${this.name}/${objectName}`;
-    return new MemoryFile(this.store, key);
-  }
-}
-
-class MemoryStorage {
-  private store = new Map<string, Buffer>();
-
-  bucket(name: string) {
-    return new MemoryBucket(this.store, name);
-  }
-}
-
-// Initialize object storage client
-// Use Replit's native object storage SDK which handles authentication automatically
-let objectStorageClient: any;
-
-// Use Replit Object Storage SDK - this handles authentication automatically in Replit
-logger.info('Initializing Replit Object Storage for bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
-
-if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
-  objectStorageClient = new ReplitObjectStorageClient({
-    bucketId: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID
-  });
-  logger.info('Replit Object Storage client initialized with bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
-} else {
-  logger.error('No bucket ID found - using memory storage');
-  objectStorageClient = new MemoryStorage();
-}
-
-export function setObjectStorageClient(client: any) {
-  objectStorageClient = client;
-}
-
-export { objectStorageClient };
+// The object storage client is used to interact with the object storage service.
+export const objectStorageClient = new Storage({
+  credentials: {
+    audience: "replit",
+    subject_token_type: "access_token",
+    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+    type: "external_account",
+    credential_source: {
+      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+      format: {
+        type: "json",
+        subject_token_field_name: "access_token",
+      },
+    },
+    universe_domain: "googleapis.com",
+  },
+  projectId: "",
+});
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -109,7 +37,7 @@ export class ObjectStorageService {
 
   // Gets the public object search paths.
   getPublicObjectSearchPaths(): Array<string> {
-    const pathsStr = config.objectStorage.publicObjectSearchPaths || "";
+    const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
     const paths = Array.from(
       new Set(
         pathsStr
@@ -129,7 +57,7 @@ export class ObjectStorageService {
 
   // Gets the private object directory.
   getPrivateObjectDir(): string {
-    const dir = config.objectStorage.privateObjectDir || "";
+    const dir = process.env.PRIVATE_OBJECT_DIR || "";
     if (!dir) {
       throw new Error(
         "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
@@ -206,10 +134,6 @@ export class ObjectStorageService {
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
-    if (!REPLIT_SIDECAR_ENDPOINT) {
-      return fullPath;
-    }
-
     // Sign URL for PUT method with TTL
     return signObjectURL({
       bucketName,
@@ -221,43 +145,20 @@ export class ObjectStorageService {
 
   // Gets slide file from object storage path
   async getSlideFile(objectPath: string): Promise<File> {
-    logger.info('getSlideFile called with:', {
-      originalObjectPath: objectPath,
-      pathType: typeof objectPath,
-      pathLength: objectPath ? objectPath.length : 0
-    });
-
-    // Handle both standard and Replit-specific paths
-    const cleanPath = objectPath.startsWith('/') ? objectPath.substring(1) : objectPath;
-    logger.info('Cleaned path:', { cleanPath });
-
-    // Detect standard `/<bucket>/<object>` paths and Replit-specific `/.private/` paths
-    if (cleanPath.startsWith('replit-objstore-') || cleanPath.includes('/.private/')) {
-      // This is a Replit object storage path - handle appropriately
-      logger.info('Detected Replit object storage path:', { cleanPath });
-
-      // For Replit object storage, the path should be used as-is
-      const finalPath = cleanPath;
-      logger.info('Returning Replit object storage path:', { finalPath });
-      return finalPath;
-    } else {
-      // This might be a GCS-style path or a simple filename
-      logger.info('Processing as standard object path:', { cleanPath });
-
-      // If it doesn't contain a bucket separator, assume it's just a filename in the default bucket
-      if (!cleanPath.includes('/') || cleanPath.startsWith('slide-')) {
-        const finalPath = `${this.bucket}/${cleanPath}`;
-        logger.info('Adding bucket prefix to filename:', {
-          bucket: this.bucket,
-          cleanPath,
-          finalPath
-        });
-        return finalPath;
-      }
-
-      logger.info('Using path as-is for standard object:', { cleanPath });
-      return cleanPath;
+    if (!objectPath.startsWith("/")) {
+      objectPath = `/${objectPath}`;
     }
+
+    const { bucketName, objectName } = parseObjectPath(objectPath);
+    const bucket = objectStorageClient.bucket(bucketName);
+    const file = bucket.file(objectName);
+
+    const [exists] = await file.exists();
+    if (!exists) {
+      throw new ObjectNotFoundError();
+    }
+
+    return file;
   }
 
   normalizeSlideObjectPath(rawPath: string): string {
