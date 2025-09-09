@@ -1,4 +1,5 @@
 import { Storage, File } from "@google-cloud/storage";
+import { Client as ReplitObjectStorageClient } from "@replit/object-storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
 import { Readable } from "stream";
@@ -54,11 +55,15 @@ class MemoryStorage {
 }
 
 // Initialize object storage client
-// Check if we have object storage configuration before falling back to memory
+// Use Replit's native object storage SDK which handles authentication automatically
 let objectStorageClient: any;
 
-if (REPLIT_SIDECAR_ENDPOINT) {
-  // Use real Google Cloud Storage with Replit credentials
+if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
+  // Use Replit's native object storage SDK - this handles authentication automatically
+  logger.info('Using Replit Object Storage SDK for bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
+  objectStorageClient = new ReplitObjectStorageClient();
+} else if (REPLIT_SIDECAR_ENDPOINT) {
+  // Fallback to Google Cloud Storage with sidecar credentials
   objectStorageClient = new Storage({
     credentials: {
       audience: "replit",
@@ -76,12 +81,9 @@ if (REPLIT_SIDECAR_ENDPOINT) {
     },
     projectId: "",
   });
-} else if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID && process.env.PRIVATE_OBJECT_DIR) {
-  // Object storage is configured but sidecar endpoint is missing
-  // This happens in Replit environments - try to use default Google Cloud Storage
-  objectStorageClient = new Storage();
 } else {
-  // Fallback to memory storage for local development
+  // Fallback to memory storage for true local development
+  logger.info('Using memory storage fallback');
   objectStorageClient = new MemoryStorage();
 }
 
@@ -156,29 +158,41 @@ export class ObjectStorageService {
   }
 
   // Downloads an object to the response.
-  async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
+  async downloadObject(file: any, res: Response, cacheTtlSec: number = 3600) {
     try {
-      // Get file metadata
-      const [metadata] = await file.getMetadata();
-      
-      // Set appropriate headers
-      res.set({
-        "Content-Type": metadata.contentType || "application/octet-stream",
-        "Content-Length": metadata.size,
-        "Cache-Control": `public, max-age=${cacheTtlSec}`,
-      });
+      if (file.type === 'replit') {
+        // Handle Replit Object Storage
+        const buffer = await file.client.downloadAsBytes(file.objectName);
+        
+        // Set appropriate headers for images
+        res.set({
+          "Content-Type": "image/jpeg", // Default to jpeg, could be improved to detect actual type
+          "Content-Length": buffer.length,
+          "Cache-Control": `public, max-age=${cacheTtlSec}`,
+        });
 
-      // Stream the file to the response
-      const stream = file.createReadStream();
+        res.send(buffer);
+      } else {
+        // Handle Google Cloud Storage
+        const [metadata] = await file.getMetadata();
+        
+        res.set({
+          "Content-Type": metadata.contentType || "application/octet-stream",
+          "Content-Length": metadata.size,
+          "Cache-Control": `public, max-age=${cacheTtlSec}`,
+        });
 
-      stream.on("error", (err: Error) => {
-        logger.error("Stream error:", { error: err.message });
-        if (!res.headersSent) {
-          res.status(500).json({ error: "Error streaming file" });
-        }
-      });
+        const stream = file.createReadStream();
 
-      stream.pipe(res);
+        stream.on("error", (err: Error) => {
+          logger.error("Stream error:", { error: err.message });
+          if (!res.headersSent) {
+            res.status(500).json({ error: "Error streaming file" });
+          }
+        });
+
+        stream.pipe(res);
+      }
     } catch (error) {
       logger.error("Error downloading file:", { error: error instanceof Error ? error.message : String(error) });
       if (!res.headersSent) {
@@ -216,21 +230,37 @@ export class ObjectStorageService {
   }
 
   // Gets slide file from object storage path
-  async getSlideFile(objectPath: string): Promise<File> {
+  async getSlideFile(objectPath: string): Promise<any> {
     if (!objectPath.startsWith("/")) {
       objectPath = `/${objectPath}`;
     }
 
-    const { bucketName, objectName } = parseObjectPath(objectPath);
-    const bucket = objectStorageClient.bucket(bucketName);
-    const file = bucket.file(objectName);
-    
-    const [exists] = await file.exists();
-    if (!exists) {
-      throw new ObjectNotFoundError();
+    // Check if we're using Replit's SDK
+    if (objectStorageClient instanceof ReplitObjectStorageClient) {
+      // For Replit SDK, the path is the full object path
+      const objectName = objectPath.substring(1); // Remove leading slash
+      
+      try {
+        // Try to check if file exists by attempting to get its info
+        await objectStorageClient.list({ prefix: objectName, maxResults: 1 });
+        return { type: 'replit', objectName, client: objectStorageClient };
+      } catch (error) {
+        logger.error('Replit object storage error:', error);
+        throw new ObjectNotFoundError();
+      }
+    } else {
+      // Use Google Cloud Storage API
+      const { bucketName, objectName } = parseObjectPath(objectPath);
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+      
+      const [exists] = await file.exists();
+      if (!exists) {
+        throw new ObjectNotFoundError();
+      }
+      
+      return file;
     }
-    
-    return file;
   }
 
   normalizeSlideObjectPath(rawPath: string): string {
