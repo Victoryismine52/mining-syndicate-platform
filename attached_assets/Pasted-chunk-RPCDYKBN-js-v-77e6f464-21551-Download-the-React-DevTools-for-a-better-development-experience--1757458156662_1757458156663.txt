@@ -1,0 +1,121 @@
+chunk-RPCDYKBN.js?v=77e6f464:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+presentation-viewer.tsx:343 Slide composition data: {siteId: 'node-pool', siteType: 'pitch-site', siteSlides: {…}, dynamicFormSlide: {…}, globalSlides: {…}, …}
+presentation-viewer.tsx:402 Final slides array: {count: 1, slides: Array(1)}
+presentation-viewer.tsx:343 Slide composition data: {siteId: 'node-pool', siteType: 'pitch-site', siteSlides: {…}, dynamicFormSlide: {…}, globalSlides: {…}, …}
+presentation-viewer.tsx:402 Final slides array: {count: 1, slides: Array(1)}
+presentation-viewer.tsx:275 Processing slide: {id: '792d5fc5-e89b-4a5d-987d-140ea739c3ce', title: 'Conduit Mining Pools - Nodes', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4098e0c6-f64a-4266-95e9-273d3073b15a.jpg', isVisible: true, slideOrder: '0'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4098e0c6-f64a-4266-95e9-273d3073b15a.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4098e0c6-f64a-4266-95e9-273d3073b15a.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '792d5fc5-e89b-4a5d-987d-140ea739c3ce', title: 'Conduit Mining Pools - Nodes', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4098e0c6-f64a-4266-95e9-273d3073b15a.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '2558edcb-53ce-4d05-a64d-ec8e71a6261c', title: 'Conduit Mining Pools - Nodes (1)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/bbbca9f0-d3f4-4b43-8cc9-dfdb6b4f319c.jpg', isVisible: true, slideOrder: '1'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/bbbca9f0-d3f4-4b43-8cc9-dfdb6b4f319c.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/bbbca9f0-d3f4-4b43-8cc9-dfdb6b4f319c.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '2558edcb-53ce-4d05-a64d-ec8e71a6261c', title: 'Conduit Mining Pools - Nodes (1)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/bbbca9f0-d3f4-4b43-8cc9-dfdb6b4f319c.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '540ec3bb-8207-4e0e-9e18-5a6b91a38d27', title: 'Conduit Mining Pools - Nodes (2)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/1a00afef-57a8-4ef7-86d5-c070568775b4.jpg', isVisible: true, slideOrder: '2'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/1a00afef-57a8-4ef7-86d5-c070568775b4.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/1a00afef-57a8-4ef7-86d5-c070568775b4.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '540ec3bb-8207-4e0e-9e18-5a6b91a38d27', title: 'Conduit Mining Pools - Nodes (2)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/1a00afef-57a8-4ef7-86d5-c070568775b4.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '1edbae00-22ed-4396-806f-b6e0439ed233', title: 'Conduit Mining Pools - Nodes (3)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/6630e657-4bc5-42f2-84a0-6dd8c6221c84.jpg', isVisible: true, slideOrder: '3'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/6630e657-4bc5-42f2-84a0-6dd8c6221c84.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/6630e657-4bc5-42f2-84a0-6dd8c6221c84.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '1edbae00-22ed-4396-806f-b6e0439ed233', title: 'Conduit Mining Pools - Nodes (3)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/6630e657-4bc5-42f2-84a0-6dd8c6221c84.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '296409d9-782c-4f20-bacb-ae90a311a68f', title: 'Conduit Mining Pools - Nodes (4)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/f5d22343-6fc4-470a-96ea-68663984c025.jpg', isVisible: true, slideOrder: '4'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/f5d22343-6fc4-470a-96ea-68663984c025.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/f5d22343-6fc4-470a-96ea-68663984c025.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '296409d9-782c-4f20-bacb-ae90a311a68f', title: 'Conduit Mining Pools - Nodes (4)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/f5d22343-6fc4-470a-96ea-68663984c025.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '4b319fcc-d155-409d-bd4d-fff635c60d5d', title: 'Conduit Mining Pools - Nodes (5)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/6ba74d7f-a9be-4d07-8a0a-dccc6724b93b.jpg', isVisible: true, slideOrder: '5'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/6ba74d7f-a9be-4d07-8a0a-dccc6724b93b.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/6ba74d7f-a9be-4d07-8a0a-dccc6724b93b.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '4b319fcc-d155-409d-bd4d-fff635c60d5d', title: 'Conduit Mining Pools - Nodes (5)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/6ba74d7f-a9be-4d07-8a0a-dccc6724b93b.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: 'c826fe10-f48c-4534-840b-52b83daa9d77', title: 'Conduit Mining Pools - Nodes (6)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/15b74709-a12c-4374-9d20-946624b60097.jpg', isVisible: true, slideOrder: '6'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/15b74709-a12c-4374-9d20-946624b60097.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/15b74709-a12c-4374-9d20-946624b60097.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: 'c826fe10-f48c-4534-840b-52b83daa9d77', title: 'Conduit Mining Pools - Nodes (6)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/15b74709-a12c-4374-9d20-946624b60097.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '46941b50-a85b-4aa6-8584-a44e96253106', title: 'Conduit Mining Pools - Nodes (7)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/38064b65-688f-4f82-b659-c137c0fd63e8.jpg', isVisible: true, slideOrder: '7'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/38064b65-688f-4f82-b659-c137c0fd63e8.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/38064b65-688f-4f82-b659-c137c0fd63e8.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '46941b50-a85b-4aa6-8584-a44e96253106', title: 'Conduit Mining Pools - Nodes (7)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/38064b65-688f-4f82-b659-c137c0fd63e8.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '0fd033f5-4531-464a-9500-a603b8fc5eba', title: 'Conduit Mining Pools - Nodes (8)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/9585d2a2-6e45-4bb4-8188-8d9d640378fa.jpg', isVisible: true, slideOrder: '8'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/9585d2a2-6e45-4bb4-8188-8d9d640378fa.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/9585d2a2-6e45-4bb4-8188-8d9d640378fa.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '0fd033f5-4531-464a-9500-a603b8fc5eba', title: 'Conduit Mining Pools - Nodes (8)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/9585d2a2-6e45-4bb4-8188-8d9d640378fa.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '86a4d5a9-d1e1-47bd-b996-0ccb5ef9d5ac', title: 'Conduit Mining Pools - Nodes (9)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/aef7acd7-dd55-4d91-b2ef-95991e38ea4d.jpg', isVisible: true, slideOrder: '9'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/aef7acd7-dd55-4d91-b2ef-95991e38ea4d.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/aef7acd7-dd55-4d91-b2ef-95991e38ea4d.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '86a4d5a9-d1e1-47bd-b996-0ccb5ef9d5ac', title: 'Conduit Mining Pools - Nodes (9)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/aef7acd7-dd55-4d91-b2ef-95991e38ea4d.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: 'd2782390-41ba-4f5d-82ef-09b3ab98b858', title: 'Conduit Mining Pools - Nodes (10)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d312f58d-5b8c-4956-85af-c47812364969.jpg', isVisible: true, slideOrder: '10'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d312f58d-5b8c-4956-85af-c47812364969.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d312f58d-5b8c-4956-85af-c47812364969.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: 'd2782390-41ba-4f5d-82ef-09b3ab98b858', title: 'Conduit Mining Pools - Nodes (10)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d312f58d-5b8c-4956-85af-c47812364969.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '29335b37-ba97-43e9-aa96-86e013f489ab', title: 'Conduit Mining Pools - Nodes (11)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/ce939fa4-6c37-4e66-868e-9c99183ccdc5.jpg', isVisible: true, slideOrder: '11'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/ce939fa4-6c37-4e66-868e-9c99183ccdc5.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/ce939fa4-6c37-4e66-868e-9c99183ccdc5.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '29335b37-ba97-43e9-aa96-86e013f489ab', title: 'Conduit Mining Pools - Nodes (11)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/ce939fa4-6c37-4e66-868e-9c99183ccdc5.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:275 Processing slide: {id: '7a838739-ef5c-4cc6-95d3-a2f51bd95554', title: 'Conduit Mining Pools - Nodes (12)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/67362344-5562-40d7-aabd-a7707308cc79.jpg', isVisible: true, slideOrder: '12'}
+presentation-viewer.tsx:287 Transformed Replit objstore URL: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/67362344-5562-40d7-aabd-a7707308cc79.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/67362344-5562-40d7-aabd-a7707308cc79.jpg'}
+presentation-viewer.tsx:311 Final processed slide: {id: '7a838739-ef5c-4cc6-95d3-a2f51bd95554', title: 'Conduit Mining Pools - Nodes (12)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/67362344-5562-40d7-aabd-a7707308cc79.jpg', type: 'image', slideType: 'site'}
+presentation-viewer.tsx:343 Slide composition data: {siteId: 'node-pool', siteType: 'pitch-site', siteSlides: {…}, dynamicFormSlide: {…}, globalSlides: {…}, …}
+presentation-viewer.tsx:402 Final slides array: {count: 14, slides: Array(14)}
+4098e0c6-f64a-4266-95e9-273d3073b15a.jpg:1  GET https://485e2e64-1b2c-43eb-99b5-63298da289f4-00-1kpwljks2mo2e.kirk.replit.dev/slide-images/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb9e5/.private/slides/4098e0c6-f64a-4266-95e9-273d3073b15a.jpg 500 (Internal Server Error)
+Image
+commitMount @ chunk-RPCDYKBN.js?v=77e6f464:8412
+commitLayoutEffectOnFiber @ chunk-RPCDYKBN.js?v=77e6f464:17102
+commitLayoutMountEffects_complete @ chunk-RPCDYKBN.js?v=77e6f464:17980
+commitLayoutEffects_begin @ chunk-RPCDYKBN.js?v=77e6f464:17969
+commitLayoutEffects @ chunk-RPCDYKBN.js?v=77e6f464:17920
+commitRootImpl @ chunk-RPCDYKBN.js?v=77e6f464:19353
+commitRoot @ chunk-RPCDYKBN.js?v=77e6f464:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=77e6f464:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=77e6f464:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=77e6f464:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=77e6f464:555
+flush @ @tanstack_react-query.js?v=77e6f464:569
+batch @ @tanstack_react-query.js?v=77e6f464:587
+dispatch_fn @ @tanstack_react-query.js?v=77e6f464:996
+setData @ @tanstack_react-query.js?v=77e6f464:696
+onSuccess @ @tanstack_react-query.js?v=77e6f464:897
+resolve @ @tanstack_react-query.js?v=77e6f464:456
+Promise.then
+run @ @tanstack_react-query.js?v=77e6f464:498
+start @ @tanstack_react-query.js?v=77e6f464:536
+fetch @ @tanstack_react-query.js?v=77e6f464:926
+executeFetch_fn @ @tanstack_react-query.js?v=77e6f464:2211
+onSubscribe @ @tanstack_react-query.js?v=77e6f464:1898
+subscribe @ @tanstack_react-query.js?v=77e6f464:24
+(anonymous) @ @tanstack_react-query.js?v=77e6f464:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=77e6f464:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=77e6f464:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=77e6f464:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=77e6f464:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=77e6f464:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=77e6f464:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=77e6f464:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=77e6f464:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=77e6f464:19416
+commitRoot @ chunk-RPCDYKBN.js?v=77e6f464:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=77e6f464:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=77e6f464:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=77e6f464:18627
+presentation-viewer.tsx:582 Image failed to load: {src: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4098e0c6-f64a-4266-95e9-273d3073b15a.jpg', slide: {…}, error: SyntheticBaseEvent}
+onError @ presentation-viewer.tsx:582
+callCallback2 @ chunk-RPCDYKBN.js?v=77e6f464:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=77e6f464:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=77e6f464:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=77e6f464:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=77e6f464:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=77e6f464:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=77e6f464:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=77e6f464:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=77e6f464:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=77e6f464:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=77e6f464:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=77e6f464:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=77e6f464:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=77e6f464:5472
+presentation-viewer.tsx:587 Attempting to fetch image directly to check server response...
+presentation-viewer.tsx:588  GET https://485e2e64-1b2c-43eb-99b5-63298da289f4-00-1kpwljks2mo2e.kirk.replit.dev/slide-images/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb9e5/.private/slides/4098e0c6-f64a-4266-95e9-273d3073b15a.jpg 500 (Internal Server Error)
+onError @ presentation-viewer.tsx:588
+callCallback2 @ chunk-RPCDYKBN.js?v=77e6f464:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=77e6f464:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=77e6f464:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=77e6f464:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=77e6f464:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=77e6f464:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=77e6f464:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=77e6f464:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=77e6f464:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=77e6f464:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=77e6f464:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=77e6f464:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=77e6f464:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=77e6f464:5472
+presentation-viewer.tsx:590 Direct fetch response: {url: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4098e0c6-f64a-4266-95e9-273d3073b15a.jpg', status: 500, statusText: 'Internal Server Error', headers: {…}}
