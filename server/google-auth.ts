@@ -59,10 +59,11 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // Set to false for development to ensure cookies work over HTTP/HTTPS proxies
+      secure: process.env.NODE_ENV === 'production', // Secure in production, flexible in development
       maxAge: sessionTtl,
-      sameSite: 'lax', // Allow cross-site requests for OAuth callbacks
+      sameSite: 'none', // Allow cross-site requests for development/production switching
       path: '/', // Ensure cookie is available on all paths
+      domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser decide domain
     },
   });
 }
@@ -86,15 +87,15 @@ export async function setupAuth(app: Express) {
   // Validate Google OAuth configuration
   const { clientId, clientSecret } = validateGoogleOAuthConfig();
   
-  // Google OAuth Strategy - Use environment variable or build from current host
-  const callbackURL = config.google.oauthCallbackUrl || (() => {
-    // In development, use the current Replit dev domain
+  // Google OAuth Strategy - Use development domain if available, otherwise use configured URL
+  const callbackURL = (() => {
+    // In development, prioritize the current Replit dev domain
     const devDomain = process.env.REPLIT_DEV_DOMAIN;
-    if (devDomain) {
+    if (devDomain && process.env.NODE_ENV !== 'production') {
       return `https://${devDomain}/api/auth/google/callback`;
     }
-    // Fallback to production
-    return `https://conduit.replit.app/api/auth/google/callback`;
+    // Use configured URL or fallback to production
+    return config.google.oauthCallbackUrl || `https://conduit.replit.app/api/auth/google/callback`;
   })();
   // Google OAuth configured with callback URL
   
