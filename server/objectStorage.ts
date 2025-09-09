@@ -160,7 +160,7 @@ export class ObjectStorageService {
       const stream = file.createReadStream();
 
       stream.on("error", (err: Error) => {
-        logger.error("Stream error:", err);
+        logger.error("Stream error:", { error: err.message });
         if (!res.headersSent) {
           res.status(500).json({ error: "Error streaming file" });
         }
@@ -168,7 +168,7 @@ export class ObjectStorageService {
 
       stream.pipe(res);
     } catch (error) {
-      logger.error("Error downloading file:", error);
+      logger.error("Error downloading file:", { error: error instanceof Error ? error.message : String(error) });
       if (!res.headersSent) {
         res.status(500).json({ error: "Error downloading file" });
       }
