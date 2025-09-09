@@ -58,15 +58,9 @@ class MemoryStorage {
 // Use Replit's native object storage SDK which handles authentication automatically
 let objectStorageClient: any;
 
-if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
-  // Use Replit's native object storage SDK - this handles authentication automatically
-  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-  logger.info('Using Replit Object Storage SDK for bucket:', bucketId);
-  objectStorageClient = new ReplitObjectStorageClient({
-    bucketId: bucketId
-  });
-} else if (REPLIT_SIDECAR_ENDPOINT) {
-  // Fallback to Google Cloud Storage with sidecar credentials
+if (REPLIT_SIDECAR_ENDPOINT) {
+  // Use Google Cloud Storage with sidecar credentials (original working method)
+  logger.info('Using Google Cloud Storage with sidecar endpoint');
   objectStorageClient = new Storage({
     credentials: {
       audience: "replit",
@@ -84,6 +78,22 @@ if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
     },
     projectId: "",
   });
+} else if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
+  // Fallback to Replit's native object storage SDK
+  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+  logger.info('Using Replit Object Storage SDK for bucket:', bucketId);
+  objectStorageClient = new ReplitObjectStorageClient({
+    bucketId: bucketId
+  });
+} else if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
+  // Try using Google Cloud Storage with Application Default Credentials
+  logger.info('Using Google Cloud Storage with default credentials for bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
+  try {
+    objectStorageClient = new Storage();
+  } catch (error) {
+    logger.error('Failed to initialize Google Cloud Storage with default credentials:', error);
+    objectStorageClient = new MemoryStorage();
+  }
 } else {
   // Fallback to memory storage for true local development
   logger.info('Using memory storage fallback');
@@ -165,16 +175,24 @@ export class ObjectStorageService {
     try {
       if (file.type === 'replit') {
         // Handle Replit Object Storage
-        const buffer = await file.client.downloadAsBytes(file.objectName);
+        logger.info('Replit SDK: Downloading object:', file.objectName);
         
-        // Set appropriate headers for images
-        res.set({
-          "Content-Type": "image/jpeg", // Default to jpeg, could be improved to detect actual type
-          "Content-Length": buffer.length,
-          "Cache-Control": `public, max-age=${cacheTtlSec}`,
-        });
+        try {
+          const buffer = await file.client.downloadAsBytes(file.objectName);
+          logger.info('Replit SDK: Downloaded bytes:', buffer.length);
+          
+          // Set appropriate headers for images
+          res.set({
+            "Content-Type": "image/jpeg", // Default to jpeg, could be improved to detect actual type
+            "Content-Length": buffer.length,
+            "Cache-Control": `public, max-age=${cacheTtlSec}`,
+          });
 
-        res.send(buffer);
+          res.send(buffer);
+        } catch (downloadError) {
+          logger.error('Replit SDK download error:', downloadError);
+          throw downloadError;
+        }
       } else {
         // Handle Google Cloud Storage
         const [metadata] = await file.getMetadata();
@@ -240,15 +258,54 @@ export class ObjectStorageService {
 
     // Check if we're using Replit's SDK
     if (objectStorageClient instanceof ReplitObjectStorageClient) {
-      // For Replit SDK, the path is the full object path
-      const objectName = objectPath.substring(1); // Remove leading slash
+      logger.info('Replit SDK: Full object path received:', objectPath);
       
-      try {
-        // Try to check if file exists by attempting to get its info
-        await objectStorageClient.list({ prefix: objectName, maxResults: 1 });
-        return { type: 'replit', objectName, client: objectStorageClient };
-      } catch (error) {
-        logger.error('Replit object storage error:', error);
+      // For Replit SDK, need to parse the path correctly
+      // Path format: /replit-objstore-{bucket-id}/.private/slides/{file-id}.jpg
+      const pathParts = objectPath.split('/');
+      logger.info('Replit SDK: Path parts:', pathParts);
+      
+      if (pathParts.length >= 4 && pathParts[2] === '.private') {
+        // Extract just the file path after .private  
+        const objectName = pathParts.slice(2).join('/'); // ".private/slides/{file-id}.jpg"
+        logger.info('Replit SDK: Parsed object name:', objectName);
+        
+        try {
+          // First try to list all files to see what's actually there
+          logger.info('Replit SDK: Listing all files in bucket...');
+          const allFiles = await objectStorageClient.list({ maxResults: 50 });
+          logger.info('Replit SDK: Total files in bucket:', allFiles.length);
+          if (allFiles.length > 0) {
+            logger.info('Replit SDK: Sample files:', allFiles.slice(0, 3).map(f => f.key));
+          }
+          
+          // Now try to find our specific file
+          const files = await objectStorageClient.list({ prefix: objectName, maxResults: 1 });
+          logger.info('Replit SDK: Files matching prefix:', files.length);
+          
+          if (files.length > 0) {
+            logger.info('Replit SDK: Found matching file:', files[0].key);
+            return { type: 'replit', objectName: files[0].key, client: objectStorageClient };
+          } else {
+            // Try alternative paths in case the structure is different
+            const alternativeObjectName = pathParts.slice(3).join('/'); // "slides/{file-id}.jpg"
+            logger.info('Replit SDK: Trying alternative path:', alternativeObjectName);
+            
+            const altFiles = await objectStorageClient.list({ prefix: alternativeObjectName, maxResults: 1 });
+            if (altFiles.length > 0) {
+              logger.info('Replit SDK: Found with alternative path:', altFiles[0].key);
+              return { type: 'replit', objectName: altFiles[0].key, client: objectStorageClient };
+            }
+            
+            logger.error('File not found in object storage with any path variant');
+            throw new ObjectNotFoundError();
+          }
+        } catch (error) {
+          logger.error('Replit object storage error:', error);
+          throw new ObjectNotFoundError();
+        }
+      } else {
+        logger.error('Invalid object path format:', objectPath, 'parts:', pathParts);
         throw new ObjectNotFoundError();
       }
     } else {
