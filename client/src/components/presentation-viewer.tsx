@@ -531,6 +531,8 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
               alt={currentSlideData.title}
               className="max-w-full max-h-full object-contain"
               draggable={false}
+              onLoad={() => console.log('Image loaded successfully:', currentSlideData.content || currentSlideData.imageUrl)}
+              onError={() => console.error('Image failed to load:', currentSlideData.content || currentSlideData.imageUrl, 'currentSlideData:', currentSlideData)}
             />
             
             {/* Navigation Overlay for image slides */}
