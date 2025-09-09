@@ -79,20 +79,19 @@ if (REPLIT_SIDECAR_ENDPOINT) {
     projectId: "",
   });
 } else if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
-  // Fallback to Replit's native object storage SDK
-  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-  logger.info('Using Replit Object Storage SDK for bucket:', bucketId);
-  objectStorageClient = new ReplitObjectStorageClient({
-    bucketId: bucketId
-  });
-} else if (process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID) {
-  // Try using Google Cloud Storage with Application Default Credentials
+  // PRIORITIZE Google Cloud Storage to access existing files
   logger.info('Using Google Cloud Storage with default credentials for bucket:', process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID);
   try {
     objectStorageClient = new Storage();
+    logger.info('Google Cloud Storage client initialized successfully');
   } catch (error) {
-    logger.error('Failed to initialize Google Cloud Storage with default credentials:', error);
-    objectStorageClient = new MemoryStorage();
+    logger.error('Failed to initialize Google Cloud Storage, falling back to Replit SDK:', error);
+    // Fallback to Replit's native object storage SDK
+    const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+    logger.info('Using Replit Object Storage SDK for bucket:', bucketId);
+    objectStorageClient = new ReplitObjectStorageClient({
+      bucketId: bucketId
+    });
   }
 } else {
   // Fallback to memory storage for true local development
@@ -256,7 +255,7 @@ export class ObjectStorageService {
       objectPath = `/${objectPath}`;
     }
 
-    // Check if we're using Replit's SDK
+    // Check if we're using Replit's SDK (only if it's actually a ReplitObjectStorageClient)
     if (objectStorageClient instanceof ReplitObjectStorageClient) {
       logger.info('Replit SDK: Full object path received:', objectPath);
       
