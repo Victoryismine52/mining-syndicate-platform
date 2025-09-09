@@ -523,7 +523,7 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
           // Render regular image slide
           <>
             <img
-              src={currentSlideData.content || currentSlideData.imageUrl || ''}
+              src={currentSlideData.content || ''}
               alt={currentSlideData.title}
               className="max-w-full max-h-full object-contain"
               draggable={false}
