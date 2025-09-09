@@ -579,16 +579,35 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Get slides for a site
   app.get("/api/sites/:siteId/slides", async (req, res) => {
     try {
+      const siteId = req.params.siteId;
+      logger.info('Fetching slides for site:', { siteId });
+      
       // First verify the site exists
-      const site = await siteStorage.getSite(req.params.siteId);
+      const site = await siteStorage.getSite(siteId);
       if (!site) {
+        logger.warn('Site not found when fetching slides:', { siteId });
         return res.status(404).json({ error: "Site not found" });
       }
       
-      const slides = await siteStorage.getSiteSlides(req.params.siteId);
+      logger.info('Site found, fetching slides:', { siteId, siteName: site.name });
+      const slides = await siteStorage.getSiteSlides(siteId);
+      
+      logger.info('Retrieved slides from database:', { 
+        siteId,
+        slideCount: slides.length,
+        slides: slides.map(slide => ({
+          id: slide.id,
+          title: slide.title,
+          imageUrl: slide.imageUrl,
+          isVisible: slide.isVisible,
+          slideOrder: slide.slideOrder,
+          slideType: slide.slideType
+        }))
+      });
+      
       res.json(slides);
     } catch (error) {
-      logger.error("Error fetching site slides:", error);
+      logger.error("Error fetching site slides:", { siteId: req.params.siteId, error });
       res.status(500).json({ error: "Failed to fetch slides" });
     }
   });
@@ -685,26 +704,44 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.get('/slide-images/*', async (req, res) => {
     const objectPath = req.path.replace('/slide-images', '');
     try {
-      logger.info('Serving slide image from object storage:', { objectPath });
+      logger.info('Slide image request:', { 
+        originalPath: req.path,
+        objectPath,
+        method: req.method,
+        headers: req.headers,
+        query: req.query
+      });
       
       // Set headers to allow image display in browsers
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'public, max-age=3600');
       res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
       
+      logger.info('Attempting to get slide file from object storage:', { objectPath });
       const file = await objectStorageService.getSlideFile(objectPath);
+      logger.info('Successfully retrieved file reference:', { 
+        file: file ? 'found' : 'null',
+        objectPath 
+      });
+      
+      logger.info('Starting download stream for slide image:', { objectPath });
       await objectStorageService.downloadObject(file, res);
+      logger.info('Successfully served slide image:', { objectPath });
     } catch (error: any) {
       logger.error('Error serving slide image:', { 
         error: error.message, 
         stack: error.stack, 
         objectPath,
-        errorType: error.constructor.name 
+        originalPath: req.path,
+        errorType: error.constructor.name,
+        errorDetails: error
       });
       
       if (error instanceof ObjectNotFoundError) {
+        logger.warn('Slide image not found in object storage:', { objectPath });
         return res.status(404).json({ error: 'Slide image not found' });
       }
+      logger.error('Internal server error serving slide image:', { objectPath, error: error.message });
       res.status(500).json({ error: 'Failed to serve slide image' });
     }
   });

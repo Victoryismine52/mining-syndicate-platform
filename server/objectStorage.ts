@@ -221,27 +221,50 @@ export class ObjectStorageService {
 
   // Gets slide file from object storage path
   async getSlideFile(objectPath: string): Promise<File> {
-    if (!objectPath.startsWith("/")) {
-      objectPath = `/${objectPath}`;
+    logger.info('getSlideFile called with:', {
+      originalObjectPath: objectPath,
+      pathType: typeof objectPath,
+      pathLength: objectPath ? objectPath.length : 0
+    });
+
+    // Handle both standard and Replit-specific paths
+    const cleanPath = objectPath.startsWith('/') ? objectPath.substring(1) : objectPath;
+    logger.info('Cleaned path:', { cleanPath });
+
+    // Detect standard `/<bucket>/<object>` paths and Replit-specific `/.private/` paths
+    if (cleanPath.startsWith('replit-objstore-') || cleanPath.includes('/.private/')) {
+      // This is a Replit object storage path - handle appropriately
+      logger.info('Detected Replit object storage path:', { cleanPath });
+
+      // For Replit object storage, the path should be used as-is
+      const finalPath = cleanPath;
+      logger.info('Returning Replit object storage path:', { finalPath });
+      return finalPath;
+    } else {
+      // This might be a GCS-style path or a simple filename
+      logger.info('Processing as standard object path:', { cleanPath });
+
+      // If it doesn't contain a bucket separator, assume it's just a filename in the default bucket
+      if (!cleanPath.includes('/') || cleanPath.startsWith('slide-')) {
+        const finalPath = `${this.bucket}/${cleanPath}`;
+        logger.info('Adding bucket prefix to filename:', {
+          bucket: this.bucket,
+          cleanPath,
+          finalPath
+        });
+        return finalPath;
+      }
+
+      logger.info('Using path as-is for standard object:', { cleanPath });
+      return cleanPath;
     }
-
-    const { bucketName, objectName } = parseObjectPath(objectPath);
-    const bucket = objectStorageClient.bucket(bucketName);
-    const file = bucket.file(objectName);
-
-    const [exists] = await file.exists();
-    if (!exists) {
-      throw new ObjectNotFoundError();
-    }
-
-    return file;
   }
 
   normalizeSlideObjectPath(rawPath: string): string {
     if (!rawPath.startsWith("https://storage.googleapis.com/")) {
       return rawPath;
     }
-  
+
     // Extract the path from the URL by removing query parameters and domain
     const url = new URL(rawPath);
     return url.pathname;

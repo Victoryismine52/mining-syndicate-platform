@@ -272,19 +272,44 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     .filter(slide => slide.isVisible)
     .sort((a, b) => parseInt(a.slideOrder || "0") - parseInt(b.slideOrder || "0"))
     .map(slide => {
+      console.log('Processing slide:', {
+        id: slide.id,
+        title: slide.title,
+        originalImageUrl: slide.imageUrl,
+        isVisible: slide.isVisible,
+        slideOrder: slide.slideOrder
+      });
+      
       // For object storage paths, use the slide-images endpoint
       let imageUrl = slide.imageUrl;
       if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
         imageUrl = `/slide-images${imageUrl}`;
+        console.log('Transformed Replit objstore URL:', {
+          original: slide.imageUrl,
+          transformed: imageUrl
+        });
+      } else if (imageUrl && !imageUrl.startsWith('http')) {
+        // Handle other non-HTTP URLs
+        console.log('Non-HTTP URL detected:', imageUrl);
+        if (!imageUrl.startsWith('/slide-images')) {
+          imageUrl = `/slide-images${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
+          console.log('Added slide-images prefix:', {
+            original: slide.imageUrl,
+            transformed: imageUrl
+          });
+        }
       }
       
-      return {
+      const processedSlide = {
         id: slide.id,
         title: slide.title,
         content: imageUrl,
         type: "image" as const,
         slideType: "site" as const,
       };
+      
+      console.log('Final processed slide:', processedSlide);
+      return processedSlide;
     });
   
 
@@ -315,6 +340,15 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     forms: presentationForms,
   }] : [];
 
+  console.log('Slide composition data:', {
+    siteId,
+    siteType,
+    siteSlides: { count: siteSlides.length, slides: siteSlides },
+    dynamicFormSlide: { count: dynamicFormSlide.length, slides: dynamicFormSlide },
+    globalSlides: { count: globalSlides.length, slides: globalSlides },
+    finalActionSlide: { count: finalActionSlide.length, slides: finalActionSlide }
+  });
+
   // CRITICAL: Pitch Sites should NEVER inherit global slides - they have independent slide management
   // Only Mining Syndicate sites should fall back to global slides when no site-specific content exists
   const slides = siteSlides.length > 0 
@@ -329,6 +363,7 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
           .filter(slide => slide.isVisible && slide.displayPosition !== 'end')
           .sort((a, b) => (a.createdAt ? new Date(a.createdAt).getTime() : 0) - (b.createdAt ? new Date(b.createdAt).getTime() : 0)) // Sort by creation time
           .map(slide => {
+            console.log('Processing global slide:', slide);
             // Handle different slide types properly
             if (slide.slideType === 'action-cards') {
               return {
@@ -344,6 +379,10 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
               let imageUrl = slide.imageUrl;
               if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
                 imageUrl = `/slide-images${imageUrl}`;
+                console.log('Global slide URL transformation:', {
+                  original: slide.imageUrl,
+                  transformed: imageUrl
+                });
               }
               
               return {
@@ -359,6 +398,17 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
         // Then add the final action slide at the end
         ...finalActionSlide
       ];
+
+  console.log('Final slides array:', {
+    count: slides.length,
+    slides: slides.map(slide => ({
+      id: slide.id,
+      title: slide.title,
+      content: slide.content,
+      type: slide.type,
+      slideType: slide.slideType
+    }))
+  });
   
 
   // All hooks must be defined before any conditional returns
@@ -527,6 +577,27 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
               alt={currentSlideData.title}
               className="max-w-full max-h-full object-contain"
               draggable={false}
+              onLoad={() => console.log('Image loaded successfully:', currentSlideData.content)}
+              onError={(e) => {
+                console.error('Image failed to load:', {
+                  src: currentSlideData.content,
+                  slide: currentSlideData,
+                  error: e
+                });
+                console.log('Attempting to fetch image directly to check server response...');
+                fetch(currentSlideData.content || '')
+                  .then(response => {
+                    console.log('Direct fetch response:', {
+                      url: currentSlideData.content,
+                      status: response.status,
+                      statusText: response.statusText,
+                      headers: Object.fromEntries(response.headers.entries())
+                    });
+                  })
+                  .catch(fetchError => {
+                    console.error('Direct fetch failed:', fetchError);
+                  });
+              }}
             />
             
             {/* Navigation Overlay for image slides */}
