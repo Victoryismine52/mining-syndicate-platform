@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
+    "dev:mem": "cross-env NODE_ENV=development STORAGE_MODE=memory AUTH_DISABLED=true tsx server/index.ts",
     "dev:explorer": "cross-env NODE_ENV=development tsx server/explorer.ts",
     "dev:card": "cross-env NODE_ENV=development tsx server/card-builder.ts",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
