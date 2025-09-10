@@ -653,4 +653,8 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export let storage: IStorage = new DatabaseStorage();
+
+export function setStorage(storageImpl: IStorage) {
+  storage = storageImpl;
+}
