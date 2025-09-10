@@ -84,32 +84,55 @@ export class ObjectStorageService {
 
   // Gets the public object search paths.
   getPublicObjectSearchPaths(): Array<string> {
-    const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
+    const pathsStr = config.objectStorage.publicObjectSearchPaths || "";
     const paths = Array.from(
       new Set(
         pathsStr
           .split(",")
-          .map((path) => path.trim())
-          .filter((path) => path.length > 0)
+          .map((p) => p.trim())
+          .filter((p) => p.length > 0)
       )
     );
+
     if (paths.length === 0) {
+      if (config.storageMode === "memory") {
+        const defaultDir = path.resolve("./public-objects");
+        if (!fs.existsSync(defaultDir)) {
+          fs.mkdirSync(defaultDir, { recursive: true });
+        }
+        return [defaultDir];
+      }
       throw new Error(
         "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
           "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var (comma-separated paths)."
       );
     }
+
+    if (config.storageMode === "memory") {
+      for (const dir of paths) {
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+      }
+    }
+
     return paths;
   }
 
   // Gets the private object directory.
   getPrivateObjectDir(): string {
-    const dir = process.env.PRIVATE_OBJECT_DIR || "";
+    let dir = config.objectStorage.privateObjectDir || "";
+    if (!dir && config.storageMode === "memory") {
+      dir = path.resolve("./private-objects");
+    }
     if (!dir) {
       throw new Error(
         "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
           "tool and set PRIVATE_OBJECT_DIR env var."
       );
+    }
+    if (config.storageMode === "memory" && !fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
     }
     return dir;
   }
