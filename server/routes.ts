@@ -36,8 +36,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     logger.info('HubSpot API key not found - lead sync disabled');
   }
 
-  // Basic health check endpoint to verify DB connectivity
+  // Basic health check endpoint
   app.get("/api/health", async (_req, res) => {
+    if (config.storageMode === "memory") {
+      return res.json({ ok: true });
+    }
+
     try {
       await db.execute(sql`select 1`);
       res.json({ ok: true });
