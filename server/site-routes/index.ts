@@ -74,6 +74,23 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
+  // Check slug availability
+  app.get("/api/sites/check-slug/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const existingSite = await siteStorage.getSite(slug);
+      
+      res.json({ 
+        available: !existingSite,
+        slug: slug,
+        message: existingSite ? "Site URL is already taken" : "Site URL is available"
+      });
+    } catch (error) {
+      logger.error("Error checking slug availability:", error);
+      res.status(500).json({ error: "Failed to check slug availability" });
+    }
+  });
+
   // Update site
   app.put("/api/sites/:siteId", async (req, res) => {
     try {
@@ -89,7 +106,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Handle database unique constraint violations
       if (error && typeof error === 'object' && 'code' in error) {
         if (error.code === '23505') { // PostgreSQL unique violation error code
-          const errorMessage = error.message || '';
+          const errorMessage = (error as any).message || '';
           if (errorMessage.includes('site_id')) {
             return res.status(409).json({ 
               error: "Site URL already exists", 

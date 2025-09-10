@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, QrCode, Eye, Edit, Trash2, Copy, Settings, ArrowLeft, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { SlugInput } from '@/components/slug-input';
 import type { Site, InsertSite } from '@shared/site-schema';
 
 export function SiteManager() {
@@ -26,6 +27,9 @@ export function SiteManager() {
   const [siteNameValue, setSiteNameValue] = useState('');
   const [siteIdValue, setSiteIdValue] = useState('');
   const [siteIdTouched, setSiteIdTouched] = useState(false);
+  
+  // Edit form states
+  const [editSiteIdValue, setEditSiteIdValue] = useState('');
 
   // Generate a URL-friendly slug from site name
   const generateSlug = (name: string) => {
@@ -264,6 +268,7 @@ export function SiteManager() {
 
   const handleEditSite = (site: Site) => {
     setEditingSite(site);
+    setEditSiteIdValue(site.siteId); // Initialize the slug input with current value
     setIsEditOpen(true);
   };
 
@@ -276,7 +281,7 @@ export function SiteManager() {
     const switchElement = form.querySelector('[name="passwordProtected"]') as HTMLInputElement;
     
     const updates: Partial<InsertSite> = {
-      siteId: formData.get('siteId') as string,
+      siteId: editSiteIdValue, // Use controlled slug input value
       name: formData.get('name') as string,
       description: formData.get('description') as string,
       password: formData.get('password') as string || undefined,
@@ -389,24 +394,22 @@ export function SiteManager() {
                             data-testid="input-site-name"
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="siteId" className="text-slate-300">Site ID (Optional)</Label>
-                          <Input
-                            id="siteId"
-                            name="siteId"
-                            value={siteIdValue}
-                            onChange={handleSiteIdChange}
-                            placeholder={siteNameValue ? generateSlug(siteNameValue) : "my-mining-site"}
-                            className="bg-slate-700/50 border-slate-600 focus:border-blue-500"
-                            data-testid="input-site-id"
-                          />
-                          <p className="text-xs text-slate-500 mt-1">
-                            Used in URL: /sites/{siteIdValue || (siteNameValue ? generateSlug(siteNameValue) : 'your-id')}
-                            {!siteIdTouched && siteNameValue && (
-                              <span className="text-blue-400 ml-2">(auto-generated from site name)</span>
-                            )}
+                        <SlugInput
+                          label="Site ID (Optional)"
+                          name="siteId"
+                          value={siteIdValue}
+                          onChange={(value) => {
+                            setSiteIdValue(value);
+                            setSiteIdTouched(true);
+                          }}
+                          placeholder={siteNameValue ? generateSlug(siteNameValue) : "my-mining-site"}
+                          data-testid="input-site-id"
+                        />
+                        {!siteIdTouched && siteNameValue && (
+                          <p className="text-xs text-blue-400 -mt-2">
+                            Auto-generated from site name
                           </p>
-                        </div>
+                        )}
                         <div>
                           <Label htmlFor="description" className="text-slate-300">Description (Optional)</Label>
                           <Textarea
@@ -628,18 +631,16 @@ export function SiteManager() {
                   <div className="space-y-4">
                     <h4 className="font-medium text-slate-200 border-b border-slate-700 pb-2">Basic Information</h4>
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="edit-siteId" className="text-slate-300">Site ID</Label>
-                        <Input
-                          id="edit-siteId"
-                          name="siteId"
-                          defaultValue={editingSite.siteId}
-                          className="bg-slate-700/50 border-slate-600 focus:border-blue-500"
-                          required
-                          data-testid="input-edit-site-id"
-                        />
-                      </div>
+                    <div className="space-y-4">
+                      <SlugInput
+                        label="Site ID"
+                        name="siteId"
+                        value={editSiteIdValue}
+                        onChange={setEditSiteIdValue}
+                        originalSlug={editingSite.siteId}
+                        required
+                        data-testid="input-edit-site-id"
+                      />
                       <div>
                         <Label htmlFor="edit-name" className="text-slate-300">Display Name</Label>
                         <Input
