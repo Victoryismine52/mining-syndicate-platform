@@ -76,11 +76,22 @@ function loadSeed(): SeedData {
   }
 }
 
+function saveSeed(data: SeedData) {
+  const seedPath = path.join(__dirname, "data", "core-seed.json");
+  fs.writeFileSync(seedPath, JSON.stringify(data, null, 2));
+}
+
 export class MemoryStorage implements IStorage {
   private data: SeedData;
 
   constructor(seedData?: SeedData) {
     this.data = seedData ?? loadSeed();
+  }
+
+  persist(): void {
+    if (process.env.MEMORY_PERSIST === "true") {
+      saveSeed(this.data);
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -589,3 +600,10 @@ export class MemoryStorage implements IStorage {
 }
 
 export const memoryStorage = new MemoryStorage();
+
+if (process.env.MEMORY_PERSIST === "true") {
+  const handler = () => memoryStorage.persist();
+  process.on("beforeExit", handler);
+  process.on("SIGINT", handler);
+  process.on("SIGTERM", handler);
+}

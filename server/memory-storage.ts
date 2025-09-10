@@ -67,11 +67,22 @@ function loadSeed(): SeedData {
   }
 }
 
+function saveSeed(data: SeedData) {
+  const seedPath = path.join(__dirname, "data", "seed.json");
+  fs.writeFileSync(seedPath, JSON.stringify(data, null, 2));
+}
+
 export class MemorySiteStorage implements ISiteStorage {
   private data: SeedData;
 
   constructor() {
     this.data = loadSeed();
+  }
+
+  persist(): void {
+    if (process.env.MEMORY_PERSIST === "true") {
+      saveSeed(this.data);
+    }
   }
 
   // Site operations
@@ -739,4 +750,11 @@ export class MemorySiteStorage implements ISiteStorage {
 }
 
 export const memorySiteStorage = new MemorySiteStorage();
+
+if (process.env.MEMORY_PERSIST === "true") {
+  const handler = () => memorySiteStorage.persist();
+  process.on("beforeExit", handler);
+  process.on("SIGINT", handler);
+  process.on("SIGTERM", handler);
+}
 
