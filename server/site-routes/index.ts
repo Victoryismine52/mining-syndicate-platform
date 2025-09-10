@@ -1,7 +1,7 @@
 import type { Express, Response } from "express";
 import express from "express";
 import path from "path";
-import { siteStorage, updateSiteLead } from "../site-storage";
+import { siteStorage } from "../site-storage";
 import { storage } from "../storage";
 import { qrGenerator } from "../qr-generator";
 import { submitToHubSpotForm } from "../hubspot";
@@ -28,7 +28,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
       res.json(site);
     } catch (error) {
-      logger.error("Error fetching site:", error);
+      logger.error({ err: error }, "Error fetching site");
       res.status(500).json({ error: "Failed to fetch site" });
     }
   });
@@ -69,7 +69,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         res.json(accessibleSites);
       }
     } catch (error) {
-      logger.error("Error listing sites:", error);
+      logger.error({ err: error }, "Error listing sites");
       res.status(500).json({ error: "Failed to list sites" });
     }
   });
@@ -86,7 +86,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         message: existingSite ? "Site URL is already taken" : "Site URL is available"
       });
     } catch (error) {
-      logger.error("Error checking slug availability:", error);
+      logger.error({ err: error }, "Error checking slug availability");
       res.status(500).json({ error: "Failed to check slug availability" });
     }
   });
@@ -98,7 +98,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const site = await siteStorage.updateSite(req.params.siteId, updates);
       res.json(site);
     } catch (error) {
-      logger.error("Error updating site:", error);
+      logger.error({ err: error }, "Error updating site");
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
@@ -126,7 +126,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.deleteSite(req.params.siteId);
       res.json({ success: true });
     } catch (error) {
-      logger.error("Error deleting site:", error);
+      logger.error({ err: error }, "Error deleting site");
       res.status(500).json({ error: "Failed to delete site" });
     }
   });
@@ -173,17 +173,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
             logger.info(`Contact created/updated in HubSpot with ID: ${result.id}`);
             // Update the lead with HubSpot contact ID
             try {
-              await updateSiteLead(lead.id, result.id);
+              await siteStorage.updateSiteLead(lead.id, { hubspotContactId: result.id });
               logger.info(`Lead ${lead.id} updated with HubSpot contact ID ${result.id}`);
             } catch (updateError) {
               logger.error(
-                "Failed to update lead with HubSpot contact ID:",
-                updateError
+                { err: updateError },
+                "Failed to update lead with HubSpot contact ID"
               );
             }
           }
         } catch (hubspotError) {
-          logger.error("HubSpot contact creation failed:", hubspotError);
+          logger.error({ err: hubspotError }, "HubSpot contact creation failed");
           // Continue - don't fail the whole request if HubSpot fails
         }
       }
@@ -223,7 +223,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
               leadSource: `Site: ${site.name} (${site.siteId})`,
             });
           } catch (hubspotError) {
-            logger.error("HubSpot form submission failed:", hubspotError);
+            logger.error({ err: hubspotError }, "HubSpot form submission failed");
             // Continue - don't fail the whole request if HubSpot fails
           }
         }
@@ -231,7 +231,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.json({ success: true, leadId: lead.id });
     } catch (error) {
-      logger.error("Error submitting site lead:", error);
+      logger.error({ err: error }, "Error submitting site lead");
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
@@ -271,7 +271,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const leads = await siteStorage.getSiteLeads(req.params.siteId);
       res.json(leads);
     } catch (error) {
-      logger.error("Error fetching site leads:", error);
+      logger.error({ err: error }, "Error fetching site leads");
       res.status(500).json({ error: "Failed to fetch leads" });
     }
   });
@@ -282,7 +282,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const leads = await siteStorage.getSiteLeadsByType(req.params.siteId, req.params.formType);
       res.json(leads);
     } catch (error) {
-      logger.error("Error fetching site leads by type:", error);
+      logger.error({ err: error }, "Error fetching site leads by type");
       res.status(500).json({ error: "Failed to fetch leads" });
     }
   });
@@ -304,7 +304,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.json({ qrCodeUrl: updatedSite.qrCodeUrl });
     } catch (error) {
-      logger.error("Error generating QR code:", error);
+      logger.error({ err: error }, "Error generating QR code");
       res.status(500).json({ error: "Failed to generate QR code" });
     }
   });
@@ -337,7 +337,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.json(managers);
     } catch (error) {
-      logger.error("Error fetching site managers:", error);
+      logger.error({ err: error }, "Error fetching site managers");
       res.status(500).json({ error: "Failed to fetch site managers" });
     }
   });
@@ -410,7 +410,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.json(manager);
     } catch (error) {
-      logger.error("Error adding site manager:", error);
+      logger.error({ err: error }, "Error adding site manager");
       res.status(500).json({ error: "Failed to add site manager" });
     }
   });
@@ -452,7 +452,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.removeSiteManager(siteId, decodedEmail);
       res.json({ success: true });
     } catch (error) {
-      logger.error("Error removing site manager:", error);
+      logger.error({ err: error }, "Error removing site manager");
       res.status(500).json({ error: "Failed to remove site manager" });
     }
   });
@@ -463,7 +463,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const leads = await siteStorage.getSiteLeads(req.params.siteId);
       res.json(leads);
     } catch (error) {
-      logger.error("Error fetching site leads:", error);
+      logger.error({ err: error }, "Error fetching site leads");
       res.status(500).json({ error: "Failed to fetch leads" });
     }
   });
