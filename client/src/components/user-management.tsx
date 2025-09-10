@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Shield, UserCheck, User, Edit3, Plus, Mail, Trash2, UserPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { config } from '../../../server/config';
 
 interface UserType {
   id: string;
@@ -454,7 +455,7 @@ export function UserManagement() {
                       </div>
                     </div>
                   </div>
-                  {entry.email !== "bnelson523@gmail.com" && (
+                  {entry.email !== config.defaultAdminEmail && (
                     <Button
                       variant="outline"
                       size="sm"

@@ -23,6 +23,7 @@ const envSchema = z.object({
   REPLIT_SIDECAR_ENDPOINT: z.string().optional(),
   PUBLIC_OBJECT_SEARCH_PATHS: z.string().optional(),
   PRIVATE_OBJECT_DIR: z.string().optional(),
+  DEFAULT_ADMIN_EMAIL: z.string().default('bnelson523@gmail.com'),
   LOG_LEVEL: z.string().default('info'),
 });
 
@@ -63,6 +64,7 @@ const config = {
   storageMode: env.STORAGE_MODE,
   sessionSecret: env.SESSION_SECRET,
   databaseUrl: env.STORAGE_MODE === 'memory' ? undefined : databaseUrl, // Database is optional in memory mode
+  defaultAdminEmail: env.DEFAULT_ADMIN_EMAIL,
   replit: {
     domains: (env.REPLIT_DOMAINS ?? env.REPLIT_DEV_DOMAIN ?? 'conduit.replit.app')
       .split(',')

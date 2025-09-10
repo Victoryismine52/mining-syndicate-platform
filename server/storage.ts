@@ -3,6 +3,7 @@ import { siteLeads, sites, type SiteLead } from "@shared/site-schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 import { logger } from './logger';
+import { config } from './config';
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -100,8 +101,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser & { isAdmin?: boolean }): Promise<User> {
-    // Check if user is bnelson523@gmail.com and make them admin
-    const isAdmin = insertUser.email === "bnelson523@gmail.com" || insertUser.isAdmin || false;
+    // Check if user is the default admin email and make them admin
+    const isAdmin = insertUser.email === config.defaultAdminEmail || insertUser.isAdmin || false;
     
     const [user] = await db
       .insert(users)
@@ -224,7 +225,7 @@ export class DatabaseStorage implements IStorage {
     let userRole = "generic"; // Default role for all users
     const hasAdminAccess = await this.checkUserAccess(userData.email);
     
-    if (userData.email === "bnelson523@gmail.com") {
+    if (userData.email === config.defaultAdminEmail) {
       userRole = "admin";
     } else if (hasAdminAccess) {
       userRole = "site_manager"; // Users in access list become site managers
@@ -236,7 +237,7 @@ export class DatabaseStorage implements IStorage {
       firstName: userData.firstName || userData.email?.split("@")[0] || "Unknown",
       lastName: userData.lastName || "User",
       role: userRole,
-      isAdmin: userData.email === "bnelson523@gmail.com" || false, // Keep for backward compatibility
+      isAdmin: userData.email === config.defaultAdminEmail || false, // Keep for backward compatibility
     };
     
     logger.info('Final user data:', userDataWithDefaults);
@@ -260,8 +261,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async checkUserAccess(email: string): Promise<boolean> {
-    // bnelson523@gmail.com always has access
-    if (email === "bnelson523@gmail.com") {
+    // The default admin email always has access
+    if (email === config.defaultAdminEmail) {
       return true;
     }
 
@@ -275,11 +276,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addToAccessList(email: string, addedBy: string): Promise<AccessListEntry> {
-    // Initialize bnelson523@gmail.com as the first entry if access list is empty
+    // Initialize the default admin email as the first entry if access list is empty
     const existing = await db.select().from(accessList);
-    if (existing.length === 0 && email !== "bnelson523@gmail.com") {
+    if (existing.length === 0 && email !== config.defaultAdminEmail) {
       await db.insert(accessList).values({
-        email: "bnelson523@gmail.com",
+        email: config.defaultAdminEmail,
         addedBy: null,
       });
     }
@@ -303,8 +304,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async removeFromAccessList(email: string): Promise<void> {
-    // Don't allow removing bnelson523@gmail.com
-    if (email === "bnelson523@gmail.com") {
+    // Don't allow removing the default admin email
+    if (email === config.defaultAdminEmail) {
       return;
     }
     

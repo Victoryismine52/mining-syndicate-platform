@@ -51,6 +51,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `SESSION_SECRET` | Secret used to sign Express session cookies. |
 | `HUBSPOT_API_KEY` | Token for submitting forms to HubSpot. |
 | `AUTH_DISABLED` | Set to `true` to bypass authentication with a mock admin user. Defaults to `true` when `STORAGE_MODE=memory`. |
+| `DEFAULT_ADMIN_EMAIL` | Email address granted admin rights and initial access. |
 | `PORT` | Port for the combined Express and Vite servers (defaults to `5000`). |
 | `BASE_DEV_URL` | Local API base URL used during initialization. |
 | `BASE_CODEX_URL` | Fallback Codex API endpoint when the local API is unavailable. |
