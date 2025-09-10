@@ -28,15 +28,22 @@ export function VideoCard({ template, className = "" }: VideoCardProps) {
     // Clean the video ID - remove any URL parts if user pasted full URL
     const cleanVideoId = config.vimeoVideoId.toString().replace(/.*vimeo\.com\//, '').split('?')[0];
     
+    const vimeoParams: Record<string, string> = {
+      autoplay: config.autoplay ? '1' : '0',
+      controls: config.showControls ? '1' : '0',
+      title: '0', // Hide title
+      byline: '0', // Hide byline  
+      portrait: '0', // Hide portrait
+      dnt: '1', // Do not track
+    };
+    
+    // Add hash parameter if provided
+    if (config.vimeoHash) {
+      vimeoParams.h = config.vimeoHash;
+    }
+    
     embedUrl = `https://player.vimeo.com/video/${cleanVideoId}?` + 
-      new URLSearchParams({
-        autoplay: config.autoplay ? '1' : '0',
-        controls: config.showControls ? '1' : '0',
-        title: '0', // Hide title
-        byline: '0', // Hide byline  
-        portrait: '0', // Hide portrait
-        dnt: '1', // Do not track
-      }).toString();
+      new URLSearchParams(vimeoParams).toString();
     
     // Debug logging for Vimeo videos
     console.log('Vimeo Video Debug:', {

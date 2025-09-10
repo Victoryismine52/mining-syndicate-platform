@@ -413,6 +413,7 @@ function FormLibraryManagement() {
     // Add Vimeo-specific config
     if (cardType === 'vimeo') {
       config.vimeoVideoId = formData.get('vimeoVideoId') as string;
+      config.vimeoHash = formData.get('vimeoHash') as string;
       config.autoplay = formData.get('autoplay') === 'on';
       config.showControls = formData.get('showControls') === 'on';
     }
@@ -475,6 +476,7 @@ function FormLibraryManagement() {
         // Keep existing or add new Vimeo fields
         ...(editingForm.cardType === 'vimeo' && {
           vimeoVideoId: formData.get('vimeoVideoId') as string || editingForm.config?.vimeoVideoId,
+          vimeoHash: formData.get('vimeoHash') as string || editingForm.config?.vimeoHash,
           autoplay: formData.get('autoplay') === 'on' || editingForm.config?.autoplay,
           showControls: formData.get('showControls') === 'on' || editingForm.config?.showControls
         }),
@@ -745,29 +747,42 @@ function FormLibraryManagement() {
                           Extract from Vimeo URL: vimeo.com/<strong>VIDEO_ID</strong>
                         </p>
                       </div>
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id="vimeoAutoplay"
-                            name="autoplay"
-                            defaultChecked={false}
-                            className="w-4 h-4 bg-slate-700/50 border-slate-600 rounded"
-                            data-testid="checkbox-vimeo-autoplay"
-                          />
-                          <Label htmlFor="vimeoAutoplay" className="text-slate-300">Auto-play video</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id="vimeoShowControls"
-                            name="showControls"
-                            defaultChecked={true}
-                            className="w-4 h-4 bg-slate-700/50 border-slate-600 rounded"
-                            data-testid="checkbox-vimeo-show-controls"
-                          />
-                          <Label htmlFor="vimeoShowControls" className="text-slate-300">Show video controls</Label>
-                        </div>
+                      <div>
+                        <Label htmlFor="vimeoHash" className="text-slate-300">Vimeo Hash (Optional)</Label>
+                        <Input
+                          id="vimeoHash"
+                          name="vimeoHash"
+                          placeholder="e.g., 31591eb5fb"
+                          className="bg-slate-700/50 border-slate-600 text-white"
+                          data-testid="input-vimeo-hash"
+                        />
+                        <p className="text-xs text-slate-400 mt-1">
+                          Extract from Vimeo URL: ?h=<strong>HASH_VALUE</strong>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="vimeoAutoplay"
+                          name="autoplay"
+                          defaultChecked={false}
+                          className="w-4 h-4 bg-slate-700/50 border-slate-600 rounded"
+                          data-testid="checkbox-vimeo-autoplay"
+                        />
+                        <Label htmlFor="vimeoAutoplay" className="text-slate-300">Auto-play video</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="vimeoShowControls"
+                          name="showControls"
+                          defaultChecked={true}
+                          className="w-4 h-4 bg-slate-700/50 border-slate-600 rounded"
+                          data-testid="checkbox-vimeo-show-controls"
+                        />
+                        <Label htmlFor="vimeoShowControls" className="text-slate-300">Show video controls</Label>
                       </div>
                     </div>
                   </div>
@@ -1231,29 +1246,43 @@ function FormLibraryManagement() {
                         Extract from Vimeo URL: vimeo.com/<strong>VIDEO_ID</strong>
                       </p>
                     </div>
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="edit-vimeoAutoplay"
-                          name="autoplay"
-                          defaultChecked={editingForm.config?.autoplay || false}
-                          className="w-4 h-4 bg-slate-700/50 border-slate-600 rounded"
-                          data-testid="checkbox-edit-vimeo-autoplay"
-                        />
-                        <Label htmlFor="edit-vimeoAutoplay" className="text-slate-300">Auto-play video</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="edit-vimeoShowControls"
-                          name="showControls"
-                          defaultChecked={editingForm.config?.showControls || true}
-                          className="w-4 h-4 bg-slate-700/50 border-slate-600 rounded"
-                          data-testid="checkbox-edit-vimeo-show-controls"
-                        />
-                        <Label htmlFor="edit-vimeoShowControls" className="text-slate-300">Show video controls</Label>
-                      </div>
+                    <div>
+                      <Label htmlFor="edit-vimeoHash" className="text-slate-300">Vimeo Hash (Optional)</Label>
+                      <Input
+                        id="edit-vimeoHash"
+                        name="vimeoHash"
+                        defaultValue={editingForm.config?.vimeoHash || ''}
+                        className="bg-slate-700/50 border-slate-600 text-white"
+                        placeholder="e.g., 31591eb5fb"
+                        data-testid="input-edit-vimeo-hash"
+                      />
+                      <p className="text-xs text-slate-400 mt-1">
+                        Extract from Vimeo URL: ?h=<strong>HASH_VALUE</strong>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="edit-vimeoAutoplay"
+                        name="autoplay"
+                        defaultChecked={editingForm.config?.autoplay || false}
+                        className="w-4 h-4 bg-slate-700/50 border-slate-600 rounded"
+                        data-testid="checkbox-edit-vimeo-autoplay"
+                      />
+                      <Label htmlFor="edit-vimeoAutoplay" className="text-slate-300">Auto-play video</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="edit-vimeoShowControls"
+                        name="showControls"
+                        defaultChecked={editingForm.config?.showControls || true}
+                        className="w-4 h-4 bg-slate-700/50 border-slate-600 rounded"
+                        data-testid="checkbox-edit-vimeo-show-controls"
+                      />
+                      <Label htmlFor="edit-vimeoShowControls" className="text-slate-300">Show video controls</Label>
                     </div>
                   </div>
                 </div>

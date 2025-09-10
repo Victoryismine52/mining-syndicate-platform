@@ -229,6 +229,7 @@ export const formTemplates = pgTable('form_templates', {
     // YouTube card properties
     youtubeVideoId?: string; // YouTube video ID for youtube cards
     vimeoVideoId?: string; // Vimeo video ID for vimeo cards
+    vimeoHash?: string; // Vimeo hash parameter for private/unlisted videos
     autoplay?: boolean; // Whether to autoplay the video
     showControls?: boolean; // Whether to show video controls
     // Join card properties
