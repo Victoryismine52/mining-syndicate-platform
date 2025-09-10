@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Info, Pickaxe, DollarSign, SkipBack, SkipForward, ChevronsLeft, ChevronsRight, ArrowRight, Mail, Users, Phone, FileText, Star, Heart, Shield } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, Pickaxe, DollarSign, SkipBack, SkipForward, ChevronsLeft, ChevronsRight, ArrowRight, Mail, Users, Phone, FileText, Star, Heart, Shield, Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { MiningPoolModal } from "./mining-pool-modal";
 import { LendingPoolModal } from "./lending-pool-modal";
 import { FinalActionSlide } from "./final-action-slide";
 import { SimpleFormModal } from "./simple-form-modal";
+import { VideoCard } from "./video-card";
 import type { SiteSlide, GlobalSlide } from "@shared/site-schema";
 import type { Site } from "@shared/site-schema";
 
@@ -54,13 +55,15 @@ function getFormColorTheme(colorOverride?: string) {
 // Dynamic Forms Slide Component
 interface DynamicFormsSlideProps {
   forms: any[];
+  videos?: any[];
+  documents?: any[];
   siteId: string;
   siteLanguage: string;
   onPrevSlide: () => void;
   onNextSlide: () => void;
 }
 
-function DynamicFormsSlide({ forms, siteId, siteLanguage, onPrevSlide, onNextSlide }: DynamicFormsSlideProps) {
+function DynamicFormsSlide({ forms, videos = [], documents = [], siteId, siteLanguage, onPrevSlide, onNextSlide }: DynamicFormsSlideProps) {
   const [selectedFormAssignment, setSelectedFormAssignment] = useState<any>(null);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
@@ -138,12 +141,80 @@ function DynamicFormsSlide({ forms, siteId, siteLanguage, onPrevSlide, onNextSli
           </p>
         </div>
 
-        {/* Form Cards Grid - Responsive layout for presentation constraints */}
+        {/* All Cards Grid - Responsive layout for presentation constraints */}
         <div className={`grid gap-6 mx-auto ${
-          forms.length === 1 ? 'grid-cols-1 max-w-md' : 
-          forms.length === 2 ? 'md:grid-cols-2 max-w-4xl' : 
+          (forms.length + videos.length + documents.length) === 1 ? 'grid-cols-1 max-w-md' : 
+          (forms.length + videos.length + documents.length) === 2 ? 'md:grid-cols-2 max-w-4xl' : 
           'md:grid-cols-3 max-w-6xl'
         }`}>
+          {/* Render Video Cards */}
+          {videos.map((videoAssignment) => {
+            const formTemplate = videoAssignment.formTemplate;
+            const config = formTemplate.config || {};
+            
+            return (
+              <div key={videoAssignment.id} className="w-full">
+                <VideoCard
+                  template={formTemplate}
+                  className="h-full"
+                />
+              </div>
+            );
+          })}
+          
+          {/* Render Document Cards */}
+          {documents.map((docAssignment) => {
+            const formTemplate = docAssignment.formTemplate;
+            const config = formTemplate.config || {};
+            const effectiveColor = docAssignment.overrideConfig?.color || config.color || 'blue';
+            const colorTheme = getFormColor(effectiveColor);
+            const effectiveTitle = docAssignment.overrideConfig?.title || config.title || formTemplate.name;
+            const effectiveSubtitle = docAssignment.overrideConfig?.subtitle ?? config.subtitle;
+            const effectiveDescription = docAssignment.overrideConfig?.description || config.description || formTemplate.description || 'Click to download document';
+            const documentUrl = config.documentUrl;
+            
+            return (
+              <Card 
+                key={docAssignment.id}
+                className={`bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-600 backdrop-blur-sm hover:border-slate-500 transition-all duration-300 cursor-pointer transform hover:scale-105 flex flex-col h-full ${colorTheme.shadow}`}
+                data-testid={`document-card-${formTemplate.name.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                <CardHeader className="text-center pb-4 flex-grow">
+                  <div className={`w-20 h-20 rounded-xl mx-auto mb-4 flex items-center justify-center border-2 ${colorTheme.icon}`}>
+                    <Download className="w-6 h-6 text-white" />
+                  </div>
+                  <CardTitle className="text-xl text-white mb-2">
+                    {effectiveTitle}
+                  </CardTitle>
+                  {effectiveSubtitle && (
+                    <p className="text-slate-400 text-xs mb-2 font-medium">
+                      {effectiveSubtitle}
+                    </p>
+                  )}
+                  <CardDescription className="text-slate-300 text-sm whitespace-pre-line">
+                    {effectiveDescription}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="text-center pt-0 mt-auto">
+                  <Button
+                    className={`w-full ${colorTheme.button} text-white font-semibold transition-all duration-300`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (documentUrl) {
+                        window.open(documentUrl, '_blank');
+                      }
+                    }}
+                  >
+                    Download
+                    <ExternalLink className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+          
+          {/* Render Form Cards */}
           {forms.map((formAssignment) => {
             // Use the exact same logic as the site page
             const formTemplate = formAssignment.formTemplate;
@@ -325,19 +396,38 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
       globalSlide: slide,
     }));
 
-  // Get forms marked for inclusion in presentation
-  const presentationForms = formAssignments.filter(assignment => 
+  // Get all assignments marked for inclusion in presentation  
+  const presentationAssignments = formAssignments.filter(assignment => 
     assignment.overrideConfig?.includeInPresentation === true
   );
 
-  // Create dynamic form slide if there are forms marked for presentation
-  const dynamicFormSlide = presentationForms.length > 0 ? [{
+  // CRITICAL FIX: Separate different card types to prevent rendering videos/documents as forms
+  const presentationForms = presentationAssignments.filter(assignment => {
+    const config = assignment.formTemplate?.config || {};
+    // Only include actual forms (not video or document cards)
+    return !config.vimeoVideoId && !config.youtubeVideoId && !config.documentUrl && !config.fileKey;
+  });
+
+  const presentationVideos = presentationAssignments.filter(assignment => {
+    const config = assignment.formTemplate?.config || {};
+    return config.vimeoVideoId || config.youtubeVideoId;
+  });
+
+  const presentationDocuments = presentationAssignments.filter(assignment => {
+    const config = assignment.formTemplate?.config || {};
+    return config.documentUrl || config.fileKey;
+  });
+
+  // Create dynamic slide with proper mixed content if there are any cards marked for presentation
+  const dynamicFormSlide = presentationAssignments.length > 0 ? [{
     id: 'dynamic-forms',
     title: 'Get In Touch',
     content: 'dynamic-forms',
     type: "dynamic-forms" as const,
     slideType: "dynamic" as const,
     forms: presentationForms,
+    videos: presentationVideos,
+    documents: presentationDocuments,
   }] : [];
 
   console.log('Slide composition data:', {
@@ -561,9 +651,11 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
             onLendingPool={() => setIsLendingPoolModalOpen(true)}
           />
         ) : currentSlideData.type === "dynamic-forms" ? (
-          // Render dynamic forms slide
+          // Render dynamic forms slide with mixed card types
           <DynamicFormsSlide
             forms={(currentSlideData as any).forms}
+            videos={(currentSlideData as any).videos}
+            documents={(currentSlideData as any).documents}
             siteId={siteId}
             siteLanguage={siteLanguage}
             onPrevSlide={prevSlide}
