@@ -16,6 +16,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { SlugInput } from '@/components/slug-input';
 import type { Site, SiteLead, SiteManager, LegalDisclaimer, SiteDisclaimer } from '@shared/site-schema';
 import { SlideManager } from '@/components/slide-manager';
 import * as XLSX from 'xlsx';
@@ -1359,20 +1360,15 @@ export function SiteAdmin(props: SiteAdminProps) {
                                   required
                                 />
                               </div>
-                              <div>
-                                <Label htmlFor="siteId">Site URL Slug</Label>
-                                <Input
-                                  id="siteId"
-                                  name="siteId"
-                                  value={formData.siteId}
-                                  onChange={(e) => updateFormField('siteId', e.target.value)}
-                                  className="bg-slate-700 border-slate-600"
-                                  data-testid="input-site-slug"
-                                  pattern="[a-z0-9-]+"
-                                  title="Only lowercase letters, numbers, and hyphens allowed"
-                                  required
-                                />
-                              </div>
+                              <SlugInput
+                                label="Site URL Slug"
+                                name="siteId"
+                                value={formData.siteId}
+                                onChange={(value) => updateFormField('siteId', value)}
+                                originalSlug={site.siteId}
+                                required
+                                data-testid="input-site-slug"
+                              />
                             </div>
 
                             <div>
