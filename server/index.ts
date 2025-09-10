@@ -1,5 +1,4 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { setSiteStorage } from "./site-storage";
 import { logger } from './logger';
@@ -104,6 +103,10 @@ app.use((req, res, next) => {
     logger.info('Using in-memory site storage');
   }
 
+  const { registerRoutes } =
+    config.storageMode === 'memory'
+      ? await import('./memory-routes')
+      : await import('./routes');
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
