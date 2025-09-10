@@ -85,6 +85,20 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
+      
+      // Handle database unique constraint violations
+      if (error && typeof error === 'object' && 'code' in error) {
+        if (error.code === '23505') { // PostgreSQL unique violation error code
+          const errorMessage = error.message || '';
+          if (errorMessage.includes('site_id')) {
+            return res.status(409).json({ 
+              error: "Site URL already exists", 
+              message: "A site with this URL already exists. Please choose a different URL." 
+            });
+          }
+        }
+      }
+      
       res.status(500).json({ error: "Failed to update site" });
     }
   });
