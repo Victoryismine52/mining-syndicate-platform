@@ -35,8 +35,8 @@ variables like `DATABASE_URL`, `SESSION_SECRET`, and others listed below.
 
 - **Docker Postgres**: `npm run db:up`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`
   - Spins up a Postgres container and loads seed data from `server/seeds/`.
-- **In-memory**: set `AUTH_DISABLED=true` and `STORAGE_MODE=memory`, then `npm run dev`
-  - Bypasses authentication and uses `server/data/seed.json` for ephemeral data.
+- **In-memory**: `npm run dev:mem`
+  - Starts the server with `AUTH_DISABLED=true` and `STORAGE_MODE=memory` for ephemeral data.
 
 ### Environment variables
 
@@ -102,7 +102,9 @@ This allows each environment to ship branded decks without modifying source code
 
 Setting `STORAGE_MODE=memory` launches the API using JSON files loaded into RAM
 instead of Postgres. Seed data lives in `server/data/seed.json`. Because changes
-aren't persisted, restart the server to reset to the contents of that file.
+aren't persisted, restart the server to reset to the contents of that file. Use
+`npm run dev:mem` to start the server with these settings and authentication
+disabled.
 
 ## Self-Contained Tools
 
