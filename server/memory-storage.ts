@@ -709,11 +709,32 @@ export class MemorySiteStorage implements ISiteStorage {
 
   // Access control
   async checkSiteAccess(
-    _siteId: string,
-    _userEmail: string,
+    siteId: string,
+    userEmail: string,
     isAdmin: boolean
   ): Promise<boolean> {
-    return isAdmin || true;
+    if (isAdmin) {
+      return true;
+    }
+
+    // Check if user is a site manager
+    const isManager = this.data.siteManagers.some(
+      (m) => m.siteId === siteId && m.userEmail === userEmail
+    );
+    if (isManager) {
+      return true;
+    }
+
+    // Look up user by email
+    const user = this.data.users.find((u) => u.email === userEmail);
+    if (!user) {
+      return false;
+    }
+
+    // Check site membership
+    return this.data.siteMemberships.some(
+      (m) => m.siteId === siteId && m.userId === user.id
+    );
   }
 }
 

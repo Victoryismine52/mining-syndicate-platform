@@ -594,13 +594,40 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
   // Access control
   async checkSiteAccess(siteId: string, userEmail: string, isAdmin: boolean): Promise<boolean> {
-    // Global admins have access to all sites
-    if (isAdmin) {
-      return true;
+    try {
+      // Global admins have access to all sites
+      if (isAdmin) {
+        return true;
+      }
+
+      // Site managers always have access
+      const isManager = await this.isSiteManager(siteId, userEmail);
+      if (isManager) {
+        return true;
+      }
+
+      // Check site membership for the user
+      const { siteMemberships } = await import("@shared/schema");
+
+      const [user] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, userEmail));
+
+      if (!user) {
+        return false;
+      }
+
+      const [membership] = await db
+        .select()
+        .from(siteMemberships)
+        .where(and(eq(siteMemberships.siteId, siteId), eq(siteMemberships.userId, user.id)));
+
+      return !!membership;
+    } catch (error) {
+      logger.error('Error checking site access:', error);
+      return false;
     }
-    
-    // Check if user is a site manager
-    return await this.isSiteManager(siteId, userEmail);
   }
 
   // Collective Messages Methods
