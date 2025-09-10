@@ -80,6 +80,10 @@ export class MemorySiteStorage implements ISiteStorage {
   }
 
   persist(): void {
+    this.maybePersist();
+  }
+
+  private maybePersist(): void {
     if (process.env.MEMORY_PERSIST === "true") {
       saveSeed(this.data);
     }
@@ -96,6 +100,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.sites.push(newSite);
+    this.maybePersist();
     return newSite;
   }
 
@@ -111,11 +116,13 @@ export class MemorySiteStorage implements ISiteStorage {
     const site = await this.getSite(siteId);
     if (!site) throw new Error("Site not found");
     Object.assign(site as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return site;
   }
 
   async deleteSite(siteId: string): Promise<void> {
     this.data.sites = this.data.sites.filter((s) => s.siteId !== siteId);
+    this.maybePersist();
   }
 
   async listSites(): Promise<Site[]> {
@@ -131,6 +138,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.siteLeads.push(newLead);
+    this.maybePersist();
     return newLead;
   }
 
@@ -151,6 +159,7 @@ export class MemorySiteStorage implements ISiteStorage {
     const lead = this.data.siteLeads.find((l) => (l as any).id === leadId);
     if (!lead) throw new Error("Lead not found");
     Object.assign(lead as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return lead;
   }
 
@@ -164,6 +173,7 @@ export class MemorySiteStorage implements ISiteStorage {
       createdAt: new Date(),
     };
     this.data.siteAnalytics.push(newEntry);
+    this.maybePersist();
     return newEntry;
   }
 
@@ -187,6 +197,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     } as any;
     this.data.siteManagers.push(manager);
+    this.maybePersist();
     return manager;
   }
 
@@ -194,6 +205,7 @@ export class MemorySiteStorage implements ISiteStorage {
     this.data.siteManagers = this.data.siteManagers.filter(
       (m) => !(m.siteId === siteId && m.userEmail === userEmail)
     );
+    this.maybePersist();
   }
 
   async getSiteManagers(siteId: string): Promise<SiteManager[]> {
@@ -217,6 +229,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.legalDisclaimers.push(newDisclaimer);
+    this.maybePersist();
     return newDisclaimer;
   }
 
@@ -231,6 +244,7 @@ export class MemorySiteStorage implements ISiteStorage {
     const disclaimer = await this.getLegalDisclaimer(id);
     if (!disclaimer) throw new Error("Disclaimer not found");
     Object.assign(disclaimer as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return disclaimer;
   }
 
@@ -238,6 +252,7 @@ export class MemorySiteStorage implements ISiteStorage {
     this.data.legalDisclaimers = this.data.legalDisclaimers.filter(
       (d) => (d as any).id !== id
     );
+    this.maybePersist();
   }
 
   async listLegalDisclaimers(): Promise<LegalDisclaimer[]> {
@@ -266,6 +281,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     } as any;
     this.data.siteDisclaimers.push(attach);
+    this.maybePersist();
     return attach;
   }
 
@@ -276,6 +292,7 @@ export class MemorySiteStorage implements ISiteStorage {
     this.data.siteDisclaimers = this.data.siteDisclaimers.filter(
       (d) => !(d.siteId === siteId && d.disclaimerId === disclaimerId)
     );
+    this.maybePersist();
   }
 
   async getSiteDisclaimers(
@@ -302,6 +319,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.siteSlides.push(newSlide);
+    this.maybePersist();
     return newSlide;
   }
 
@@ -320,6 +338,7 @@ export class MemorySiteStorage implements ISiteStorage {
     const slide = await this.getSiteSlide(slideId);
     if (!slide) throw new Error("Slide not found");
     Object.assign(slide as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return slide;
   }
 
@@ -327,6 +346,7 @@ export class MemorySiteStorage implements ISiteStorage {
     this.data.siteSlides = this.data.siteSlides.filter(
       (s) => (s as any).id !== slideId
     );
+    this.maybePersist();
   }
 
   async reorderSiteSlides(
@@ -338,6 +358,7 @@ export class MemorySiteStorage implements ISiteStorage {
       const slide = slides.find((s) => (s as any).id === id);
       if (slide) (slide as any).slideOrder = slideOrder;
     });
+    this.maybePersist();
   }
 
   // Global slide operations
@@ -357,6 +378,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.globalSlides.push(slide);
+    this.maybePersist();
     return slide;
   }
 
@@ -368,6 +390,7 @@ export class MemorySiteStorage implements ISiteStorage {
     if (!slide) return null;
     (slide as any).isVisible = isVisible;
     (slide as any).updatedAt = new Date();
+    this.maybePersist();
     return slide;
   }
 
@@ -388,6 +411,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.siteSections.push(section);
+    this.maybePersist();
     return section;
   }
 
@@ -398,6 +422,7 @@ export class MemorySiteStorage implements ISiteStorage {
     const section = await this.getSiteSection(sectionId);
     if (!section) throw new Error("Section not found");
     Object.assign(section as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return section;
   }
 
@@ -405,6 +430,7 @@ export class MemorySiteStorage implements ISiteStorage {
     this.data.siteSections = this.data.siteSections.filter(
       (s) => (s as any).id !== sectionId
     );
+    this.maybePersist();
   }
 
   // Site membership operations (simplified)
@@ -424,6 +450,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.siteMemberships.push(membership);
+    this.maybePersist();
     return membership;
   }
 
@@ -437,6 +464,7 @@ export class MemorySiteStorage implements ISiteStorage {
     );
     if (!membership) return null;
     Object.assign(membership, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return membership;
   }
 
@@ -445,7 +473,11 @@ export class MemorySiteStorage implements ISiteStorage {
     this.data.siteMemberships = this.data.siteMemberships.filter(
       (m) => !(m.siteId === siteId && m.userId === userId)
     );
-    return this.data.siteMemberships.length < before;
+    const deleted = this.data.siteMemberships.length < before;
+    if (deleted) {
+      this.maybePersist();
+    }
+    return deleted;
   }
 
   // ===== COLLECTIVE MESSAGES METHODS =====
@@ -488,6 +520,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.collectiveMessages.push(message);
+    this.maybePersist();
     return message;
   }
 
@@ -572,6 +605,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.collectiveBlogPosts.push(post);
+    this.maybePersist();
     return post;
   }
 
@@ -579,6 +613,7 @@ export class MemorySiteStorage implements ISiteStorage {
     const post = this.data.collectiveBlogPosts.find((p) => p.id === postId);
     if (!post) throw new Error("Post not found");
     Object.assign(post, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return post;
   }
 
@@ -586,12 +621,14 @@ export class MemorySiteStorage implements ISiteStorage {
     this.data.collectiveBlogPosts = this.data.collectiveBlogPosts.filter(
       (p) => p.id !== postId
     );
+    this.maybePersist();
   }
 
   async incrementBlogPostViewCount(postId: string): Promise<void> {
     const post = this.data.collectiveBlogPosts.find((p) => p.id === postId);
     if (post) {
       post.viewCount = (post.viewCount || 0) + 1;
+      this.maybePersist();
     }
   }
 
@@ -654,6 +691,7 @@ export class MemorySiteStorage implements ISiteStorage {
       completedAt: null,
     };
     this.data.collectiveTasks.push(task);
+    this.maybePersist();
     return task;
   }
 
@@ -661,6 +699,7 @@ export class MemorySiteStorage implements ISiteStorage {
     const task = this.data.collectiveTasks.find((t) => t.id === taskId);
     if (!task) throw new Error("Task not found");
     Object.assign(task, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return task;
   }
 
@@ -668,6 +707,7 @@ export class MemorySiteStorage implements ISiteStorage {
     this.data.collectiveTasks = this.data.collectiveTasks.filter(
       (t) => t.id !== taskId
     );
+    this.maybePersist();
   }
 
   async getUserTasks(siteId: string, userId: string): Promise<any[]> {
@@ -715,6 +755,7 @@ export class MemorySiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     this.data.taskAssignments.push(assignment);
+    this.maybePersist();
     return assignment;
   }
 
