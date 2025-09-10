@@ -319,7 +319,7 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     queryKey: [`/api/sites/${siteId}`],
     enabled: !!siteId,
   });
-  const siteLanguage = site?.landingConfig?.language || 'en';
+  const siteLanguage = (site?.landingConfig as any)?.language || 'en';
 
   // Fetch slides from the database
   const { data: dbSlides = [], isLoading: slidesLoading } = useQuery<SiteSlide[]>({
@@ -401,21 +401,9 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     assignment.overrideConfig?.includeInPresentation === true
   );
 
-  console.log('All form assignments:', formAssignments.length);
-  console.log('Presentation assignments:', presentationAssignments.length);
-  
   // CRITICAL FIX: Separate different card types to prevent rendering videos/documents as forms
   const presentationForms = presentationAssignments.filter(assignment => {
     const config = assignment.formTemplate?.config || {};
-    console.log('Checking assignment for form filtering:', {
-      id: assignment.id,
-      templateName: assignment.formTemplate?.name,
-      config: config,
-      hasVimeo: !!config.vimeoVideoId,
-      hasYouTube: !!config.youtubeVideoId,
-      hasDocUrl: !!config.documentUrl,
-      hasFileKey: !!config.fileKey
-    });
     // Only include actual forms (not video or document cards)
     return !config.vimeoVideoId && !config.youtubeVideoId && !config.documentUrl && !config.fileKey;
   });
