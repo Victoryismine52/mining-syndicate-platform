@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { setupVite, serveStatic } from "./vite";
 import { setSiteStorage } from "./site-storage";
+import { setStorage } from "./storage";
 import { logger } from './logger';
 import pinoHttp from 'pino-http';
 import { randomUUID } from 'crypto';
@@ -101,6 +102,10 @@ app.use((req, res, next) => {
     const { memorySiteStorage } = await import('./memory-storage');
     setSiteStorage(memorySiteStorage);
     logger.info('Using in-memory site storage');
+
+    const { memoryStorage } = await import('./memory-core-storage');
+    setStorage(memoryStorage);
+    logger.info('Memory storage active');
   }
 
   const { registerRoutes } =
