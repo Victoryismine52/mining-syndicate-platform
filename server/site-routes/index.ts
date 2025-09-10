@@ -16,7 +16,7 @@ import { isAuthenticated } from "../google-auth";
 import { z } from "zod";
 import { registerSiteCreateRoutes } from "./site-create";
 import { logger } from '../logger';
-export function registerSiteRoutes(app: Express, storage?: any) {
+export function registerSiteRoutes(app: Express) {
   registerSiteCreateRoutes(app);
 
   // Get site by siteId (no access control for basic site info - admin panel handles its own access control)
