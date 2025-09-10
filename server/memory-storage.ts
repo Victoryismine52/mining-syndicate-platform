@@ -23,6 +23,69 @@ import {
 } from "@shared/site-schema";
 import type { ISiteStorage } from "./site-storage";
 
+interface CollectiveTask {
+  id: string;
+  siteId: string;
+  title: string;
+  description: string;
+  taskType: string;
+  priority: string;
+  status: string;
+  dueDate: Date | null;
+  createdBy: string;
+  assignedToRole: string | null;
+  taskConfig: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt: Date | null;
+}
+
+interface TaskAssignment {
+  id: string;
+  taskId: string;
+  userId: string;
+  assignedBy: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface CollectiveMessage {
+  id: string;
+  siteId: string;
+  senderId: string;
+  messageType: string;
+  content: string;
+  messageData: Record<string, any>;
+  isEdited: boolean;
+  isDeleted: boolean;
+  editedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface CollectiveBlogPost {
+  id: string;
+  siteId: string;
+  title: string;
+  content: string;
+  excerpt: string | null;
+  slug: string;
+  authorId: string;
+  status: string;
+  visibility: string;
+  featuredImageUrl: string | null;
+  tags: string[];
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  publishedAt: Date | null;
+  lastEditedBy: string | null;
+  lastEditedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface SeedData {
   sites: Site[];
   siteLeads: SiteLead[];
@@ -34,10 +97,10 @@ interface SeedData {
   globalSlides: GlobalSlide[];
   siteSections: SiteSection[];
   siteMemberships: any[];
-  collectiveTasks: any[];
-  taskAssignments: any[];
-  collectiveMessages: any[];
-  collectiveBlogPosts: any[];
+  collectiveTasks: CollectiveTask[];
+  taskAssignments: TaskAssignment[];
+  collectiveMessages: CollectiveMessage[];
+  collectiveBlogPosts: CollectiveBlogPost[];
   users: any[];
 }
 
@@ -58,10 +121,10 @@ function loadSeed(): SeedData {
       globalSlides: [],
       siteSections: [],
       siteMemberships: [],
-      collectiveTasks: [],
-      taskAssignments: [],
-      collectiveMessages: [],
-      collectiveBlogPosts: [],
+      collectiveTasks: [] as CollectiveTask[],
+      taskAssignments: [] as TaskAssignment[],
+      collectiveMessages: [] as CollectiveMessage[],
+      collectiveBlogPosts: [] as CollectiveBlogPost[],
       users: [],
     };
   }
@@ -484,7 +547,7 @@ export class MemorySiteStorage implements ISiteStorage {
   async getCollectiveMessages(
     siteId: string,
     options: { limit: number; offset: number }
-  ): Promise<any[]> {
+  ): Promise<CollectiveMessage[]> {
     const messages = this.data.collectiveMessages
       .filter((m) => m.siteId === siteId && !m.isDeleted)
       .sort(
@@ -505,7 +568,7 @@ export class MemorySiteStorage implements ISiteStorage {
     return messages;
   }
 
-  async createCollectiveMessage(messageData: any): Promise<any> {
+  async createCollectiveMessage(messageData: any): Promise<CollectiveMessage> {
     const message = {
       id: randomUUID(),
       siteId: messageData.siteId,
@@ -524,7 +587,9 @@ export class MemorySiteStorage implements ISiteStorage {
     return message;
   }
 
-  async getCollectiveMessageWithSender(messageId: string): Promise<any> {
+  async getCollectiveMessageWithSender(
+    messageId: string
+  ): Promise<CollectiveMessage | undefined> {
     const message = this.data.collectiveMessages.find((m) => m.id === messageId);
     if (!message) return undefined;
     const sender = this.data.users.find((u) => u.id === message.senderId) || {};
@@ -541,7 +606,7 @@ export class MemorySiteStorage implements ISiteStorage {
   async getCollectiveBlogPosts(
     siteId: string,
     options: { status?: string; userRole?: string; limit?: number; offset?: number }
-  ): Promise<any[]> {
+  ): Promise<CollectiveBlogPost[]> {
     let posts = this.data.collectiveBlogPosts.filter((p) => p.siteId === siteId);
     if (options.status) {
       posts = posts.filter((p) => p.status === options.status);
@@ -569,7 +634,9 @@ export class MemorySiteStorage implements ISiteStorage {
     return posts;
   }
 
-  async getCollectiveBlogPostById(postId: string): Promise<any> {
+  async getCollectiveBlogPostById(
+    postId: string
+  ): Promise<CollectiveBlogPost | undefined> {
     const post = this.data.collectiveBlogPosts.find((p) => p.id === postId);
     if (!post) return undefined;
     const author = this.data.users.find((u) => u.id === post.authorId) || {};
@@ -582,7 +649,7 @@ export class MemorySiteStorage implements ISiteStorage {
     };
   }
 
-  async createCollectiveBlogPost(postData: any): Promise<any> {
+  async createCollectiveBlogPost(postData: any): Promise<CollectiveBlogPost> {
     const post = {
       id: randomUUID(),
       siteId: postData.siteId,
@@ -609,7 +676,10 @@ export class MemorySiteStorage implements ISiteStorage {
     return post;
   }
 
-  async updateCollectiveBlogPost(postId: string, updates: any): Promise<any> {
+  async updateCollectiveBlogPost(
+    postId: string,
+    updates: any
+  ): Promise<CollectiveBlogPost> {
     const post = this.data.collectiveBlogPosts.find((p) => p.id === postId);
     if (!post) throw new Error("Post not found");
     Object.assign(post, updates, { updatedAt: new Date() });
@@ -636,7 +706,7 @@ export class MemorySiteStorage implements ISiteStorage {
   async getCollectiveTasks(
     siteId: string,
     options: { status?: string; limit?: number; offset?: number }
-  ): Promise<any[]> {
+  ): Promise<CollectiveTask[]> {
     let tasks = this.data.collectiveTasks.filter((t) => t.siteId === siteId);
     if (options.status) {
       tasks = tasks.filter((t) => t.status === options.status);
@@ -660,7 +730,9 @@ export class MemorySiteStorage implements ISiteStorage {
     return tasks;
   }
 
-  async getCollectiveTaskById(taskId: string): Promise<any> {
+  async getCollectiveTaskById(
+    taskId: string
+  ): Promise<CollectiveTask | undefined> {
     const task = this.data.collectiveTasks.find((t) => t.id === taskId);
     if (!task) return undefined;
     const creator = this.data.users.find((u) => u.id === task.createdBy) || {};
@@ -673,7 +745,7 @@ export class MemorySiteStorage implements ISiteStorage {
     };
   }
 
-  async createCollectiveTask(taskData: any): Promise<any> {
+  async createCollectiveTask(taskData: any): Promise<CollectiveTask> {
     const task = {
       id: randomUUID(),
       siteId: taskData.siteId,
@@ -695,7 +767,10 @@ export class MemorySiteStorage implements ISiteStorage {
     return task;
   }
 
-  async updateCollectiveTask(taskId: string, updates: any): Promise<any> {
+  async updateCollectiveTask(
+    taskId: string,
+    updates: any
+  ): Promise<CollectiveTask> {
     const task = this.data.collectiveTasks.find((t) => t.id === taskId);
     if (!task) throw new Error("Task not found");
     Object.assign(task, updates, { updatedAt: new Date() });
@@ -710,7 +785,7 @@ export class MemorySiteStorage implements ISiteStorage {
     this.maybePersist();
   }
 
-  async getUserTasks(siteId: string, userId: string): Promise<any[]> {
+  async getUserTasks(siteId: string, userId: string): Promise<CollectiveTask[]> {
     const assignments = this.data.taskAssignments.filter(
       (a) => a.userId === userId
     );
@@ -732,7 +807,7 @@ export class MemorySiteStorage implements ISiteStorage {
           creatorProfilePicture: creator.profilePicture || null,
         };
       })
-      .filter(Boolean) as any[];
+      .filter(Boolean) as CollectiveTask[];
     tasks.sort(
       (a, b) =>
         new Date(b.assignedAt).getTime() - new Date(a.assignedAt).getTime()
@@ -744,7 +819,7 @@ export class MemorySiteStorage implements ISiteStorage {
     taskId: string,
     userId: string,
     assignedById: string
-  ): Promise<any> {
+  ): Promise<TaskAssignment> {
     const assignment = {
       id: randomUUID(),
       taskId,
