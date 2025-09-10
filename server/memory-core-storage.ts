@@ -90,6 +90,10 @@ export class MemoryStorage implements IStorage {
   }
 
   persist(): void {
+    this.maybePersist();
+  }
+
+  private maybePersist(): void {
     if (process.env.MEMORY_PERSIST === "true") {
       saveSeed(this.data);
     }
@@ -117,6 +121,7 @@ export class MemoryStorage implements IStorage {
       isAdmin,
     } as User;
     this.data.users.push(newUser);
+    this.maybePersist();
     return newUser;
   }
 
@@ -124,6 +129,7 @@ export class MemoryStorage implements IStorage {
     const existing = this.data.users.find((u) => u.email === (user as any).email);
     if (existing) {
       Object.assign(existing as any, user);
+      this.maybePersist();
       return existing;
     }
     return this.createUser(user as any);
@@ -149,6 +155,7 @@ export class MemoryStorage implements IStorage {
       createdAt: new Date(),
     } as Lead;
     this.data.leads.push(newLead);
+    this.maybePersist();
     return newLead;
   }
 
@@ -187,6 +194,7 @@ export class MemoryStorage implements IStorage {
       } as SlideSetting;
       this.data.slideSettings.push(setting);
     }
+    this.maybePersist();
     return setting;
   }
 
@@ -198,6 +206,7 @@ export class MemoryStorage implements IStorage {
       status: (request as any).status ?? "pending",
     } as AccessRequest;
     this.data.accessRequests.push(entry);
+    this.maybePersist();
     return entry;
   }
 
@@ -213,6 +222,7 @@ export class MemoryStorage implements IStorage {
     const req = this.data.accessRequests.find((r) => r.id === id);
     if (!req) throw new Error("Request not found");
     Object.assign(req as any, { status, reviewedBy, reviewedAt: new Date() });
+    this.maybePersist();
     return req;
   }
 
@@ -228,6 +238,7 @@ export class MemoryStorage implements IStorage {
         addedBy: null as any,
         addedAt: new Date(),
       } as AccessListEntry);
+      this.maybePersist();
     }
     let entry = this.data.accessList.find((e) => e.email === email);
     if (entry) return entry;
@@ -238,12 +249,14 @@ export class MemoryStorage implements IStorage {
       addedAt: new Date(),
     } as AccessListEntry;
     this.data.accessList.push(entry);
+    this.maybePersist();
     return entry;
   }
 
   async removeFromAccessList(email: string): Promise<void> {
     if (email === config.defaultAdminEmail) return;
     this.data.accessList = this.data.accessList.filter((e) => e.email !== email);
+    this.maybePersist();
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -272,6 +285,7 @@ export class MemoryStorage implements IStorage {
       createdAt: new Date(),
     } as FormTemplate;
     this.data.formTemplates.push(newTemplate);
+    this.maybePersist();
     return newTemplate;
   }
 
@@ -282,11 +296,13 @@ export class MemoryStorage implements IStorage {
     const template = this.data.formTemplates.find((t) => t.id === id);
     if (!template) throw new Error("Form template not found");
     Object.assign(template as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return template;
   }
 
   async deleteFormTemplate(id: string): Promise<void> {
     this.data.formTemplates = this.data.formTemplates.filter((t) => t.id !== id);
+    this.maybePersist();
   }
 
   // Landing Page Template operations
@@ -309,6 +325,7 @@ export class MemoryStorage implements IStorage {
       createdAt: new Date(),
     } as LandingPageTemplate;
     this.data.landingPageTemplates.push(tpl);
+    this.maybePersist();
     return tpl;
   }
 
@@ -319,6 +336,7 @@ export class MemoryStorage implements IStorage {
     const tpl = this.data.landingPageTemplates.find((t) => t.id === id);
     if (!tpl) throw new Error("Template not found");
     Object.assign(tpl as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return tpl;
   }
 
@@ -326,6 +344,7 @@ export class MemoryStorage implements IStorage {
     this.data.landingPageTemplates = this.data.landingPageTemplates.filter(
       (t) => t.id !== id
     );
+    this.maybePersist();
   }
 
   // Site Form Assignment operations
@@ -373,6 +392,7 @@ export class MemoryStorage implements IStorage {
     const assignment = this.data.siteFormAssignments.find((a) => a.id === id);
     if (!assignment) throw new Error("Assignment not found");
     Object.assign(assignment as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return assignment;
   }
 
@@ -380,6 +400,7 @@ export class MemoryStorage implements IStorage {
     this.data.siteFormAssignments = this.data.siteFormAssignments.filter(
       (a) => a.id !== id
     );
+    this.maybePersist();
   }
 
   // Site Landing Config operations
@@ -399,6 +420,7 @@ export class MemoryStorage implements IStorage {
       updatedAt: new Date(),
     } as SiteLandingConfig;
     this.data.siteLandingConfigs.push(cfg);
+    this.maybePersist();
     return cfg;
   }
 
@@ -409,6 +431,7 @@ export class MemoryStorage implements IStorage {
     const cfg = this.data.siteLandingConfigs.find((c) => c.siteId === siteId);
     if (!cfg) throw new Error("Site landing config not found");
     Object.assign(cfg as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return cfg;
   }
 
@@ -429,6 +452,7 @@ export class MemoryStorage implements IStorage {
       updatedAt: new Date(),
     } as FieldLibrary;
     this.data.fieldLibrary.push(newField);
+    this.maybePersist();
     return newField;
   }
 
@@ -439,11 +463,13 @@ export class MemoryStorage implements IStorage {
     const field = this.data.fieldLibrary.find((f) => f.id === id);
     if (!field) throw new Error("Field not found");
     Object.assign(field as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return field;
   }
 
   async deleteFieldLibraryItem(id: string): Promise<void> {
     this.data.fieldLibrary = this.data.fieldLibrary.filter((f) => f.id !== id);
+    this.maybePersist();
   }
 
   // Form Template Fields operations
@@ -470,6 +496,7 @@ export class MemoryStorage implements IStorage {
       updatedAt: new Date(),
     } as FormTemplateField;
     this.data.formTemplateFields.push(newField);
+    this.maybePersist();
     return newField;
   }
 
@@ -480,6 +507,7 @@ export class MemoryStorage implements IStorage {
     const fld = this.data.formTemplateFields.find((f) => f.id === id);
     if (!fld) throw new Error("Form template field not found");
     Object.assign(fld as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return fld;
   }
 
@@ -487,6 +515,7 @@ export class MemoryStorage implements IStorage {
     this.data.formTemplateFields = this.data.formTemplateFields.filter(
       (f) => f.id !== id
     );
+    this.maybePersist();
   }
 
   // Site Membership operations
@@ -542,6 +571,7 @@ export class MemoryStorage implements IStorage {
       updatedAt: new Date(),
     } as SiteMembership;
     this.data.siteMemberships.push(mem);
+    this.maybePersist();
     return mem;
   }
 
@@ -552,6 +582,7 @@ export class MemoryStorage implements IStorage {
     const mem = this.data.siteMemberships.find((m) => m.id === id);
     if (!mem) throw new Error("Membership not found");
     Object.assign(mem as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return mem;
   }
 
@@ -559,6 +590,7 @@ export class MemoryStorage implements IStorage {
     this.data.siteMemberships = this.data.siteMemberships.filter(
       (m) => m.id !== id
     );
+    this.maybePersist();
   }
 
   // Site Member Profile operations
@@ -580,6 +612,7 @@ export class MemoryStorage implements IStorage {
       updatedAt: new Date(),
     } as SiteMemberProfile;
     this.data.siteMemberProfiles.push(prof);
+    this.maybePersist();
     return prof;
   }
 
@@ -590,6 +623,7 @@ export class MemoryStorage implements IStorage {
     const prof = this.data.siteMemberProfiles.find((p) => p.id === id);
     if (!prof) throw new Error("Profile not found");
     Object.assign(prof as any, updates, { updatedAt: new Date() });
+    this.maybePersist();
     return prof;
   }
 
@@ -597,6 +631,7 @@ export class MemoryStorage implements IStorage {
     this.data.siteMemberProfiles = this.data.siteMemberProfiles.filter(
       (p) => p.id !== id
     );
+    this.maybePersist();
   }
 }
 
