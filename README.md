@@ -36,7 +36,7 @@ variables like `DATABASE_URL`, `SESSION_SECRET`, and others listed below.
 - **Docker Postgres**: `npm run db:up`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`
   - Spins up a Postgres container and loads seed data from `server/seeds/`.
 - **In-memory**: `npm run dev:mem`
-  - Starts the server with `AUTH_DISABLED=true` and `STORAGE_MODE=memory` for ephemeral data.
+  - Starts the server with `STORAGE_MODE=memory`; authentication is disabled by default.
 
 ### Environment variables
 
@@ -50,7 +50,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `TEST_DATABASE_URL` | Overrides `DATABASE_URL` during tests for a separate Postgres database. |
 | `SESSION_SECRET` | Secret used to sign Express session cookies. |
 | `HUBSPOT_API_KEY` | Token for submitting forms to HubSpot. |
-| `AUTH_DISABLED` | Set to `true` to bypass authentication with a mock admin user. |
+| `AUTH_DISABLED` | Set to `true` to bypass authentication with a mock admin user. Defaults to `true` when `STORAGE_MODE=memory`. |
 | `PORT` | Port for the combined Express and Vite servers (defaults to `5000`). |
 | `BASE_DEV_URL` | Local API base URL used during initialization. |
 | `BASE_CODEX_URL` | Fallback Codex API endpoint when the local API is unavailable. |
@@ -103,8 +103,9 @@ This allows each environment to ship branded decks without modifying source code
 Setting `STORAGE_MODE=memory` launches the API using JSON files loaded into RAM
 instead of Postgres. Seed data lives in `server/data/seed.json`. Because changes
 aren't persisted, restart the server to reset to the contents of that file. Use
-`npm run dev:mem` to start the server with these settings and authentication
-disabled. In this mode, the database layer exports a stub with no-op methods for
+`npm run dev:mem` to start the server with these settings. Authentication is
+disabled by default in this mode but can be enabled by setting `AUTH_DISABLED=false`.
+In this mode, the database layer exports a stub with no-op methods for
 development and testing only; do not rely on it in production.
 
 ## Self-Contained Tools
