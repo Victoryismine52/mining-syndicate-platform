@@ -17,5 +17,18 @@
   "siteSlides": [],
   "globalSlides": [],
   "siteSections": [],
-  "siteMemberships": []
+  "siteMemberships": [],
+  "collectiveTasks": [],
+  "taskAssignments": [],
+  "collectiveMessages": [],
+  "collectiveBlogPosts": [],
+  "users": [
+    {
+      "id": "demo-user",
+      "firstName": "Demo",
+      "lastName": "User",
+      "email": "demo@example.com",
+      "profilePicture": null
+    }
+  ]
 }

@@ -34,6 +34,11 @@ interface SeedData {
   globalSlides: GlobalSlide[];
   siteSections: SiteSection[];
   siteMemberships: any[];
+  collectiveTasks: any[];
+  taskAssignments: any[];
+  collectiveMessages: any[];
+  collectiveBlogPosts: any[];
+  users: any[];
 }
 
 function loadSeed(): SeedData {
@@ -53,6 +58,11 @@ function loadSeed(): SeedData {
       globalSlides: [],
       siteSections: [],
       siteMemberships: [],
+      collectiveTasks: [],
+      taskAssignments: [],
+      collectiveMessages: [],
+      collectiveBlogPosts: [],
+      users: [],
     };
   }
 }
@@ -425,6 +435,276 @@ export class MemorySiteStorage implements ISiteStorage {
       (m) => !(m.siteId === siteId && m.userId === userId)
     );
     return this.data.siteMemberships.length < before;
+  }
+
+  // ===== COLLECTIVE MESSAGES METHODS =====
+  async getCollectiveMessages(
+    siteId: string,
+    options: { limit: number; offset: number }
+  ): Promise<any[]> {
+    const messages = this.data.collectiveMessages
+      .filter((m) => m.siteId === siteId && !m.isDeleted)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      .slice(options.offset, options.offset + options.limit)
+      .map((m) => {
+        const sender = this.data.users.find((u) => u.id === m.senderId) || {};
+        return {
+          ...m,
+          senderFirstName: sender.firstName || null,
+          senderLastName: sender.lastName || null,
+          senderEmail: sender.email || null,
+          senderProfilePicture: sender.profilePicture || null,
+        };
+      });
+    return messages;
+  }
+
+  async createCollectiveMessage(messageData: any): Promise<any> {
+    const message = {
+      id: randomUUID(),
+      siteId: messageData.siteId,
+      senderId: messageData.senderId,
+      messageType: messageData.messageType || "text",
+      content: messageData.content,
+      messageData: messageData.messageData || {},
+      isEdited: false,
+      isDeleted: false,
+      editedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.data.collectiveMessages.push(message);
+    return message;
+  }
+
+  async getCollectiveMessageWithSender(messageId: string): Promise<any> {
+    const message = this.data.collectiveMessages.find((m) => m.id === messageId);
+    if (!message) return undefined;
+    const sender = this.data.users.find((u) => u.id === message.senderId) || {};
+    return {
+      ...message,
+      senderFirstName: sender.firstName || null,
+      senderLastName: sender.lastName || null,
+      senderEmail: sender.email || null,
+      senderProfilePicture: sender.profilePicture || null,
+    };
+  }
+
+  // ===== COLLECTIVE BLOG POSTS METHODS =====
+  async getCollectiveBlogPosts(
+    siteId: string,
+    options: { status?: string; userRole?: string; limit?: number; offset?: number }
+  ): Promise<any[]> {
+    let posts = this.data.collectiveBlogPosts.filter((p) => p.siteId === siteId);
+    if (options.status) {
+      posts = posts.filter((p) => p.status === options.status);
+    }
+    if (options.userRole === "member") {
+      posts = posts.filter((p) => p.visibility !== "brehons");
+    }
+    posts = posts
+      .sort((a, b) => {
+        const aDate = new Date(a.publishedAt || a.createdAt).getTime();
+        const bDate = new Date(b.publishedAt || b.createdAt).getTime();
+        return bDate - aDate;
+      })
+      .slice(options.offset || 0, (options.offset || 0) + (options.limit || posts.length))
+      .map((p) => {
+        const author = this.data.users.find((u) => u.id === p.authorId) || {};
+        return {
+          ...p,
+          authorFirstName: author.firstName || null,
+          authorLastName: author.lastName || null,
+          authorEmail: author.email || null,
+          authorProfilePicture: author.profilePicture || null,
+        };
+      });
+    return posts;
+  }
+
+  async getCollectiveBlogPostById(postId: string): Promise<any> {
+    const post = this.data.collectiveBlogPosts.find((p) => p.id === postId);
+    if (!post) return undefined;
+    const author = this.data.users.find((u) => u.id === post.authorId) || {};
+    return {
+      ...post,
+      authorFirstName: author.firstName || null,
+      authorLastName: author.lastName || null,
+      authorEmail: author.email || null,
+      authorProfilePicture: author.profilePicture || null,
+    };
+  }
+
+  async createCollectiveBlogPost(postData: any): Promise<any> {
+    const post = {
+      id: randomUUID(),
+      siteId: postData.siteId,
+      title: postData.title,
+      content: postData.content,
+      excerpt: postData.excerpt || null,
+      slug: postData.slug,
+      authorId: postData.authorId,
+      status: postData.status || "draft",
+      visibility: postData.visibility || "members",
+      featuredImageUrl: postData.featuredImageUrl || null,
+      tags: postData.tags || [],
+      viewCount: 0,
+      likeCount: 0,
+      commentCount: 0,
+      publishedAt: postData.publishedAt || null,
+      lastEditedBy: postData.lastEditedBy || null,
+      lastEditedAt: postData.lastEditedAt || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.data.collectiveBlogPosts.push(post);
+    return post;
+  }
+
+  async updateCollectiveBlogPost(postId: string, updates: any): Promise<any> {
+    const post = this.data.collectiveBlogPosts.find((p) => p.id === postId);
+    if (!post) throw new Error("Post not found");
+    Object.assign(post, updates, { updatedAt: new Date() });
+    return post;
+  }
+
+  async deleteCollectiveBlogPost(postId: string): Promise<void> {
+    this.data.collectiveBlogPosts = this.data.collectiveBlogPosts.filter(
+      (p) => p.id !== postId
+    );
+  }
+
+  async incrementBlogPostViewCount(postId: string): Promise<void> {
+    const post = this.data.collectiveBlogPosts.find((p) => p.id === postId);
+    if (post) {
+      post.viewCount = (post.viewCount || 0) + 1;
+    }
+  }
+
+  // ===== COLLECTIVE TASKS METHODS =====
+  async getCollectiveTasks(
+    siteId: string,
+    options: { status?: string; limit?: number; offset?: number }
+  ): Promise<any[]> {
+    let tasks = this.data.collectiveTasks.filter((t) => t.siteId === siteId);
+    if (options.status) {
+      tasks = tasks.filter((t) => t.status === options.status);
+    }
+    tasks = tasks
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      .slice(options.offset || 0, (options.offset || 0) + (options.limit || tasks.length))
+      .map((t) => {
+        const creator = this.data.users.find((u) => u.id === t.createdBy) || {};
+        return {
+          ...t,
+          creatorFirstName: creator.firstName || null,
+          creatorLastName: creator.lastName || null,
+          creatorEmail: creator.email || null,
+          creatorProfilePicture: creator.profilePicture || null,
+        };
+      });
+    return tasks;
+  }
+
+  async getCollectiveTaskById(taskId: string): Promise<any> {
+    const task = this.data.collectiveTasks.find((t) => t.id === taskId);
+    if (!task) return undefined;
+    const creator = this.data.users.find((u) => u.id === task.createdBy) || {};
+    return {
+      ...task,
+      creatorFirstName: creator.firstName || null,
+      creatorLastName: creator.lastName || null,
+      creatorEmail: creator.email || null,
+      creatorProfilePicture: creator.profilePicture || null,
+    };
+  }
+
+  async createCollectiveTask(taskData: any): Promise<any> {
+    const task = {
+      id: randomUUID(),
+      siteId: taskData.siteId,
+      title: taskData.title,
+      description: taskData.description,
+      taskType: taskData.taskType || "general",
+      priority: taskData.priority || "medium",
+      status: taskData.status || "open",
+      dueDate: taskData.dueDate || null,
+      createdBy: taskData.createdBy,
+      assignedToRole: taskData.assignedToRole || null,
+      taskConfig: taskData.taskConfig || {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      completedAt: null,
+    };
+    this.data.collectiveTasks.push(task);
+    return task;
+  }
+
+  async updateCollectiveTask(taskId: string, updates: any): Promise<any> {
+    const task = this.data.collectiveTasks.find((t) => t.id === taskId);
+    if (!task) throw new Error("Task not found");
+    Object.assign(task, updates, { updatedAt: new Date() });
+    return task;
+  }
+
+  async deleteCollectiveTask(taskId: string): Promise<void> {
+    this.data.collectiveTasks = this.data.collectiveTasks.filter(
+      (t) => t.id !== taskId
+    );
+  }
+
+  async getUserTasks(siteId: string, userId: string): Promise<any[]> {
+    const assignments = this.data.taskAssignments.filter(
+      (a) => a.userId === userId
+    );
+    const tasks = assignments
+      .map((a) => {
+        const task = this.data.collectiveTasks.find(
+          (t) => t.id === a.taskId && t.siteId === siteId
+        );
+        if (!task) return null;
+        const creator = this.data.users.find((u) => u.id === task.createdBy) || {};
+        return {
+          ...task,
+          assignmentId: a.id,
+          assignedAt: a.createdAt,
+          assignmentStatus: a.status,
+          creatorFirstName: creator.firstName || null,
+          creatorLastName: creator.lastName || null,
+          creatorEmail: creator.email || null,
+          creatorProfilePicture: creator.profilePicture || null,
+        };
+      })
+      .filter(Boolean) as any[];
+    tasks.sort(
+      (a, b) =>
+        new Date(b.assignedAt).getTime() - new Date(a.assignedAt).getTime()
+    );
+    return tasks;
+  }
+
+  async assignTaskToUser(
+    taskId: string,
+    userId: string,
+    assignedById: string
+  ): Promise<any> {
+    const assignment = {
+      id: randomUUID(),
+      taskId,
+      userId,
+      assignedBy: assignedById,
+      status: "assigned",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.data.taskAssignments.push(assignment);
+    return assignment;
   }
 
   // Access control

@@ -69,9 +69,31 @@ export interface ISiteStorage {
   createSiteMembership(membershipData: any): Promise<any>;
   updateSiteMembership(siteId: string, userId: string, updates: any): Promise<any>;
   deleteSiteMembership(siteId: string, userId: string): Promise<boolean>;
-  
+
   // Access control
   checkSiteAccess(siteId: string, userEmail: string, isAdmin: boolean): Promise<boolean>;
+
+  // Collective Messages Methods
+  getCollectiveMessages(siteId: string, options: { limit: number; offset: number }): Promise<any[]>;
+  createCollectiveMessage(messageData: any): Promise<any>;
+  getCollectiveMessageWithSender(messageId: string): Promise<any>;
+
+  // Collective Blog Posts Methods
+  getCollectiveBlogPosts(siteId: string, options: { status?: string; userRole?: string; limit?: number; offset?: number }): Promise<any[]>;
+  getCollectiveBlogPostById(postId: string): Promise<any>;
+  createCollectiveBlogPost(postData: any): Promise<any>;
+  updateCollectiveBlogPost(postId: string, updates: any): Promise<any>;
+  deleteCollectiveBlogPost(postId: string): Promise<void>;
+  incrementBlogPostViewCount(postId: string): Promise<void>;
+
+  // Collective Tasks Methods
+  getCollectiveTasks(siteId: string, options: { status?: string; limit?: number; offset?: number }): Promise<any[]>;
+  getCollectiveTaskById(taskId: string): Promise<any>;
+  createCollectiveTask(taskData: any): Promise<any>;
+  updateCollectiveTask(taskId: string, updates: any): Promise<any>;
+  deleteCollectiveTask(taskId: string): Promise<void>;
+  getUserTasks(siteId: string, userId: string): Promise<any[]>;
+  assignTaskToUser(taskId: string, userId: string, assignedById: string): Promise<any>;
 }
 
 export class DatabaseSiteStorage implements ISiteStorage {
