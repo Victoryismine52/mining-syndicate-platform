@@ -104,7 +104,8 @@ Setting `STORAGE_MODE=memory` launches the API using JSON files loaded into RAM
 instead of Postgres. Seed data lives in `server/data/seed.json`. Because changes
 aren't persisted, restart the server to reset to the contents of that file. Use
 `npm run dev:mem` to start the server with these settings and authentication
-disabled.
+disabled. In this mode, the database layer exports a stub with no-op methods for
+development and testing only; do not rely on it in production.
 
 ## Self-Contained Tools
 

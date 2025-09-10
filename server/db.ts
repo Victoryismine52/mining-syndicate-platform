@@ -8,26 +8,34 @@ import * as schema from "@shared/schema";
 import * as siteSchema from "@shared/site-schema";
 import { config } from "./config";
 
-neonConfig.webSocketConstructor = ws;
+let pool: NeonPool | PgPool | { end: () => Promise<void> } | undefined;
+let db: any;
 
-const connectionString = config.databaseUrl;
-
-const url = new URL(connectionString);
-const isLocal = ["localhost", "127.0.0.1"].includes(url.hostname);
-
-const schemas = { ...schema, ...siteSchema };
-
-let pool: NeonPool | PgPool;
-let db:
-  | ReturnType<typeof neonDrizzle>
-  | ReturnType<typeof pgDrizzle>;
-
-if (isLocal) {
-  pool = new PgPool({ connectionString });
-  db = pgDrizzle(pool, { schema: schemas });
+if (config.storageMode === "memory") {
+  // Stub database for non-production in-memory mode
+  const noop = async () => {};
+  pool = { end: noop } as any;
+  db = {
+    execute: noop,
+    transaction: async (fn: (tx: any) => Promise<any>) => fn({}),
+  };
 } else {
-  pool = new NeonPool({ connectionString });
-  db = neonDrizzle({ client: pool, schema: schemas });
+  neonConfig.webSocketConstructor = ws;
+
+  const connectionString = config.databaseUrl!;
+
+  const url = new URL(connectionString);
+  const isLocal = ["localhost", "127.0.0.1"].includes(url.hostname);
+
+  const schemas = { ...schema, ...siteSchema };
+
+  if (isLocal) {
+    pool = new PgPool({ connectionString });
+    db = pgDrizzle(pool, { schema: schemas });
+  } else {
+    pool = new NeonPool({ connectionString });
+    db = neonDrizzle({ client: pool, schema: schemas });
+  }
 }
 
 export { pool, db };
