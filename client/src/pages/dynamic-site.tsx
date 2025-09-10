@@ -1036,6 +1036,13 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
     } else if (cardType === 'youtube') {
       // YouTube cards don't need click handling - they display video directly
       return;
+    } else if (cardType === 'document') {
+      // Handle document cards
+      const documentUrl = cardTemplate.config?.documentUrl || cardAssignment.overrideConfig?.documentUrl;
+      if (documentUrl) {
+        // Open document in new tab for download
+        window.open(documentUrl, '_blank', 'noopener,noreferrer');
+      }
     } else if (cardType === 'join-card') {
       // Handle join collective cards
       handleJoinCollective(cardTemplate);
