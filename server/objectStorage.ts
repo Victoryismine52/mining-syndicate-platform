@@ -1,27 +1,74 @@
 import { Storage, File } from "@google-cloud/storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
+import fs from "fs";
+import path from "path";
+import { config } from "./config";
 
-const REPLIT_SIDECAR_ENDPOINT = process.env.REPLIT_SIDECAR_ENDPOINT || "http://127.0.0.1:1106";
+const REPLIT_SIDECAR_ENDPOINT = config.objectStorage.replitSidecarEndpoint;
+
+// Simple local filesystem-backed storage implementation used when the
+// Replit sidecar is unavailable or we're explicitly running in memory mode.
+class MemoryFile {
+  constructor(private fullPath: string) {}
+
+  async exists(): Promise<[boolean]> {
+    try {
+      await fs.promises.access(this.fullPath, fs.constants.F_OK);
+      return [true];
+    } catch {
+      return [false];
+    }
+  }
+
+  async getMetadata(): Promise<[{ contentType: string; size: number }]> {
+    const stat = await fs.promises.stat(this.fullPath);
+    return [{ contentType: "application/octet-stream", size: stat.size }];
+    }
+
+  createReadStream() {
+    return fs.createReadStream(this.fullPath);
+  }
+}
+
+class MemoryBucket {
+  constructor(private bucketPath: string) {}
+  file(objectName: string) {
+    return new MemoryFile(path.join(this.bucketPath, objectName));
+  }
+}
+
+class MemoryStorage {
+  bucket(name: string) {
+    const bucketPath = name.startsWith("/") ? name : `/${name}`;
+    return new MemoryBucket(bucketPath);
+  }
+}
+
+type StorageFile = File | MemoryFile;
+
+const useMemoryStorage = !REPLIT_SIDECAR_ENDPOINT || config.storageMode === "memory";
 
 // The object storage client is used to interact with the object storage service.
-export const objectStorageClient = new Storage({
-  credentials: {
-    audience: "replit",
-    subject_token_type: "access_token",
-    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-    type: "external_account",
-    credential_source: {
-      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-      format: {
-        type: "json",
-        subject_token_field_name: "access_token",
+export const objectStorageClient = useMemoryStorage
+  ? new MemoryStorage()
+  : new Storage({
+      credentials: {
+        audience: "replit",
+        subject_token_type: "access_token",
+        token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+        type: "external_account",
+        credential_source: {
+          url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+          format: {
+            type: "json",
+            subject_token_field_name: "access_token",
+          },
+        },
+        universe_domain: "googleapis.com",
       },
-    },
-    universe_domain: "googleapis.com",
-  },
-  projectId: "",
-});
+      projectId: "",
+    });
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -68,7 +115,7 @@ export class ObjectStorageService {
   }
 
   // Search for a public object from the search paths.
-  async searchPublicObject(filePath: string): Promise<File | null> {
+  async searchPublicObject(filePath: string): Promise<StorageFile | null> {
     for (const searchPath of this.getPublicObjectSearchPaths()) {
       const fullPath = `${searchPath}/${filePath}`;
 
@@ -88,7 +135,7 @@ export class ObjectStorageService {
   }
 
   // Downloads an object to the response.
-  async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
+  async downloadObject(file: StorageFile, res: Response, cacheTtlSec: number = 3600) {
     try {
       // Get file metadata
       const [metadata] = await file.getMetadata();
@@ -132,6 +179,11 @@ export class ObjectStorageService {
     const slideId = randomUUID();
     const fullPath = `${privateObjectDir}/slides/${slideId}.jpg`;
 
+    if (useMemoryStorage) {
+      await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
+      return fullPath;
+    }
+
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
     // Sign URL for PUT method with TTL
@@ -144,7 +196,7 @@ export class ObjectStorageService {
   }
 
   // Gets slide file from object storage path
-  async getSlideFile(objectPath: string): Promise<File> {
+  async getSlideFile(objectPath: string): Promise<StorageFile> {
     if (!objectPath.startsWith("/")) {
       objectPath = `/${objectPath}`;
     }
