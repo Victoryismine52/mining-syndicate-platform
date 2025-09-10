@@ -31,6 +31,7 @@ import {
 } from "@shared/schema";
 import { type SiteLead, type Site } from "@shared/site-schema";
 import type { IStorage } from "./storage";
+import { config } from "./config";
 
 interface SeedData {
   users: User[];
@@ -108,7 +109,7 @@ export class MemoryStorage implements IStorage {
 
   async createUser(user: InsertUser & { isAdmin?: boolean }): Promise<User> {
     const isAdmin =
-      user.email === "bnelson523@gmail.com" || (user as any).isAdmin || false;
+      user.email === config.defaultAdminEmail || (user as any).isAdmin || false;
     const newUser: User = {
       ...(user as any),
       id: randomUUID(),
@@ -129,7 +130,7 @@ export class MemoryStorage implements IStorage {
   }
 
   async checkUserAccess(email: string): Promise<boolean> {
-    if (email === "bnelson523@gmail.com") return true;
+    if (email === config.defaultAdminEmail) return true;
     return this.data.accessList.some((e) => e.email === email);
   }
 
@@ -220,10 +221,10 @@ export class MemoryStorage implements IStorage {
   }
 
   async addToAccessList(email: string, addedBy: string): Promise<AccessListEntry> {
-    if (this.data.accessList.length === 0 && email !== "bnelson523@gmail.com") {
+    if (this.data.accessList.length === 0 && email !== config.defaultAdminEmail) {
       this.data.accessList.push({
         id: randomUUID(),
-        email: "bnelson523@gmail.com",
+        email: config.defaultAdminEmail,
         addedBy: null as any,
         addedAt: new Date(),
       } as AccessListEntry);
@@ -241,7 +242,7 @@ export class MemoryStorage implements IStorage {
   }
 
   async removeFromAccessList(email: string): Promise<void> {
-    if (email === "bnelson523@gmail.com") return;
+    if (email === config.defaultAdminEmail) return;
     this.data.accessList = this.data.accessList.filter((e) => e.email !== email);
   }
 
