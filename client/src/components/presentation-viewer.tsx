@@ -404,6 +404,15 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
   // CRITICAL FIX: Separate different card types to prevent rendering videos/documents as forms
   const presentationForms = presentationAssignments.filter(assignment => {
     const config = assignment.formTemplate?.config || {};
+    console.log('Checking assignment for form filtering:', {
+      id: assignment.id,
+      templateName: assignment.formTemplate?.name,
+      config: config,
+      hasVimeo: !!config.vimeoVideoId,
+      hasYouTube: !!config.youtubeVideoId,
+      hasDocUrl: !!config.documentUrl,
+      hasFileKey: !!config.fileKey
+    });
     // Only include actual forms (not video or document cards)
     return !config.vimeoVideoId && !config.youtubeVideoId && !config.documentUrl && !config.fileKey;
   });
