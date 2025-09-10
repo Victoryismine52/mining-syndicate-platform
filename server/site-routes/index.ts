@@ -7,10 +7,16 @@ import { qrGenerator } from "../qr-generator";
 import { submitToHubSpotForm } from "../hubspot";
 import { createHubSpotService, type ContactData } from "../hubspot-service";
 import { ObjectStorageService, ObjectNotFoundError } from "../objectStorage";
-import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, insertSiteDisclaimerSchema, insertSiteSlideSchema, insertGlobalSlideSchema, insertSiteAnalyticsSchema, siteManagers, type SiteManagerWithAccount } from "@shared/site-schema";
-import { users } from "@shared/schema";
-import { db } from "../db";
-import { eq } from "drizzle-orm";
+import {
+  insertSiteSchema,
+  insertSiteLeadSchema,
+  insertLegalDisclaimerSchema,
+  insertSiteDisclaimerSchema,
+  insertSiteSlideSchema,
+  insertGlobalSlideSchema,
+  insertSiteAnalyticsSchema,
+  type SiteManagerWithAccount,
+} from "@shared/site-schema";
 import { checkSiteAccess, requireAdmin } from "../site-access-control";
 import { isAuthenticated } from "../google-auth";
 import { z } from "zod";
@@ -284,27 +290,20 @@ export function registerSiteRoutes(app: Express) {
   app.get("/api/sites/:siteId/managers", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const { siteId } = req.params;
-      const rows = await db
-        .select({
-          id: siteManagers.id,
-          siteId: siteManagers.siteId,
-          userEmail: siteManagers.userEmail,
-          createdAt: siteManagers.createdAt,
-          existingEmail: users.email,
+
+      const managers = await siteStorage.getSiteManagers(siteId);
+
+      const managersWithAccount: SiteManagerWithAccount[] = await Promise.all(
+        managers.map(async (manager) => {
+          const user = await storage.getUserByEmail(manager.userEmail);
+          return {
+            ...manager,
+            hasAccount: !!user,
+          };
         })
-        .from(siteManagers)
-        .leftJoin(users, eq(siteManagers.userEmail, users.email))
-        .where(eq(siteManagers.siteId, siteId));
+      );
 
-      const managers: SiteManagerWithAccount[] = rows.map((row) => ({
-        id: row.id,
-        siteId: row.siteId,
-        userEmail: row.userEmail,
-        createdAt: row.createdAt,
-        hasAccount: !!row.existingEmail,
-      }));
-
-      res.json(managers);
+      res.json(managersWithAccount);
     } catch (error) {
       logger.error("Error fetching site managers:", error);
       res.status(500).json({ error: "Failed to fetch site managers" });
