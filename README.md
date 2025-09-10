@@ -63,6 +63,7 @@ Environment configuration is managed through Replit's Secrets manager. For local
 | `REPLIT_DEV_DOMAIN` | Default Replit domain during development. |
 | `REPLIT_DOMAINS` | Comma-separated list of domains allowed for OIDC callbacks. |
 | `STORAGE_MODE` | Set to `memory` to use in-memory JSON storage for sites. |
+| `MEMORY_PERSIST` | Toggle write-back of in-memory data to `server/data/*.json` files. |
 
 The server exits on startup if `DATABASE_URL` is missing. When `AUTH_DISABLED` is not `true`, Google and Replit auth credentials (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `REPL_ID`) must also be provided.
 
@@ -104,10 +105,18 @@ This allows each environment to ship branded decks without modifying source code
 Setting `STORAGE_MODE=memory` launches the API using JSON files loaded into RAM
 instead of Postgres. Seed data lives in `server/data/seed.json`. Because changes
 aren't persisted, restart the server to reset to the contents of that file. Use
-`npm run dev:mem` to start the server with these settings. Authentication is
-disabled by default in this mode but can be enabled by setting `AUTH_DISABLED=false`.
-In this mode, the database layer exports a stub with no-op methods for
-development and testing only; do not rely on it in production.
+`npm run dev:mem` to start the server with these settings. Set
+`MEMORY_PERSIST=true` to write changes back to disk so they survive restarts,
+for example:
+
+```
+MEMORY_PERSIST=true npm run dev:mem
+```
+
+Authentication is disabled by default in this mode but can be enabled by
+setting `AUTH_DISABLED=false`. In this mode, the database layer exports a stub
+with no-op methods for development and testing only; do not rely on it in
+production.
 
 ## Self-Contained Tools
 
