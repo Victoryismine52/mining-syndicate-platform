@@ -401,6 +401,9 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
     assignment.overrideConfig?.includeInPresentation === true
   );
 
+  console.log('All form assignments:', formAssignments.length);
+  console.log('Presentation assignments:', presentationAssignments.length);
+  
   // CRITICAL FIX: Separate different card types to prevent rendering videos/documents as forms
   const presentationForms = presentationAssignments.filter(assignment => {
     const config = assignment.formTemplate?.config || {};
