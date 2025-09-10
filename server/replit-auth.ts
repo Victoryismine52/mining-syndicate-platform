@@ -38,16 +38,9 @@ const getOidcConfig = memoize(
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: config.databaseUrl,
-    createTableIfMissing: true,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
-  return session({
+
+  const sessionOptions: session.SessionOptions = {
     secret: config.sessionSecret!,
-    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -55,7 +48,21 @@ export function getSession() {
       secure: true,
       maxAge: sessionTtl,
     },
-  });
+  };
+
+  if (config.storageMode === 'memory') {
+    sessionOptions.store = new session.MemoryStore();
+  } else {
+    const pgStore = connectPg(session);
+    sessionOptions.store = new pgStore({
+      conString: config.databaseUrl,
+      createTableIfMissing: true,
+      ttl: sessionTtl,
+      tableName: "sessions",
+    });
+  }
+
+  return session(sessionOptions);
 }
 
 function updateUserSession(

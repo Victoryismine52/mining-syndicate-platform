@@ -45,16 +45,8 @@ declare module "express-session" {
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: config.databaseUrl,
-    createTableIfMissing: true,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
-  return session({
+  const sessionOptions: session.SessionOptions = {
     secret: config.sessionSecret || "mining-syndicate-dev-secret-2025-very-secure-random-string-32chars-minimum",
-    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -65,7 +57,21 @@ export function getSession() {
       path: '/', // Ensure cookie is available on all paths
       domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser decide domain
     },
-  });
+  };
+
+  if (config.storageMode === 'memory') {
+    sessionOptions.store = new session.MemoryStore();
+  } else {
+    const pgStore = connectPg(session);
+    sessionOptions.store = new pgStore({
+      conString: config.databaseUrl,
+      createTableIfMissing: true,
+      ttl: sessionTtl,
+      tableName: "sessions",
+    });
+  }
+
+  return session(sessionOptions);
 }
 
 export async function setupAuth(app: Express) {
