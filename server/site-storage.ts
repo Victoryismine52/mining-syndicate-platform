@@ -106,6 +106,60 @@ export class DatabaseSiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     
+    // If siteId is being changed, we need to handle foreign key constraints
+    if (updates.siteId && updates.siteId !== siteId) {
+      // Use a transaction to update all related records
+      const result = await db.transaction(async (tx) => {
+        // First update all site_form_assignments that reference this site
+        await tx
+          .update(siteFormAssignments)
+          .set({ siteId: updates.siteId })
+          .where(eq(siteFormAssignments.siteId, siteId));
+
+        // Update site_slides if they exist  
+        await tx
+          .update(siteSlides)
+          .set({ siteId: updates.siteId })
+          .where(eq(siteSlides.siteId, siteId));
+
+        // Update site_leads if they exist
+        await tx
+          .update(siteLeads)
+          .set({ siteId: updates.siteId })
+          .where(eq(siteLeads.siteId, siteId));
+
+        // Update site_disclaimers if they exist
+        await tx
+          .update(siteDisclaimers)
+          .set({ siteId: updates.siteId })
+          .where(eq(siteDisclaimers.siteId, siteId));
+
+        // Update site_sections if they exist
+        await tx
+          .update(siteSections)
+          .set({ siteId: updates.siteId })
+          .where(eq(siteSections.siteId, siteId));
+
+        // Update site_managers if they exist
+        await tx
+          .update(siteManagers)
+          .set({ siteId: updates.siteId })
+          .where(eq(siteManagers.siteId, siteId));
+
+        // Finally, update the main sites record
+        const [updatedSite] = await tx
+          .update(sites)
+          .set(updateData)
+          .where(eq(sites.siteId, siteId))
+          .returning();
+        
+        return updatedSite;
+      });
+      
+      return result;
+    }
+    
+    // Normal update (no siteId change)
     const [site] = await db
       .update(sites)
       .set(updateData)
