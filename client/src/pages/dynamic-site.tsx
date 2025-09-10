@@ -1040,8 +1040,15 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
       // Handle document cards
       const documentUrl = cardTemplate.config?.documentUrl || cardAssignment.overrideConfig?.documentUrl;
       if (documentUrl) {
+        // Convert direct Google Storage URLs to use local slide-images route for proper authentication
+        let finalUrl = documentUrl;
+        if (documentUrl.startsWith('https://storage.googleapis.com/')) {
+          // Extract the path from the Google Storage URL and serve via local route
+          const url = new URL(documentUrl);
+          finalUrl = `/slide-images${url.pathname}`;
+        }
         // Open document in new tab for download
-        window.open(documentUrl, '_blank', 'noopener,noreferrer');
+        window.open(finalUrl, '_blank', 'noopener,noreferrer');
       }
     } else if (cardType === 'join-card') {
       // Handle join collective cards
