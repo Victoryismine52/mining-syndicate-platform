@@ -12,6 +12,11 @@ const BASE_DEV_URL = config.baseDevUrl;
 const BASE_CODEX_URL = config.baseCodexUrl;
 
 async function init() {
+  if (config.storageMode === 'memory') {
+    logger.info('In-memory mode active; skipping init');
+    return;
+  }
+
   try {
     const response = await fetch(`${BASE_DEV_URL}/visible-slides`);
     if (!response.ok) {
@@ -140,6 +145,8 @@ app.use((req, res, next) => {
     reusePort: true,
   }, async () => {
     logger.info(`serving on port ${port}`);
-    await init();
+    if (config.storageMode !== 'memory') {
+      await init();
+    }
   });
 })();
