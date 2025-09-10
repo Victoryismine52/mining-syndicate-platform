@@ -37,7 +37,7 @@ This guide covers setting up the project locally, running tests, and establishin
    ```bash
    cp .env.example .env
    ```
-2. Set `AUTH_DISABLED=true` in `.env` to bypass OAuth.
+2. Set `AUTH_DISABLED=true` in `.env` to bypass OAuth. This is the default when `STORAGE_MODE=memory`.
 3. Start the local Postgres service.
    ```bash
    npm run db:up
