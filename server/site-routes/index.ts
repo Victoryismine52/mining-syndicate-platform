@@ -113,12 +113,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const { slug: currentSlug } = req.params;
       const updates = req.body;
 
+      logger.info(`Site update request for ${currentSlug}:`, updates);
+
       // If updating slug, check availability first
       if (updates.slug && updates.slug !== currentSlug) {
+        logger.info(`Checking availability of new slug: ${updates.slug}`);
         const existingSite = await siteStorage.getSite(updates.slug);
         if (existingSite) {
+          logger.warn(`Slug ${updates.slug} is already taken`);
           return res.status(400).json({ error: "Site URL is already taken" });
         }
+        logger.info(`Slug ${updates.slug} is available`);
       }
 
       // Remove any attempts to update siteId - it should remain immutable
@@ -127,10 +132,14 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Update the site using the current slug as the lookup key
+      logger.info(`Updating site with slug ${currentSlug}`);
       const site = await siteStorage.updateSite(currentSlug, updates);
       if (!site) {
+        logger.error(`Site update failed for slug ${currentSlug}`);
         return res.status(404).json({ error: "Site not found" });
       }
+
+      logger.info(`Site updated successfully:`, site);
 
       // Map slug back to siteId for UI compatibility
       const responseData = {

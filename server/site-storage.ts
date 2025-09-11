@@ -9,7 +9,7 @@ export interface ISiteStorage {
   createSite(site: InsertSite): Promise<Site>;
   getSite(slug: string): Promise<Site | undefined>;
   getSiteById(id: string): Promise<Site | undefined>;
-  updateSite(slug: string, updates: Partial<InsertSite>): Promise<Site>;
+  updateSite(slug: string, updates: Partial<InsertSite>): Promise<Site | null>;
   deleteSite(slug: string): Promise<void>;
   listSites(): Promise<Site[]>;
 
@@ -100,20 +100,38 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return site;
   }
 
-  async updateSite(slug: string, updates: Partial<Site>): Promise<Site> {
-    // Simple update - since foreign keys now reference the permanent ID,
-    // changing the slug doesn't require cascading updates
-    const [site] = await db
-      .update(sites)
-      .set(updates)
-      .where(eq(sites.slug, slug)) // Find by current slug
-      .returning();
+  async updateSite(slug: string, updates: Partial<InsertSite>): Promise<Site | null> {
+    try {
+      // First get the current site using the slug
+      const currentSite = await this.getSite(slug);
+      if (!currentSite) {
+        logger.error(`Site not found with slug: ${slug}`);
+        return null;
+      }
 
-    if (!site) {
-      throw new Error(`Site not found with slug: ${slug}`);
+      logger.info(`Updating site ${currentSite.id} (slug: ${slug}) with updates:`, updates);
+
+      // Update the site using the permanent ID
+      const [updatedSite] = await db
+        .update(sites)
+        .set({
+          ...updates,
+          updatedAt: new Date(),
+        })
+        .where(eq(sites.id, currentSite.id)) // Use permanent ID for the update
+        .returning();
+
+      if (!updatedSite) {
+        logger.error(`Failed to update site ${currentSite.id}`);
+        return null;
+      }
+
+      logger.info(`Successfully updated site ${currentSite.id}:`, updatedSite);
+      return updatedSite;
+    } catch (error) {
+      logger.error('Error updating site:', error);
+      return null;
     }
-
-    return site;
   }
 
   async deleteSite(slug: string): Promise<void> {
@@ -142,7 +160,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       return [];
     }
-    
+
     return await db
       .select()
       .from(siteLeads)
@@ -156,7 +174,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       return [];
     }
-    
+
     return await db
       .select()
       .from(siteLeads)
@@ -191,7 +209,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       return [];
     }
-    
+
     return await db
       .select()
       .from(siteAnalytics)
@@ -207,7 +225,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       throw new Error(`Site not found with slug: ${slug}`);
     }
-    
+
     const [manager] = await db
       .insert(siteManagers)
       .values({ siteId: site.id, userEmail })
@@ -221,7 +239,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       throw new Error(`Site not found with slug: ${slug}`);
     }
-    
+
     await db
       .delete(siteManagers)
       .where(and(
@@ -236,7 +254,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       return [];
     }
-    
+
     return await db
       .select()
       .from(siteManagers)
@@ -249,7 +267,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       return false;
     }
-    
+
     const [manager] = await db
       .select()
       .from(siteManagers)
@@ -326,7 +344,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       throw new Error(`Site not found with slug: ${slug}`);
     }
-    
+
     const [attachment] = await db
       .insert(siteDisclaimers)
       .values({
@@ -345,7 +363,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       throw new Error(`Site not found with slug: ${slug}`);
     }
-    
+
     await db
       .delete(siteDisclaimers)
       .where(and(
@@ -360,7 +378,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       return [];
     }
-    
+
     return await db
       .select({
         id: siteDisclaimers.id,
@@ -392,7 +410,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       return [];
     }
-    
+
     return await db
       .select()
       .from(siteSlides)
@@ -430,7 +448,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       throw new Error(`Site not found with slug: ${slug}`);
     }
-    
+
     // Update each slide's order in a transaction
     await db.transaction(async (tx) => {
       for (const { id, slideOrder } of slideOrders) {
