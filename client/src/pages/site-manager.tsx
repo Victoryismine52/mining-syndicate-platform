@@ -281,7 +281,7 @@ export function SiteManager() {
     const switchElement = form.querySelector('[name="passwordProtected"]') as HTMLInputElement;
     
     const updates: Partial<InsertSite> = {
-      siteId: editSiteIdValue, // Use controlled slug input value
+      slug: editSiteIdValue, // Use controlled slug input value
       name: formData.get('name') as string,
       description: formData.get('description') as string,
       password: formData.get('password') as string || undefined,
@@ -295,7 +295,7 @@ export function SiteManager() {
       },
     };
 
-    updateSiteMutation.mutate({ siteId: editingSite.siteId, updates });
+    updateSiteMutation.mutate({ slug: editingSite.slug, updates });
   };
 
   if (isLoading) {

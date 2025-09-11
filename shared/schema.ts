@@ -69,7 +69,7 @@ export const slideSettings = pgTable("slide_settings", {
 // Sites table - Each site has unique configuration
 export const sites = pgTable('sites', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).unique().notNull(), // Custom slug/URL identifier
+  slug: varchar('site_id', { length: 50 }).unique().notNull(), // Custom slug/URL identifier
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
   

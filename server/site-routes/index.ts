@@ -80,7 +80,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const { slug } = req.params;
       const existingSite = await siteStorage.getSite(slug);
 
-      res.json({ 
+      res.json({
         available: !existingSite,
         slug: slug,
         message: existingSite ? "Site URL is already taken" : "Site URL is available"
@@ -98,8 +98,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const updates = req.body;
 
       // If updating siteId (slug), check availability
-      if (updates.siteId && updates.siteId !== siteId) {
-        const existingSite = await siteStorage.getSite(updates.siteId);
+      if (updates.slug && updates.slug !== siteId) {
+        const existingSite = await siteStorage.getSite(updates.slug);
         if (existingSite) {
           return res.status(400).json({ error: "Site URL is already taken" });
         }
@@ -562,11 +562,11 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       });
 
       const attachment = await siteStorage.attachDisclaimerToSite(
-        req.params.siteId, 
-        disclaimerId, 
-        { 
-          displayOrder: displayOrder || "1", 
-          linkText: linkText || "Legal Disclaimer" 
+        req.params.siteId,
+        disclaimerId,
+        {
+          displayOrder: displayOrder || "1",
+          linkText: linkText || "Legal Disclaimer"
         }
       );
       res.json(attachment);
@@ -620,7 +620,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       logger.info('Site found, fetching slides:', { siteId, siteName: site.name });
       const slides = await siteStorage.getSiteSlides(siteId);
 
-      logger.info('Retrieved slides from database:', { 
+      logger.info('Retrieved slides from database:', {
         siteId,
         slideCount: slides.length,
         slides: slides.map(slide => ({
@@ -738,7 +738,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
 
     try {
-      logger.info('Slide image request:', { 
+      logger.info('Slide image request:', {
         originalPath: req.path,
         objectPath,
         method: req.method
@@ -751,9 +751,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       logger.info('Attempting to get slide file from object storage:', { objectPath });
       const file = await objectStorageService.getSlideFile(objectPath);
-      logger.info('Successfully retrieved file reference:', { 
+      logger.info('Successfully retrieved file reference:', {
         file: file ? 'found' : 'null',
-        objectPath 
+        objectPath
       });
 
       // Check again before streaming
@@ -765,9 +765,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await objectStorageService.downloadObject(file, res);
       logger.info('Successfully served slide image:', { objectPath });
     } catch (error: any) {
-      logger.error('Error serving slide image:', { 
-        error: error.message, 
-        stack: error.stack, 
+      logger.error('Error serving slide image:', {
+        error: error.message,
+        stack: error.stack,
         objectPath,
         originalPath: req.path,
         errorType: error.constructor.name
@@ -949,8 +949,14 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const { name, description, displayOrder } = req.body;
       const user = req.user as any;
 
+      // Get the site to get permanent ID
+      const site = await siteStorage.getSite(siteId);
+      if (!site) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+
       // Check if user has access to this site
-      const hasAccess = await siteStorage.checkSiteAccess(siteId, user.email, user.isAdmin);
+      const hasAccess = await siteStorage.checkSiteAccess(site.id, user.email, user.isAdmin);
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
@@ -959,8 +965,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(400).json({ error: "Section name is required" });
       }
 
-      const sectionData = {
-        siteId,
+      const sectionData: any = {
+        siteId: site.id, // Use permanent ID
         name: name.trim(),
         description: description?.trim() || null,
         displayOrder: parseInt(displayOrder) || 1,
@@ -1141,8 +1147,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const membership = memberships.find(m => m.siteId === siteId);
 
       if (!membership) {
-        return res.json({ 
-          isMember: false 
+        return res.json({
+          isMember: false
         });
       }
 
@@ -1211,8 +1217,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const existingMembership = memberships.find(m => m.siteId === siteId);
 
       if (existingMembership) {
-        return res.json({ 
-          success: true, 
+        return res.json({
+          success: true,
           message: 'Already a member',
           membership: existingMembership,
           redirectUrl: `/site/${siteId}/home`
@@ -1228,8 +1234,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         isActive: true
       });
 
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         message: 'Successfully joined collective',
         membership,
         redirectUrl: `/site/${siteId}/home`
@@ -1312,10 +1318,10 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     try {
       const { siteId } = req.params;
       const userId = (req.user as any)?.id;
-      const { 
-        title, 
-        description, 
-        priority, 
+      const {
+        title,
+        description,
+        priority,
         dueDate,
         taskType,
         assignTo,
@@ -1387,7 +1393,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       if (targetUserIds.length > 0) {
         // Create assignments for all target users
-        const assignmentPromises = targetUserIds.map(targetUserId => 
+        const assignmentPromises = targetUserIds.map(targetUserId =>
           siteStorage.assignTaskToUser(task.id, targetUserId, userId)
         );
 

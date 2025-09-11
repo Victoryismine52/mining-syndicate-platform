@@ -100,22 +100,17 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return site;
   }
 
-  async updateSite(siteSlug: string, updates: Partial<InsertSite>): Promise<Site> {
-    const updateData: any = {
-      ...updates,
-      updatedAt: new Date(),
-    };
-
+  async updateSite(slug: string, updates: Partial<Site>): Promise<Site> {
     // Simple update - since foreign keys now reference the permanent ID,
-    // changing the siteId (slug) doesn't require cascading updates
+    // changing the slug doesn't require cascading updates
     const [site] = await db
       .update(sites)
-      .set(updateData)
-      .where(eq(sites.siteId, siteSlug)) // Find by current slug
+      .set(updates)
+      .where(eq(sites.slug, slug)) // Find by current slug
       .returning();
 
     if (!site) {
-      throw new Error(`Site not found with slug: ${siteSlug}`);
+      throw new Error(`Site not found with slug: ${slug}`);
     }
 
     return site;
@@ -433,11 +428,17 @@ export class DatabaseSiteStorage implements ISiteStorage {
   }
 
   // Site sections operations
-  async getSiteSections(siteId: string): Promise<SiteSection[]> {
+  async getSiteSections(slug: string): Promise<SiteSection[]> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      return [];
+    }
+
     const sections = await db
       .select()
       .from(siteSections)
-      .where(eq(siteSections.siteId, siteId))
+      .where(eq(siteSections.siteId, site.id))
       .orderBy(siteSections.displayOrder, siteSections.createdAt);
     return sections;
   }
@@ -451,6 +452,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
   }
 
   async createSiteSection(sectionData: InsertSiteSection): Promise<SiteSection> {
+    // sectionData.siteId should now always be a permanent UUID ID
     const [section] = await db
       .insert(siteSections)
       .values([sectionData as any])

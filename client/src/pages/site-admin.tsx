@@ -1366,10 +1366,10 @@ export function SiteAdmin(props: SiteAdminProps) {
                               </div>
                               <SlugInput
                                 label="Site URL Slug"
-                                name="siteId"
-                                value={formData.siteId}
-                                onChange={(value) => updateFormField('siteId', value)}
-                                originalSlug={site.siteId}
+                                name="slug"
+                                value={formData.slug}
+                                onChange={(value) => updateFormField('slug', value)}
+                                originalSlug={site.slug}
                                 required
                                 data-testid="input-site-slug"
                               />

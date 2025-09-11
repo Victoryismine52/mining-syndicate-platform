@@ -17,7 +17,7 @@ import { sql } from 'drizzle-orm';
 // Sites table - Each site has unique configuration
 export const sites = pgTable('sites', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).unique().notNull(), // Custom slug/URL identifier
+  slug: varchar('site_id', { length: 50 }).unique().notNull(), // Custom slug/URL identifier
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
 
@@ -308,7 +308,7 @@ export const insertSiteLeadSchema = createInsertSchema(siteLeads).omit({
   submissionCount: z.string().max(10).default('1'),
   miningAmount: z.string().max(100).optional(),
   lendingAmount: z.string().max(100).optional(),
-  siteId: z.string().max(50),
+  slug: z.string().max(50),
 });
 
 export const insertSiteAnalyticsSchema = createInsertSchema(siteAnalytics).omit({
