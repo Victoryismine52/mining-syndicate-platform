@@ -90,8 +90,8 @@ export function SlugInput({
       .toLowerCase()
       .replace(/\s+/g, '-') // Convert spaces to hyphens
       .replace(/[^a-z0-9-]/g, '') // Only allow lowercase letters, numbers, hyphens
-      .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
-      .replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
 
     onChange(newValue);
     
