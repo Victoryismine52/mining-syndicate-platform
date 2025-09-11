@@ -60,14 +60,17 @@ describe('site manager access after account creation', () => {
       lastName: 'Manager',
     });
 
-    const req: any = { params: { siteId: SITE_ID }, user };
+    const { siteStorage } = await import('../site-storage');
+    const site = await siteStorage.getSite(SITE_ID);
+
+    const req: any = { params: { slug: SITE_ID }, user };
     const res: any = { status: vi.fn().mockReturnThis(), json: vi.fn() };
     const next = vi.fn();
 
     await checkSiteAccess(req, res, next);
 
     expect(next).toHaveBeenCalled();
-    expect(req.siteAccess).toMatchObject({ canManage: true, isAdmin: false, isSiteManager: true });
+    expect(req.siteAccess).toMatchObject({ siteId: site!.id, canManage: true, isAdmin: false, isSiteManager: true });
   });
 });
 

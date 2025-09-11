@@ -20,9 +20,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   registerSiteCreateRoutes(app);
 
   // Get site by siteId (no access control for basic site info - admin panel handles its own access control)
-  app.get("/api/sites/:siteId", async (req, res) => {
+  app.get("/api/sites/:slug", async (req, res) => {
     try {
-      const site = await siteStorage.getSite(req.params.siteId);
+      const site = await siteStorage.getSite(req.params.slug);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
       }
@@ -110,13 +110,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Update site
   app.put("/api/sites/:slug", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const { slug: currentSlug } = req.params;
-      const updates = req.body;
+      const { slug } = req.params;
+      const updates = insertSiteSchema.partial().parse(req.body);
 
-      logger.info(`Site update request for ${currentSlug}:`, updates);
+      logger.info(`Site update request for ${slug}:`, updates);
 
       // If updating slug, check availability first
-      if (updates.slug && updates.slug !== currentSlug) {
+      if (updates.slug && updates.slug !== slug) {
         logger.info(`Checking availability of new slug: ${updates.slug}`);
         const existingSite = await siteStorage.getSite(updates.slug);
         if (existingSite) {
@@ -127,15 +127,15 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Remove any attempts to update siteId - it should remain immutable
-      if (updates.siteId) {
-        delete updates.siteId;
+      if ((updates as any).siteId) {
+        delete (updates as any).siteId;
       }
 
       // Update the site using the current slug as the lookup key
-      logger.info(`Updating site with slug ${currentSlug}`);
-      const site = await siteStorage.updateSite(currentSlug, updates);
+      logger.info(`Updating site with slug ${slug}`);
+      const site = await siteStorage.updateSiteBySlug(slug, updates);
       if (!site) {
-        logger.error(`Site update failed for slug ${currentSlug}`);
+        logger.error(`Site update failed for slug ${slug}`);
         return res.status(404).json({ error: "Site not found" });
       }
 
@@ -155,9 +155,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Delete site
-  app.delete("/api/sites/:siteId", async (req, res) => {
+  app.delete("/api/sites/:slug", async (req, res) => {
     try {
-      await siteStorage.deleteSite(req.params.siteId);
+      await siteStorage.deleteSite(req.params.slug);
       res.json({ success: true });
     } catch (error) {
       logger.error({ err: error }, "Error deleting site");
@@ -166,9 +166,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Submit lead for specific site
-  app.post("/api/sites/:siteId/leads", async (req, res) => {
+  app.post("/api/sites/:slug/leads", async (req, res) => {
     try {
-      const siteId = req.params.siteId;
+      const siteId = req.params.slug;
 
       // Check if site exists
       const site = await siteStorage.getSite(siteId);
@@ -274,10 +274,10 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Track analytics events for a site
-  app.post("/api/sites/:siteId/analytics", async (req, res, next) => {
+  app.post("/api/sites/:slug/analytics", async (req, res, next) => {
     try {
-      const { siteId } = z.object({
-        siteId: z.string().min(1, "Site slug required")
+      const { slug } = z.object({
+        slug: z.string().min(1, "Site slug required")
       }).parse(req.params);
       const consentSchema = z.object({ status: z.literal('granted'), timestamp: z.number() });
       try {
@@ -286,7 +286,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(400).json({ error: 'Missing analytics consent' });
       }
       const analyticsData = insertSiteAnalyticsSchema.parse({
-        siteId,
+        siteId: slug,
         eventType: req.body.eventType || 'page_view',
         eventData: req.body.eventData || {},
         sessionId: req.body.sessionId,
@@ -302,9 +302,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get leads for specific site (protected)
-  app.get("/api/sites/:siteId/leads", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.get("/api/sites/:slug/leads", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const leads = await siteStorage.getSiteLeads(req.params.siteId);
+      const leads = await siteStorage.getSiteLeads(req.params.slug);
       res.json(leads);
     } catch (error) {
       logger.error({ err: error }, "Error fetching site leads");
@@ -313,9 +313,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get leads by type for specific site
-  app.get("/api/sites/:siteId/leads/:formType", async (req, res) => {
+  app.get("/api/sites/:slug/leads/:formType", async (req, res) => {
     try {
-      const leads = await siteStorage.getSiteLeadsByType(req.params.siteId, req.params.formType);
+      const leads = await siteStorage.getSiteLeadsByType(req.params.slug, req.params.formType);
       res.json(leads);
     } catch (error) {
       logger.error({ err: error }, "Error fetching site leads by type");
@@ -324,9 +324,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Regenerate QR code for site
-  app.post("/api/sites/:siteId/qr-code", async (req, res) => {
+  app.post("/api/sites/:slug/qr-code", async (req, res) => {
     try {
-      const site = await siteStorage.getSite(req.params.siteId);
+      const site = await siteStorage.getSite(req.params.slug);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
       }
@@ -503,9 +503,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Protected lead routes that require site access
-  app.get("/api/sites/:siteId/leads", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.get("/api/sites/:slug/leads", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const leads = await siteStorage.getSiteLeads(req.params.siteId);
+      const leads = await siteStorage.getSiteLeads(req.params.slug);
       res.json(leads);
     } catch (error) {
       logger.error({ err: error }, "Error fetching site leads");
@@ -542,9 +542,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get available disclaimers for a specific site type (includes global disclaimers)
-  app.get("/api/sites/:siteId/available-disclaimers", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.get("/api/sites/:slug/available-disclaimers", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const site = await siteStorage.getSite(req.params.siteId);
+      const site = await siteStorage.getSite(req.params.slug);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
       }
@@ -600,17 +600,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Site disclaimer attachment routes
 
   // Attach disclaimer to site
-  app.post("/api/sites/:siteId/disclaimers", requireAdmin, async (req, res) => {
+  app.post("/api/sites/:slug/disclaimers", requireAdmin, async (req, res) => {
     try {
       const { disclaimerId, displayOrder, linkText } = insertSiteDisclaimerSchema.parse({
-        siteId: req.params.siteId,
+        siteId: req.params.slug,
         disclaimerId: req.body.disclaimerId,
         displayOrder: req.body.displayOrder ? String(req.body.displayOrder) : "1", // Convert to string
         linkText: req.body.linkText,
       });
 
       const attachment = await siteStorage.attachDisclaimerToSite(
-        req.params.siteId,
+        req.params.slug,
         disclaimerId,
         {
           displayOrder: displayOrder || "1",
@@ -628,9 +628,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get site disclaimers
-  app.get("/api/sites/:siteId/disclaimers", async (req, res) => {
+  app.get("/api/sites/:slug/disclaimers", async (req, res) => {
     try {
-      const disclaimers = await siteStorage.getSiteDisclaimers(req.params.siteId);
+      const disclaimers = await siteStorage.getSiteDisclaimers(req.params.slug);
       res.json(disclaimers);
     } catch (error) {
       logger.error("Error fetching site disclaimers:", error);
@@ -639,9 +639,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Detach disclaimer from site
-  app.delete("/api/sites/:siteId/disclaimers/:disclaimerId", requireAdmin, async (req, res) => {
+  app.delete("/api/sites/:slug/disclaimers/:disclaimerId", requireAdmin, async (req, res) => {
     try {
-      await siteStorage.detachDisclaimerFromSite(req.params.siteId, req.params.disclaimerId);
+      await siteStorage.detachDisclaimerFromSite(req.params.slug, req.params.disclaimerId);
       res.json({ success: true });
     } catch (error) {
       logger.error("Error detaching disclaimer:", error);
@@ -653,9 +653,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   const objectStorageService = new ObjectStorageService();
 
   // Get slides for a site
-  app.get("/api/sites/:siteId/slides", async (req, res) => {
+  app.get("/api/sites/:slug/slides", async (req, res) => {
     try {
-      const siteId = req.params.siteId;
+      const siteId = req.params.slug;
       logger.info('Fetching slides for site:', { siteId });
 
       // First verify the site exists
@@ -683,13 +683,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.json(slides);
     } catch (error) {
-      logger.error("Error fetching site slides:", { siteId: req.params.siteId, error });
+      logger.error("Error fetching site slides:", { siteId: req.params.slug, error });
       res.status(500).json({ error: "Failed to fetch slides" });
     }
   });
 
   // Get upload URL for new slide
-  app.post("/api/sites/:siteId/slides/upload", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.post("/api/sites/:slug/slides/upload", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const uploadURL = await objectStorageService.getSlideUploadURL();
       res.json({ uploadURL });
@@ -700,9 +700,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Create new slide after upload
-  app.post("/api/sites/:siteId/slides", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.post("/api/sites/:slug/slides", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const validatedData = insertSiteSlideSchema.parse({
         ...req.body,
         siteId
@@ -725,7 +725,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Update slide
-  app.put("/api/sites/:siteId/slides/:slideId", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.put("/api/sites/:slug/slides/:slideId", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const validatedData = insertSiteSlideSchema.partial().parse(req.body);
 
@@ -746,7 +746,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Delete slide
-  app.delete("/api/sites/:siteId/slides/:slideId", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.delete("/api/sites/:slug/slides/:slideId", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       await siteStorage.deleteSiteSlide(req.params.slideId);
       res.json({ success: true });
@@ -757,7 +757,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Reorder slides
-  app.post("/api/sites/:siteId/slides/reorder", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.post("/api/sites/:slug/slides/reorder", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const { slideOrders } = req.body;
 
@@ -765,7 +765,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(400).json({ error: "slideOrders must be an array" });
       }
 
-      await siteStorage.reorderSiteSlides(req.params.siteId, slideOrders);
+      await siteStorage.reorderSiteSlides(req.params.slug, slideOrders);
       res.json({ success: true });
     } catch (error) {
       logger.error("Error reordering slides:", error);
@@ -955,9 +955,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Sections Management Endpoints
 
   // Get sections for a site
-  app.get("/api/sites/:siteId/sections", async (req, res) => {
+  app.get("/api/sites/:slug/sections", async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
 
       // Check if site is launched (for public access) or requires authentication
       const site = await siteStorage.getSite(siteId);
@@ -991,9 +991,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Create a new section
-  app.post("/api/sites/:siteId/sections", isAuthenticated, async (req, res) => {
+  app.post("/api/sites/:slug/sections", isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const { name, description, displayOrder } = req.body;
       const user = req.user as any;
 
@@ -1096,9 +1096,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
 
   // Site membership management routes (admin only)
-  app.get("/api/sites/:siteId/memberships", isAuthenticated, requireAdmin, async (req, res) => {
+  app.get("/api/sites/:slug/memberships", isAuthenticated, requireAdmin, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const memberships = await siteStorage.getSiteMemberships(siteId);
       res.json(memberships);
     } catch (error) {
@@ -1107,9 +1107,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
-  app.post("/api/sites/:siteId/memberships", isAuthenticated, requireAdmin, async (req, res) => {
+  app.post("/api/sites/:slug/memberships", isAuthenticated, requireAdmin, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const { userId, membershipType = "member", accessLevel = "read" } = req.body;
 
       if (!userId) {
@@ -1131,9 +1131,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
-  app.put("/api/sites/:siteId/memberships/:userId", isAuthenticated, requireAdmin, async (req, res) => {
+  app.put("/api/sites/:slug/memberships/:userId", isAuthenticated, requireAdmin, async (req, res) => {
     try {
-      const { siteId, userId } = req.params;
+      const { slug: siteId, userId } = req.params;
       const updates = req.body;
 
       const membership = await siteStorage.updateSiteMembership(siteId, userId, updates);
@@ -1149,9 +1149,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
-  app.delete("/api/sites/:siteId/memberships/:userId", isAuthenticated, requireAdmin, async (req, res) => {
+  app.delete("/api/sites/:slug/memberships/:userId", isAuthenticated, requireAdmin, async (req, res) => {
     try {
-      const { siteId, userId } = req.params;
+      const { slug: siteId, userId } = req.params;
 
       const deleted = await siteStorage.deleteSiteMembership(siteId, userId);
 
@@ -1181,9 +1181,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Member-facing endpoints (non-admin access)
 
   // Get membership status for current user
-  app.get('/api/sites/:siteId/membership', isAuthenticated, async (req, res) => {
+  app.get('/api/sites/:slug/membership', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {
@@ -1214,9 +1214,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get site members list (for members only)
-  app.get('/api/sites/:siteId/members', isAuthenticated, async (req, res) => {
+  app.get('/api/sites/:slug/members', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {
@@ -1245,9 +1245,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Join collective endpoint
-  app.post('/api/sites/:siteId/join', isAuthenticated, async (req, res) => {
+  app.post('/api/sites/:slug/join', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {
@@ -1295,9 +1295,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get user's tasks for a site
-  app.get('/api/sites/:siteId/tasks/user', isAuthenticated, async (req, res) => {
+  app.get('/api/sites/:slug/tasks/user', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {
@@ -1325,9 +1325,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get all tasks for a collective (only for site managers and admins)
-  app.get('/api/sites/:siteId/tasks', isAuthenticated, async (req, res) => {
+  app.get('/api/sites/:slug/tasks', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
       const { status, limit = 50, offset = 0 } = req.query;
 
@@ -1362,9 +1362,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Create a new task (only for site managers and admins)
-  app.post('/api/sites/:siteId/tasks', isAuthenticated, async (req, res) => {
+  app.post('/api/sites/:slug/tasks', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
       const {
         title,
@@ -1493,9 +1493,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   }
 
   // Update a task (only for site managers and admins)
-  app.put('/api/sites/:siteId/tasks/:taskId', isAuthenticated, async (req, res) => {
+  app.put('/api/sites/:slug/tasks/:taskId', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, taskId } = req.params;
+      const { slug: siteId, taskId } = req.params;
       const userId = (req.user as any)?.id;
       const { title, description, status, priority, dueDate } = req.body;
 
@@ -1543,9 +1543,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Delete a task (only for site managers and admins)
-  app.delete('/api/sites/:siteId/tasks/:taskId', isAuthenticated, async (req, res) => {
+  app.delete('/api/sites/:slug/tasks/:taskId', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, taskId } = req.params;
+      const { slug: siteId, taskId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {
@@ -1579,9 +1579,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Assign a task to a user (only for site managers and admins)
-  app.post('/api/sites/:siteId/tasks/:taskId/assign', isAuthenticated, async (req, res) => {
+  app.post('/api/sites/:slug/tasks/:taskId/assign', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, taskId } = req.params;
+      const { slug: siteId, taskId } = req.params;
       const userId = (req.user as any)?.id;
       const { assigneeUserId } = req.body;
 
@@ -1627,9 +1627,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Unassign a task from a user (only for site managers and admins)
-  app.delete('/api/sites/:siteId/tasks/:taskId/assign/:assigneeUserId', isAuthenticated, async (req, res) => {
+  app.delete('/api/sites/:slug/tasks/:taskId/assign/:assigneeUserId', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, taskId, assigneeUserId } = req.params;
+      const { slug: siteId, taskId, assigneeUserId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {
@@ -1663,9 +1663,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get task assignments (only for site managers and admins)
-  app.get('/api/sites/:siteId/tasks/:taskId/assignments', isAuthenticated, async (req, res) => {
+  app.get('/api/sites/:slug/tasks/:taskId/assignments', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, taskId } = req.params;
+      const { slug: siteId, taskId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {
@@ -1699,9 +1699,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get messages for a collective
-  app.get('/api/sites/:siteId/messages', isAuthenticated, async (req, res) => {
+  app.get('/api/sites/:slug/messages', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
       const { limit = 50, offset = 0 } = req.query;
 
@@ -1740,9 +1740,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Send a message to a collective
-  app.post('/api/sites/:siteId/messages', isAuthenticated, async (req, res) => {
+  app.post('/api/sites/:slug/messages', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
       const { content, messageType = 'text', messageData = {} } = req.body;
 
@@ -1793,9 +1793,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // ===== BLOG POSTS ENDPOINTS =====
 
   // Get blog posts for a collective
-  app.get('/api/sites/:siteId/blog-posts', isAuthenticated, async (req, res) => {
+  app.get('/api/sites/:slug/blog-posts', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
       const { status, limit = 20, offset = 0 } = req.query;
 
@@ -1841,9 +1841,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Get a single blog post by ID
-  app.get('/api/sites/:siteId/blog-posts/:postId', isAuthenticated, async (req, res) => {
+  app.get('/api/sites/:slug/blog-posts/:postId', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, postId } = req.params;
+      const { slug: siteId, postId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {
@@ -1894,9 +1894,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Create a new blog post (Brehons and Site Managers only)
-  app.post('/api/sites/:siteId/blog-posts', isAuthenticated, async (req, res) => {
+  app.post('/api/sites/:slug/blog-posts', isAuthenticated, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: siteId } = req.params;
       const userId = (req.user as any)?.id;
       const { title, content, excerpt, status = 'draft', visibility = 'members', tags = [], featuredImageUrl } = req.body;
 
@@ -1967,9 +1967,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Update a blog post (Brehons and Site Managers only)
-  app.put('/api/sites/:siteId/blog-posts/:postId', isAuthenticated, async (req, res) => {
+  app.put('/api/sites/:slug/blog-posts/:postId', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, postId } = req.params;
+      const { slug: siteId, postId } = req.params;
       const userId = (req.user as any)?.id;
       const { title, content, excerpt, status, visibility = 'members_only', tags = [], featuredImageUrl } = req.body;
 
@@ -2043,9 +2043,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Publish/unpublish a blog post (Brehons and Site Managers only)
-  app.patch('/api/sites/:siteId/blog-posts/:postId/status', isAuthenticated, async (req, res) => {
+  app.patch('/api/sites/:slug/blog-posts/:postId/status', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, postId } = req.params;
+      const { slug: siteId, postId } = req.params;
       const userId = (req.user as any)?.id;
       const { status } = req.body;
 
@@ -2102,9 +2102,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Delete a blog post (Author, Brehons, and Site Managers)
-  app.delete('/api/sites/:siteId/blog-posts/:postId', isAuthenticated, async (req, res) => {
+  app.delete('/api/sites/:slug/blog-posts/:postId', isAuthenticated, async (req, res) => {
     try {
-      const { siteId, postId } = req.params;
+      const { slug: siteId, postId } = req.params;
       const userId = (req.user as any)?.id;
 
       if (!userId) {

@@ -10,6 +10,7 @@ export interface ISiteStorage {
   getSite(slug: string): Promise<Site | undefined>;
   getSiteById(id: string): Promise<Site | undefined>;
   updateSite(slug: string, updates: Partial<InsertSite>): Promise<Site | null>;
+  updateSiteBySlug(slug: string, updates: Partial<InsertSite>): Promise<Site | null>;
   deleteSite(slug: string): Promise<void>;
   listSites(): Promise<Site[]>;
 
@@ -132,6 +133,10 @@ export class DatabaseSiteStorage implements ISiteStorage {
       logger.error('Error updating site:', error);
       return null;
     }
+  }
+
+  async updateSiteBySlug(slug: string, updates: Partial<InsertSite>): Promise<Site | null> {
+    return this.updateSite(slug, updates);
   }
 
   async deleteSite(slug: string): Promise<void> {

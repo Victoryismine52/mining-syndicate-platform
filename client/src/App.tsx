@@ -39,42 +39,42 @@ function Router() {
       <AdminRoute path="/admin" component={AdminDashboard} />
       <AdminRoute path="/sites" component={SiteManager} />
       <AdminRoute path="/disclaimers" component={LegalDisclaimers} />
-      <Route path="/site/:siteId/admin">
+      <Route path="/site/:slug/admin">
         {(params) => (
-          <SiteAdminRoute 
-            path={`/site/${params.siteId}/admin`} 
-            component={(props: any) => <SiteAdmin {...props} siteId={params.siteId} />}
-            siteId={params.siteId}
+          <SiteAdminRoute
+            path={`/site/${params.slug}/admin`}
+            component={(props: any) => <SiteAdmin {...props} siteId={params.slug} />}
+            siteId={params.slug}
           />
         )}
       </Route>
-      <Route path="/sites/:siteId/admin">
+      <Route path="/sites/:slug/admin">
         {(params) => (
-          <SiteAdminRoute 
-            path={`/sites/${params.siteId}/admin`} 
-            component={(props: any) => <SiteAdmin {...props} siteId={params.siteId} />}
-            siteId={params.siteId}
+          <SiteAdminRoute
+            path={`/sites/${params.slug}/admin`}
+            component={(props: any) => <SiteAdmin {...props} siteId={params.slug} />}
+            siteId={params.slug}
           />
         )}
       </Route>
       
       {/* Public site routes */}
-      <Route path="/site/:siteId" component={DynamicSite} />
-      <Route path="/site/:siteId/disclaimer" component={SiteDisclaimers} />
-      <Route path="/site/:siteId/disclaimer/:disclaimerId" component={SiteDisclaimerRedirect} />
+      <Route path="/site/:slug" component={DynamicSite} />
+      <Route path="/site/:slug/disclaimer" component={SiteDisclaimers} />
+      <Route path="/site/:slug/disclaimer/:disclaimerId" component={SiteDisclaimerRedirect} />
       
       {/* Member-only routes for collectives */}
-      <Route path="/site/:siteId/home">
+      <Route path="/site/:slug/home">
         {(params) => (
-          <MemberRoute 
-            siteId={params.siteId}
-            component={(props: any) => <CollectiveHome {...props} siteId={params.siteId} />}
+          <MemberRoute
+            siteId={params.slug}
+            component={(props: any) => <CollectiveHome {...props} siteId={params.slug} />}
           />
         )}
       </Route>
       
       {/* Blog post view route */}
-      <Route path="/site/:siteId/blog/:postId" component={BlogPostView} />
+      <Route path="/site/:slug/blog/:postId" component={BlogPostView} />
       <Route path="/disclaimer/:disclaimerId" component={DisclaimerPage} />
 
       {/* Standalone tools routes */}
@@ -88,11 +88,11 @@ function Router() {
       {/* Site directory as homepage - public */}
       <Route path="/" component={SiteDirectory} />
       
-      {/* Redirect bare site IDs to proper /site/:siteId format */}
-      <Route path="/:siteId">
+      {/* Redirect bare site slugs to proper /site/:slug format */}
+      <Route path="/:slug">
         {(params) => {
           // Redirect to proper site URL format
-          window.location.replace(`/site/${params.siteId}`);
+          window.location.replace(`/site/${params.slug}`);
           return null;
         }}
       </Route>

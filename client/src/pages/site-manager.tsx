@@ -121,7 +121,7 @@ export function SiteManager() {
       const response = await apiRequest('PUT', `/api/sites/${slug}`, updates);
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/sites'] });
       setIsEditOpen(false);
       setEditingSite(null);
@@ -129,6 +129,9 @@ export function SiteManager() {
         title: "Success",
         description: "Site updated successfully",
       });
+      if (data.slug && data.slug !== variables.slug) {
+        window.location.replace(`/sites/${data.slug}`);
+      }
     },
     onError: (error) => {
       toast({

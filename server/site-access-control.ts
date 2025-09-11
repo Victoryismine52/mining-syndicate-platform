@@ -7,6 +7,7 @@ declare global {
   namespace Express {
     interface Request {
       siteAccess?: {
+        siteId: string;
         canManage: boolean;
         isAdmin: boolean;
         isSiteManager: boolean;
@@ -21,8 +22,7 @@ declare global {
  */
 export const checkSiteAccess = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Handle both slug and siteId parameters for backward compatibility
-    const slug = req.params.slug || req.params.siteId;
+    const { slug } = req.params;
     const user = req.user as any;
 
     if (!user) {
@@ -31,6 +31,11 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
 
     if (!slug) {
       return res.status(400).json({ error: "Site slug required" });
+    }
+
+    const site = await siteStorage.getSite(slug);
+    if (!site) {
+      return res.status(404).json({ error: "Site not found" });
     }
 
     // Check if user is global admin (check both new role field and legacy isAdmin)
@@ -43,6 +48,7 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
       logger.info(`Global admin ${user.email} granted access to site ${slug}`); // Changed from siteId to slug
       // Add access info to request object
       req.siteAccess = {
+        siteId: site.id,
         canManage: true,
         isAdmin: true,
         isSiteManager: false,
@@ -51,14 +57,15 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
     }
 
     // Check if user is a site manager for this specific site
-    const isSiteManager = await siteStorage.isSiteManager(slug, user.email); // Changed from siteId to slug
+    const isSiteManager = await siteStorage.isSiteManager(slug, user.email);
 
-    logger.info(`Site manager check for ${slug}: user=${user.email}, isSiteManager=${isSiteManager}`); // Changed from siteId to slug
+    logger.info(`Site manager check for ${slug}: user=${user.email}, isSiteManager=${isSiteManager}`);
 
     if (isSiteManager) {
       logger.info(`Site manager ${user.email} granted access to site ${slug}`); // Changed from siteId to slug
       // Add access info to request object
       req.siteAccess = {
+        siteId: site.id,
         canManage: true,
         isAdmin: false,
         isSiteManager: true,
@@ -67,7 +74,7 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
     }
 
     // User has no access to this site
-    logger.warn(`Access denied for user ${user.email} to site ${slug}`); // Changed from siteId to slug
+    logger.warn(`Access denied for user ${user.email} to site ${slug}`);
     return res.status(403).json({ error: "Access denied to this site" });
   } catch (error) {
     logger.error({ err: error }, "Error checking site access");

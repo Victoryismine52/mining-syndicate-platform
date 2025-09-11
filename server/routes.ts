@@ -333,19 +333,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Site Form Assignment routes
-  app.get("/api/sites/:siteId/form-assignments", async (req, res, next) => {
+  app.get("/api/sites/:slug/form-assignments", async (req, res, next) => {
     try {
-      const { siteId } = req.params;
+      const { slug } = req.params;
       
       // Check if site is launched (for public access) or requires authentication
-      const site = await siteStorage.getSite(siteId);
+      const site = await siteStorage.getSite(slug);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
       }
       
       // If site is launched, allow public access
       if (site.isLaunched) {
-        const assignments = await storage.getSiteFormAssignments(siteId);
+        const assignments = await storage.getSiteFormAssignments(slug);
         return res.json(assignments);
       }
       
@@ -355,23 +355,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const user = req.user as any;
-      const hasAccess = await siteStorage.checkSiteAccess(siteId, user.email, user.isAdmin);
+      const hasAccess = await siteStorage.checkSiteAccess(slug, user.email, user.isAdmin);
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
       
-      const assignments = await storage.getSiteFormAssignments(siteId);
+      const assignments = await storage.getSiteFormAssignments(slug);
       res.json(assignments);
     } catch (error) {
       next(error);
     }
   });
 
-  app.post("/api/sites/:siteId/form-assignments", requireAuth, async (req, res, next) => {
+  app.post("/api/sites/:slug/form-assignments", requireAuth, async (req, res, next) => {
     try {
       const assignment = await storage.assignFormToSite({
         ...req.body,
-        siteId: req.params.siteId
+        siteId: req.params.slug
       });
       res.status(201).json(assignment);
     } catch (error) {
@@ -425,20 +425,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Site Landing Config routes
-  app.get("/api/sites/:siteId/landing-config", requireAuth, async (req, res, next) => {
+  app.get("/api/sites/:slug/landing-config", requireAuth, async (req, res, next) => {
     try {
-      const config = await storage.getSiteLandingConfig(req.params.siteId);
+      const config = await storage.getSiteLandingConfig(req.params.slug);
       res.json(config);
     } catch (error) {
       next(error);
     }
   });
 
-  app.post("/api/sites/:siteId/landing-config", requireAuth, async (req, res, next) => {
+  app.post("/api/sites/:slug/landing-config", requireAuth, async (req, res, next) => {
     try {
       const config = await storage.createSiteLandingConfig({
         ...req.body,
-        siteId: req.params.siteId
+        siteId: req.params.slug
       });
       res.status(201).json(config);
     } catch (error) {
@@ -446,9 +446,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/sites/:siteId/landing-config", requireAuth, async (req, res, next) => {
+  app.put("/api/sites/:slug/landing-config", requireAuth, async (req, res, next) => {
     try {
-      const config = await storage.updateSiteLandingConfig(req.params.siteId, req.body);
+      const config = await storage.updateSiteLandingConfig(req.params.slug, req.body);
       res.json(config);
     } catch (error) {
       next(error);
