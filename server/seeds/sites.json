@@ -1,7 +1,8 @@
 [
   {
-    "siteId": "main",
-    "name": "Main Site",
-    "description": "Default marketing site"
+    "slug": "main",
+    "name": "Main Site", 
+    "description": "Default marketing site",
+    "siteType": "mining-syndicate-pitch"
   }
 ]

@@ -7,27 +7,27 @@ import { logger } from './logger';
 export interface ISiteStorage {
   // Site operations
   createSite(site: InsertSite): Promise<Site>;
-  getSite(siteId: string): Promise<Site | undefined>;
+  getSite(slug: string): Promise<Site | undefined>;
   getSiteById(id: string): Promise<Site | undefined>;
-  updateSite(siteId: string, updates: Partial<InsertSite>): Promise<Site>;
-  deleteSite(siteId: string): Promise<void>;
+  updateSite(slug: string, updates: Partial<InsertSite>): Promise<Site>;
+  deleteSite(slug: string): Promise<void>;
   listSites(): Promise<Site[]>;
 
   // Lead operations (scoped to site)
   createSiteLead(lead: InsertSiteLead & { siteId: string }): Promise<SiteLead>;
-  getSiteLeads(siteId: string): Promise<SiteLead[]>;
-  getSiteLeadsByType(siteId: string, formType: string): Promise<SiteLead[]>;
+  getSiteLeads(slug: string): Promise<SiteLead[]>;
+  getSiteLeadsByType(slug: string, formType: string): Promise<SiteLead[]>;
   updateSiteLead(leadId: string, updates: Partial<InsertSiteLead>): Promise<SiteLead>;
 
   // Analytics operations
   createSiteAnalytics(analytics: InsertSiteAnalytics & { siteId: string }): Promise<SiteAnalytics>;
-  getSiteAnalytics(siteId: string, limit?: number): Promise<SiteAnalytics[]>;
+  getSiteAnalytics(slug: string, limit?: number): Promise<SiteAnalytics[]>;
 
   // Site manager operations
-  addSiteManager(siteId: string, userEmail: string): Promise<SiteManager>;
-  removeSiteManager(siteId: string, userEmail: string): Promise<void>;
-  getSiteManagers(siteId: string): Promise<SiteManager[]>;
-  isSiteManager(siteId: string, userEmail: string): Promise<boolean>;
+  addSiteManager(slug: string, userEmail: string): Promise<SiteManager>;
+  removeSiteManager(slug: string, userEmail: string): Promise<void>;
+  getSiteManagers(slug: string): Promise<SiteManager[]>;
+  isSiteManager(slug: string, userEmail: string): Promise<boolean>;
 
   // Legal disclaimer operations
   createLegalDisclaimer(disclaimer: InsertLegalDisclaimer): Promise<LegalDisclaimer>;
@@ -38,17 +38,17 @@ export interface ISiteStorage {
   getAvailableDisclaimersForSiteType(siteType: string): Promise<LegalDisclaimer[]>;
 
   // Site disclaimer attachment operations
-  attachDisclaimerToSite(siteId: string, disclaimerId: string, options?: { displayOrder?: string; linkText?: string }): Promise<SiteDisclaimer>;
-  detachDisclaimerFromSite(siteId: string, disclaimerId: string): Promise<void>;
-  getSiteDisclaimers(siteId: string): Promise<Array<SiteDisclaimer & { disclaimer: LegalDisclaimer }>>;
+  attachDisclaimerToSite(slug: string, disclaimerId: string, options?: { displayOrder?: string; linkText?: string }): Promise<SiteDisclaimer>;
+  detachDisclaimerFromSite(slug: string, disclaimerId: string): Promise<void>;
+  getSiteDisclaimers(slug: string): Promise<Array<SiteDisclaimer & { disclaimer: LegalDisclaimer }>>;
 
   // Slide operations
   createSiteSlide(slide: InsertSiteSlide & { siteId: string }): Promise<SiteSlide>;
-  getSiteSlides(siteId: string): Promise<SiteSlide[]>;
+  getSiteSlides(slug: string): Promise<SiteSlide[]>;
   getSiteSlide(slideId: string): Promise<SiteSlide | undefined>;
   updateSiteSlide(slideId: string, updates: Partial<InsertSiteSlide>): Promise<SiteSlide>;
   deleteSiteSlide(slideId: string): Promise<void>;
-  reorderSiteSlides(siteId: string, slideOrders: Array<{ id: string; slideOrder: string }>): Promise<void>;
+  reorderSiteSlides(slug: string, slideOrders: Array<{ id: string; slideOrder: string }>): Promise<void>;
 
   // Global slide operations
   getGlobalSlides(): Promise<GlobalSlide[]>;
@@ -57,7 +57,7 @@ export interface ISiteStorage {
   updateGlobalSlideVisibility(slideKey: string, isVisible: boolean): Promise<GlobalSlide | null>;
 
   // Site sections operations
-  getSiteSections(siteId: string): Promise<SiteSection[]>;
+  getSiteSections(slug: string): Promise<SiteSection[]>;
   getSiteSection(sectionId: string): Promise<SiteSection | undefined>;
   createSiteSection(sectionData: InsertSiteSection): Promise<SiteSection>;
   updateSiteSection(sectionId: string, updates: Partial<InsertSiteSection>): Promise<SiteSection>;
@@ -71,7 +71,7 @@ export interface ISiteStorage {
   deleteSiteMembership(siteId: string, userId: string): Promise<boolean>;
 
   // Access control
-  checkSiteAccess(siteId: string, userEmail: string, isAdmin: boolean): Promise<boolean>;
+  checkSiteAccess(slug: string, userEmail: string, isAdmin: boolean): Promise<boolean>;
 }
 
 export class DatabaseSiteStorage implements ISiteStorage {
@@ -84,11 +84,11 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return site;
   }
 
-  async getSite(siteId: string): Promise<Site | undefined> {
+  async getSite(slug: string): Promise<Site | undefined> {
     const [site] = await db
       .select()
       .from(sites)
-      .where(eq(sites.siteId, siteId));
+      .where(eq(sites.slug, slug));
     return site;
   }
 
@@ -116,8 +116,8 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return site;
   }
 
-  async deleteSite(siteId: string): Promise<void> {
-    await db.delete(sites).where(eq(sites.siteId, siteId));
+  async deleteSite(slug: string): Promise<void> {
+    await db.delete(sites).where(eq(sites.slug, slug));
   }
 
   async listSites(): Promise<Site[]> {
@@ -136,19 +136,31 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return lead;
   }
 
-  async getSiteLeads(siteId: string): Promise<SiteLead[]> {
+  async getSiteLeads(slug: string): Promise<SiteLead[]> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      return [];
+    }
+    
     return await db
       .select()
       .from(siteLeads)
-      .where(eq(siteLeads.siteId, siteId))
+      .where(eq(siteLeads.siteId, site.id))
       .orderBy(desc(siteLeads.createdAt));
   }
 
-  async getSiteLeadsByType(siteId: string, formType: string): Promise<SiteLead[]> {
+  async getSiteLeadsByType(slug: string, formType: string): Promise<SiteLead[]> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      return [];
+    }
+    
     return await db
       .select()
       .from(siteLeads)
-      .where(and(eq(siteLeads.siteId, siteId), eq(siteLeads.formType, formType)))
+      .where(and(eq(siteLeads.siteId, site.id), eq(siteLeads.formType, formType)))
       .orderBy(desc(siteLeads.createdAt));
   }
 
@@ -173,46 +185,76 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return analytics;
   }
 
-  async getSiteAnalytics(siteId: string, limit: number = 100): Promise<SiteAnalytics[]> {
+  async getSiteAnalytics(slug: string, limit: number = 100): Promise<SiteAnalytics[]> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      return [];
+    }
+    
     return await db
       .select()
       .from(siteAnalytics)
-      .where(eq(siteAnalytics.siteId, siteId))
+      .where(eq(siteAnalytics.siteId, site.id))
       .orderBy(desc(siteAnalytics.createdAt))
       .limit(limit);
   }
 
   // Site manager operations
-  async addSiteManager(siteId: string, userEmail: string): Promise<SiteManager> {
+  async addSiteManager(slug: string, userEmail: string): Promise<SiteManager> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      throw new Error(`Site not found with slug: ${slug}`);
+    }
+    
     const [manager] = await db
       .insert(siteManagers)
-      .values({ siteId, userEmail })
+      .values({ siteId: site.id, userEmail })
       .returning();
     return manager;
   }
 
-  async removeSiteManager(siteId: string, userEmail: string): Promise<void> {
+  async removeSiteManager(slug: string, userEmail: string): Promise<void> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      throw new Error(`Site not found with slug: ${slug}`);
+    }
+    
     await db
       .delete(siteManagers)
       .where(and(
-        eq(siteManagers.siteId, siteId),
+        eq(siteManagers.siteId, site.id),
         eq(siteManagers.userEmail, userEmail)
       ));
   }
 
-  async getSiteManagers(siteId: string): Promise<SiteManager[]> {
+  async getSiteManagers(slug: string): Promise<SiteManager[]> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      return [];
+    }
+    
     return await db
       .select()
       .from(siteManagers)
-      .where(eq(siteManagers.siteId, siteId));
+      .where(eq(siteManagers.siteId, site.id));
   }
 
-  async isSiteManager(siteId: string, userEmail: string): Promise<boolean> {
+  async isSiteManager(slug: string, userEmail: string): Promise<boolean> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      return false;
+    }
+    
     const [manager] = await db
       .select()
       .from(siteManagers)
       .where(and(
-        eq(siteManagers.siteId, siteId),
+        eq(siteManagers.siteId, site.id),
         eq(siteManagers.userEmail, userEmail)
       ));
     return !!manager;
@@ -275,14 +317,20 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
   // Site disclaimer attachment operations
   async attachDisclaimerToSite(
-    siteId: string,
+    slug: string,
     disclaimerId: string,
     options?: { displayOrder?: string; linkText?: string }
   ): Promise<SiteDisclaimer> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      throw new Error(`Site not found with slug: ${slug}`);
+    }
+    
     const [attachment] = await db
       .insert(siteDisclaimers)
       .values({
-        siteId,
+        siteId: site.id,
         disclaimerId,
         displayOrder: options?.displayOrder || '1',
         linkText: options?.linkText,
@@ -291,16 +339,28 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return attachment;
   }
 
-  async detachDisclaimerFromSite(siteId: string, disclaimerId: string): Promise<void> {
+  async detachDisclaimerFromSite(slug: string, disclaimerId: string): Promise<void> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      throw new Error(`Site not found with slug: ${slug}`);
+    }
+    
     await db
       .delete(siteDisclaimers)
       .where(and(
-        eq(siteDisclaimers.siteId, siteId),
+        eq(siteDisclaimers.siteId, site.id),
         eq(siteDisclaimers.disclaimerId, disclaimerId)
       ));
   }
 
-  async getSiteDisclaimers(siteId: string): Promise<Array<SiteDisclaimer & { disclaimer: LegalDisclaimer }>> {
+  async getSiteDisclaimers(slug: string): Promise<Array<SiteDisclaimer & { disclaimer: LegalDisclaimer }>> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      return [];
+    }
+    
     return await db
       .select({
         id: siteDisclaimers.id,
@@ -313,7 +373,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       })
       .from(siteDisclaimers)
       .innerJoin(legalDisclaimers, eq(siteDisclaimers.disclaimerId, legalDisclaimers.id))
-      .where(eq(siteDisclaimers.siteId, siteId))
+      .where(eq(siteDisclaimers.siteId, site.id))
       .orderBy(siteDisclaimers.displayOrder);
   }
 
@@ -326,11 +386,17 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return slide;
   }
 
-  async getSiteSlides(siteId: string): Promise<SiteSlide[]> {
+  async getSiteSlides(slug: string): Promise<SiteSlide[]> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      return [];
+    }
+    
     return await db
       .select()
       .from(siteSlides)
-      .where(eq(siteSlides.siteId, siteId))
+      .where(eq(siteSlides.siteId, site.id))
       .orderBy(siteSlides.slideOrder);
   }
 
@@ -358,14 +424,20 @@ export class DatabaseSiteStorage implements ISiteStorage {
     await db.delete(siteSlides).where(eq(siteSlides.id, slideId));
   }
 
-  async reorderSiteSlides(siteId: string, slideOrders: Array<{ id: string; slideOrder: string }>): Promise<void> {
+  async reorderSiteSlides(slug: string, slideOrders: Array<{ id: string; slideOrder: string }>): Promise<void> {
+    // First get the site to get the permanent ID
+    const site = await this.getSite(slug);
+    if (!site) {
+      throw new Error(`Site not found with slug: ${slug}`);
+    }
+    
     // Update each slide's order in a transaction
     await db.transaction(async (tx) => {
       for (const { id, slideOrder } of slideOrders) {
         await tx
           .update(siteSlides)
           .set({ slideOrder, updatedAt: new Date() })
-          .where(and(eq(siteSlides.id, id), eq(siteSlides.siteId, siteId)));
+          .where(and(eq(siteSlides.id, id), eq(siteSlides.siteId, site.id)));
       }
     });
   }
@@ -580,14 +652,14 @@ export class DatabaseSiteStorage implements ISiteStorage {
   }
 
   // Access control
-  async checkSiteAccess(siteId: string, userEmail: string, isAdmin: boolean): Promise<boolean> {
+  async checkSiteAccess(slug: string, userEmail: string, isAdmin: boolean): Promise<boolean> {
     // Global admins have access to all sites
     if (isAdmin) {
       return true;
     }
 
     // Check if user is a site manager
-    return await this.isSiteManager(siteId, userEmail);
+    return await this.isSiteManager(slug, userEmail);
   }
 
   // Collective Messages Methods
