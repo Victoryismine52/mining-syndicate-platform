@@ -21,21 +21,22 @@ declare global {
  */
 export const checkSiteAccess = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const slug = req.params.slug; // Changed from siteId to slug
+    // Handle both slug and siteId parameters for backward compatibility
+    const slug = req.params.slug || req.params.siteId;
     const user = req.user as any;
 
     if (!user) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
-    if (!slug) { // Changed from siteId to slug
-      return res.status(400).json({ error: "Site slug required" }); // Changed error message
+    if (!slug) {
+      return res.status(400).json({ error: "Site slug required" });
     }
 
     // Check if user is global admin (check both new role field and legacy isAdmin)
     const isAdmin = user.role === 'admin' || user.isAdmin || false;
 
-    logger.info(`Site access check for ${slug}: user=${user.email}, isAdmin=${isAdmin}`); // Changed from siteId to slug
+    logger.info(`Site access check for ${slug}: user=${user.email}, isAdmin=${isAdmin}`);
 
     // Global admins have access to all sites, no need to check site manager status
     if (isAdmin) {

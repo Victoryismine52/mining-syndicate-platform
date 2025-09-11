@@ -339,11 +339,18 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Site manager routes (protected)
 
   // Get site managers (admin or site managers can view)
-  app.get("/api/sites/:siteId/managers", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.get("/api/sites/:slug/managers", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const { siteId } = z.object({
-        siteId: z.string().min(1, "Site slug required")
+      const { slug } = z.object({
+        slug: z.string().min(1, "Site slug required")
       }).parse(req.params);
+      
+      // Get the site to get the permanent ID
+      const site = await siteStorage.getSite(slug);
+      if (!site) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+      
       const rows = await db
         .select({
           id: siteManagers.id,
@@ -354,7 +361,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         })
         .from(siteManagers)
         .leftJoin(users, eq(siteManagers.userEmail, users.email))
-        .where(eq(siteManagers.siteId, siteId));
+        .where(eq(siteManagers.siteId, site.id));
 
       const managers: SiteManagerWithAccount[] = rows.map((row) => ({
         id: row.id,
@@ -372,26 +379,26 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Add site manager (admin only)
-  app.post("/api/sites/:siteId/managers", isAuthenticated, requireAdmin, async (req, res) => {
+  app.post("/api/sites/:slug/managers", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       const { userEmail } = req.body;
-      const { siteId } = req.params;
+      const { slug } = req.params;
 
       if (!userEmail) {
         return res.status(400).json({ error: "User email is required" });
       }
 
       // Check if manager already exists
-      const isManager = await siteStorage.isSiteManager(siteId, userEmail);
+      const isManager = await siteStorage.isSiteManager(slug, userEmail);
       if (isManager) {
         return res.status(400).json({ error: "User is already a site manager" });
       }
 
       // Add the site manager
-      const manager = await siteStorage.addSiteManager(siteId, userEmail);
+      const manager = await siteStorage.addSiteManager(slug, userEmail);
 
-      // For collective sites, automatically add them as a Brehon member
-      const site = await siteStorage.getSite(siteId);
+      // Get the site for collective logic using the slug
+      const site = await siteStorage.getSite(slug);
       if (site && site.siteType === 'collective') {
         try {
           // Find user by email
@@ -401,7 +408,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           if (user) {
             // Check if they're already a member
             const userMemberships = await siteStorage.getUserMemberships(user.id);
-            const existingMembership = userMemberships.find(m => m.siteId === siteId);
+            const existingMembership = userMemberships.find(m => m.siteId === site.id);
 
             // All site managers get Brehon role, regardless of global admin status
             const targetRole = 'brehon';
@@ -411,28 +418,28 @@ export function registerSiteRoutes(app: Express, storage?: any) {
             if (existingMembership) {
               // Update existing membership to Brehon role if they're not already at that level
               if (existingMembership.collectiveRole !== targetRole) {
-                await siteStorage.updateSiteMembership(siteId, user.id, {
+                await siteStorage.updateSiteMembership(site.id, user.id, {
                   membershipType: targetMembershipType,
                   collectiveRole: targetRole
                 });
-                logger.info(`Updated ${userEmail} to ${roleDisplayName} status in collective ${siteId}`);
+                logger.info(`Updated ${userEmail} to ${roleDisplayName} status in collective ${site.id}`);
               }
             } else {
               // Create new membership with Brehon role
               await siteStorage.createSiteMembership({
-                siteId,
+                siteId: site.id,
                 userId: user.id,
                 membershipType: targetMembershipType,
                 collectiveRole: targetRole,
                 membershipStatus: 'active'
               });
-              logger.info(`Added ${userEmail} as ${roleDisplayName} member to collective ${siteId}`);
+              logger.info(`Added ${userEmail} as ${roleDisplayName} member to collective ${site.id}`);
             }
           } else {
-            console.warn(`User with email ${userEmail} not found for Brehon membership in collective ${siteId}`);
+            console.warn(`User with email ${userEmail} not found for Brehon membership in collective ${site.id}`);
           }
         } catch (membershipError) {
-          logger.error(`Failed to add Brehon membership for ${userEmail} in collective ${siteId}:`, membershipError);
+          logger.error(`Failed to add Brehon membership for ${userEmail} in collective ${site.id}:`, membershipError);
           // Don't fail the manager addition, just log the error
         }
       }
@@ -445,13 +452,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Remove site manager (admin only)
-  app.delete("/api/sites/:siteId/managers/:userEmail", isAuthenticated, requireAdmin, async (req, res) => {
+  app.delete("/api/sites/:slug/managers/:userEmail", isAuthenticated, requireAdmin, async (req, res) => {
     try {
-      const { siteId, userEmail } = req.params;
+      const { slug, userEmail } = req.params;
       const decodedEmail = decodeURIComponent(userEmail);
 
       // For collective sites, remove their Brehon membership first
-      const site = await siteStorage.getSite(siteId);
+      const site = await siteStorage.getSite(slug);
       if (site && site.siteType === 'collective') {
         try {
           // Find user by email
@@ -461,24 +468,24 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           if (user) {
             // Check if they have a Brehon membership
             const userMemberships = await siteStorage.getUserMemberships(user.id);
-            const membership = userMemberships.find(m => m.siteId === siteId && m.membershipType === 'brehon');
+            const membership = userMemberships.find(m => m.siteId === site.id && m.membershipType === 'brehon');
 
             if (membership) {
               // Remove the Brehon membership entirely
-              await siteStorage.deleteSiteMembership(siteId, user.id);
-              logger.info(`Removed Brehon membership for ${decodedEmail} from collective ${siteId}`);
+              await siteStorage.deleteSiteMembership(site.id, user.id);
+              logger.info(`Removed Brehon membership for ${decodedEmail} from collective ${site.id}`);
             }
           } else {
-            console.warn(`User with email ${decodedEmail} not found for Brehon membership removal in collective ${siteId}`);
+            console.warn(`User with email ${decodedEmail} not found for Brehon membership removal in collective ${site.id}`);
           }
         } catch (membershipError) {
-          logger.error(`Failed to remove Brehon membership for ${decodedEmail} in collective ${siteId}:`, membershipError);
+          logger.error(`Failed to remove Brehon membership for ${decodedEmail} in collective ${site.id}:`, membershipError);
           // Don't fail the manager removal, just log the error
         }
       }
 
       // Remove the site manager
-      await siteStorage.removeSiteManager(siteId, decodedEmail);
+      await siteStorage.removeSiteManager(slug, decodedEmail);
       res.json({ success: true });
     } catch (error) {
       logger.error({ err: error }, "Error removing site manager");
