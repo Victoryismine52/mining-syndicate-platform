@@ -93,6 +93,12 @@ export function SlugInput({
       .replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
 
     onChange(newValue);
+    
+    // Reset validation state when user types
+    if (newValue !== value) {
+      setValidationResult(null);
+      setHasChecked(false);
+    }
   };
 
   const getValidationIcon = () => {

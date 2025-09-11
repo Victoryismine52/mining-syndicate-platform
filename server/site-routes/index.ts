@@ -11,7 +11,7 @@ import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, in
 import { users } from "@shared/schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
-import { checkSiteAccess, requireAdmin } from "../site-access-control";
+import { checkSiteAccess, requireAdmin, requireSiteManagerAccess } from "../site-access-control";
 import { isAuthenticated } from "../google-auth";
 import { z } from "zod";
 import { registerSiteCreateRoutes } from "./site-create";
@@ -56,7 +56,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         const allSites = await siteStorage.listSites();
         const userMemberships = await siteStorage.getUserMemberships(user.id);
         const memberSiteIds = userMemberships.map(m => m.siteId);
-        
+
         // Filter to include only public sites or sites user is a member of
         const accessibleSites = allSites.filter(site => {
           // Include all launched sites (public access)
@@ -79,7 +79,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     try {
       const { slug } = req.params;
       const existingSite = await siteStorage.getSite(slug);
-      
+
       res.json({ 
         available: !existingSite,
         slug: slug,
@@ -92,30 +92,27 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Update site
-  app.put("/api/sites/:siteId", async (req, res) => {
+  app.put("/api/sites/:siteId", requireSiteManagerAccess, async (req, res) => {
     try {
-      const updates = insertSiteSchema.partial().parse(req.body);
-      const site = await siteStorage.updateSite(req.params.siteId, updates);
-      res.json(site);
-    } catch (error) {
-      logger.error({ err: error }, "Error updating site");
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation error", details: error.errors });
-      }
-      
-      // Handle database unique constraint violations
-      if (error && typeof error === 'object' && 'code' in error) {
-        if (error.code === '23505') { // PostgreSQL unique violation error code
-          const errorMessage = (error as any).message || '';
-          if (errorMessage.includes('site_id')) {
-            return res.status(409).json({ 
-              error: "Site URL already exists", 
-              message: "A site with this URL already exists. Please choose a different URL." 
-            });
-          }
+      const { siteId } = req.params;
+      const updates = req.body;
+
+      // If updating siteId (slug), check availability
+      if (updates.siteId && updates.siteId !== siteId) {
+        const existingSite = await siteStorage.getSite(updates.siteId);
+        if (existingSite) {
+          return res.status(400).json({ error: "Site URL is already taken" });
         }
       }
-      
+
+      const site = await siteStorage.updateSite(siteId, updates);
+      if (!site) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+
+      res.json(site);
+    } catch (error) {
+      logger.error({ err: error }, `Error updating site ${req.params.siteId}`);
       res.status(500).json({ error: "Failed to update site" });
     }
   });
@@ -135,7 +132,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.post("/api/sites/:siteId/leads", async (req, res) => {
     try {
       const siteId = req.params.siteId;
-      
+
       // Check if site exists
       const site = await siteStorage.getSite(siteId);
       if (!site) {
@@ -143,7 +140,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       const leadData = insertSiteLeadSchema.parse(req.body);
-      
+
       // Add tracking information
       const fullLeadData = {
         ...leadData,
@@ -192,7 +189,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       if (!hubspotService && site.hubspotFormIds) {
         const formIds = site.hubspotFormIds as any;
         let hubspotFormId = '';
-        
+
         switch (leadData.formType) {
           case 'learn-more':
             hubspotFormId = formIds.learnMore || '';
@@ -297,7 +294,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       const siteUrl = `${req.protocol}://${req.get('host')}/site/${site.siteId}`;
       const qrCodeUrl = await qrGenerator.generateQRCode(siteUrl, site.siteId);
-      
+
       const updatedSite = await siteStorage.updateSite(site.siteId, {
         qrCodeUrl: qrCodeUrl
       });
@@ -310,7 +307,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Site manager routes (protected)
-  
+
   // Get site managers (admin or site managers can view)
   app.get("/api/sites/:siteId/managers", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
@@ -347,7 +344,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     try {
       const { userEmail } = req.body;
       const { siteId } = req.params;
-      
+
       if (!userEmail) {
         return res.status(400).json({ error: "User email is required" });
       }
@@ -368,12 +365,12 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           // Find user by email
           const users = await storage.getAllUsers();
           const user = users.find((u: any) => u.email === userEmail);
-          
+
           if (user) {
             // Check if they're already a member
             const userMemberships = await siteStorage.getUserMemberships(user.id);
             const existingMembership = userMemberships.find(m => m.siteId === siteId);
-            
+
             // All site managers get Brehon role, regardless of global admin status
             const targetRole = 'brehon';
             const targetMembershipType = 'brehon';
@@ -428,12 +425,12 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           // Find user by email
           const users = await storage.getAllUsers();
           const user = users.find((u: any) => u.email === decodedEmail);
-          
+
           if (user) {
             // Check if they have a Brehon membership
             const userMemberships = await siteStorage.getUserMemberships(user.id);
             const membership = userMemberships.find(m => m.siteId === siteId && m.membershipType === 'brehon');
-            
+
             if (membership) {
               // Remove the Brehon membership entirely
               await siteStorage.deleteSiteMembership(siteId, user.id);
@@ -469,7 +466,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Legal disclaimer management routes
-  
+
   // Create a new legal disclaimer
   app.post("/api/disclaimers", requireAdmin, async (req, res) => {
     try {
@@ -553,7 +550,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Site disclaimer attachment routes
-  
+
   // Attach disclaimer to site
   app.post("/api/sites/:siteId/disclaimers", requireAdmin, async (req, res) => {
     try {
@@ -563,7 +560,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         displayOrder: req.body.displayOrder ? String(req.body.displayOrder) : "1", // Convert to string
         linkText: req.body.linkText,
       });
-      
+
       const attachment = await siteStorage.attachDisclaimerToSite(
         req.params.siteId, 
         disclaimerId, 
@@ -612,17 +609,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     try {
       const siteId = req.params.siteId;
       logger.info('Fetching slides for site:', { siteId });
-      
+
       // First verify the site exists
       const site = await siteStorage.getSite(siteId);
       if (!site) {
         logger.warn('Site not found when fetching slides:', { siteId });
         return res.status(404).json({ error: "Site not found" });
       }
-      
+
       logger.info('Site found, fetching slides:', { siteId, siteName: site.name });
       const slides = await siteStorage.getSiteSlides(siteId);
-      
+
       logger.info('Retrieved slides from database:', { 
         siteId,
         slideCount: slides.length,
@@ -635,7 +632,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           slideType: slide.slideType
         }))
       });
-      
+
       res.json(slides);
     } catch (error) {
       logger.error("Error fetching site slides:", { siteId: req.params.siteId, error });
@@ -683,7 +680,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.put("/api/sites/:siteId/slides/:slideId", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const validatedData = insertSiteSlideSchema.partial().parse(req.body);
-      
+
       // Normalize the image URL if it's being updated
       if (validatedData.imageUrl) {
         validatedData.imageUrl = objectStorageService.normalizeSlideObjectPath(validatedData.imageUrl);
@@ -715,7 +712,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.post("/api/sites/:siteId/slides/reorder", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const { slideOrders } = req.body;
-      
+
       if (!Array.isArray(slideOrders)) {
         return res.status(400).json({ error: "slideOrders must be an array" });
       }
@@ -734,36 +731,36 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Serve slide images from object storage
   app.get('/slide-images/*', async (req, res) => {
     const objectPath = req.path.replace('/slide-images', '');
-    
+
     // Prevent multiple responses to the same request
     if (res.headersSent) {
       return;
     }
-    
+
     try {
       logger.info('Slide image request:', { 
         originalPath: req.path,
         objectPath,
         method: req.method
       });
-      
+
       // Set headers to allow image display in browsers
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'public, max-age=3600');
       res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
-      
+
       logger.info('Attempting to get slide file from object storage:', { objectPath });
       const file = await objectStorageService.getSlideFile(objectPath);
       logger.info('Successfully retrieved file reference:', { 
         file: file ? 'found' : 'null',
         objectPath 
       });
-      
+
       // Check again before streaming
       if (res.headersSent) {
         return;
       }
-      
+
       logger.info('Starting download stream for slide image:', { objectPath });
       await objectStorageService.downloadObject(file, res);
       logger.info('Successfully served slide image:', { objectPath });
@@ -775,7 +772,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         originalPath: req.path,
         errorType: error.constructor.name
       });
-      
+
       // Only send response if headers haven't been sent
       if (!res.headersSent) {
         if (error instanceof ObjectNotFoundError) {
@@ -789,7 +786,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // ==== GLOBAL SLIDES ROUTES ====
-  
+
   // Get all global slides (public endpoint for presentation viewer)
   app.get("/api/global-slides", async (req, res) => {
     try {
@@ -819,13 +816,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.post("/api/global-slides", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       let { slideKey, title, slideType, isVisible, displayPosition, imageUrl, cardConfig } = req.body;
-      
+
       // Normalize the image URL if it's from object storage
       if (imageUrl && imageUrl.startsWith('https://storage.googleapis.com/')) {
         const objectStorageService = new ObjectStorageService();
         imageUrl = objectStorageService.normalizeSlideObjectPath(imageUrl);
       }
-      
+
       const newSlide = await siteStorage.createGlobalSlide({
         slideKey,
         title,
@@ -873,7 +870,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.delete("/api/global-slides/:slideKey", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       const { slideKey } = req.params;
-      
+
       const deleted = await siteStorage.deleteGlobalSlide(slideKey);
       if (!deleted) {
         return res.status(404).json({ error: "Global slide not found" });
@@ -889,7 +886,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.patch("/api/global-slides/reorder", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       const { slides } = req.body;
-      
+
       if (!Array.isArray(slides)) {
         return res.status(400).json({ error: "Slides must be an array" });
       }
@@ -908,35 +905,35 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Sections Management Endpoints
-  
+
   // Get sections for a site
   app.get("/api/sites/:siteId/sections", async (req, res) => {
     try {
       const { siteId } = req.params;
-      
+
       // Check if site is launched (for public access) or requires authentication
       const site = await siteStorage.getSite(siteId);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
       }
-      
+
       // If site is launched, allow public access
       if (site.isLaunched) {
         const sections = await siteStorage.getSiteSections(siteId);
         return res.json(sections);
       }
-      
+
       // If site is not launched, require authentication and site access
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: "Authentication required" });
       }
-      
+
       const user = req.user as any;
       const hasAccess = await siteStorage.checkSiteAccess(siteId, user.email, user.isAdmin);
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
-      
+
       const sections = await siteStorage.getSiteSections(siteId);
       res.json(sections);
     } catch (error) {
@@ -951,17 +948,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const { siteId } = req.params;
       const { name, description, displayOrder } = req.body;
       const user = req.user as any;
-      
+
       // Check if user has access to this site
       const hasAccess = await siteStorage.checkSiteAccess(siteId, user.email, user.isAdmin);
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
-      
+
       if (!name || !name.trim()) {
         return res.status(400).json({ error: "Section name is required" });
       }
-      
+
       const sectionData = {
         siteId,
         name: name.trim(),
@@ -969,7 +966,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         displayOrder: parseInt(displayOrder) || 1,
         isVisible: true
       };
-      
+
       const newSection = await siteStorage.createSiteSection(sectionData);
       res.json(newSection);
     } catch (error) {
@@ -984,19 +981,19 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const { sectionId } = req.params;
       const updates = req.body;
       const user = req.user as any;
-      
+
       // Get the section to check site access
       const section = await siteStorage.getSiteSection(sectionId);
       if (!section) {
         return res.status(404).json({ error: "Section not found" });
       }
-      
+
       // Check if user has access to this site
       const hasAccess = await siteStorage.checkSiteAccess(section.siteId, user.email, user.isAdmin);
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
-      
+
       const updatedSection = await siteStorage.updateSiteSection(sectionId, updates);
       res.json(updatedSection);
     } catch (error) {
@@ -1010,19 +1007,19 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     try {
       const { sectionId } = req.params;
       const user = req.user as any;
-      
+
       // Get the section to check site access
       const section = await siteStorage.getSiteSection(sectionId);
       if (!section) {
         return res.status(404).json({ error: "Section not found" });
       }
-      
+
       // Check if user has access to this site
       const hasAccess = await siteStorage.checkSiteAccess(section.siteId, user.email, user.isAdmin);
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
-      
+
       await siteStorage.deleteSiteSection(sectionId);
       res.json({ success: true, message: "Section deleted successfully" });
     } catch (error) {
@@ -1086,7 +1083,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const updates = req.body;
 
       const membership = await siteStorage.updateSiteMembership(siteId, userId, updates);
-      
+
       if (!membership) {
         return res.status(404).json({ error: "Membership not found" });
       }
@@ -1101,9 +1098,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.delete("/api/sites/:siteId/memberships/:userId", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       const { siteId, userId } = req.params;
-      
+
       const deleted = await siteStorage.deleteSiteMembership(siteId, userId);
-      
+
       if (!deleted) {
         return res.status(404).json({ error: "Membership not found" });
       }
@@ -1128,7 +1125,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Member-facing endpoints (non-admin access)
-  
+
   // Get membership status for current user
   app.get('/api/sites/:siteId/membership', isAuthenticated, async (req, res) => {
     try {
@@ -1142,7 +1139,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Check membership in database first
       const memberships = await siteStorage.getUserMemberships(userId);
       const membership = memberships.find(m => m.siteId === siteId);
-      
+
       if (!membership) {
         return res.json({ 
           isMember: false 
@@ -1178,14 +1175,14 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         const memberships = await siteStorage.getUserMemberships(userId);
         isMember = memberships.some(m => m.siteId === siteId);
       }
-      
+
       if (!isMember) {
         return res.status(403).json({ error: 'Membership required' });
       }
 
       // Get all members for this site
       const memberships = await siteStorage.getSiteMemberships(siteId);
-      
+
       return res.json(memberships);
     } catch (error) {
       logger.error('Error getting members:', error);
@@ -1212,7 +1209,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Check if already a member
       const memberships = await siteStorage.getUserMemberships(userId);
       const existingMembership = memberships.find(m => m.siteId === siteId);
-      
+
       if (existingMembership) {
         return res.json({ 
           success: true, 
@@ -1259,7 +1256,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         const memberships = await siteStorage.getUserMemberships(userId);
         isMember = memberships.some(m => m.siteId === siteId);
       }
-      
+
       if (!isMember) {
         return res.status(403).json({ error: 'Membership required' });
       }
@@ -1355,17 +1352,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       // Build task configuration based on task type
       const taskConfig: any = {};
-      
+
       if (taskType === 'document_review' && documentUrl) {
         taskConfig.documentUrl = documentUrl.trim();
         taskConfig.requiresUpload = requiresUpload || false;
       }
-      
+
       if (taskType === 'upload') {
         taskConfig.requiresUpload = true;
         taskConfig.uploadFileTypes = uploadFileTypes ? uploadFileTypes.split(',').map(t => t.trim()) : [];
       }
-      
+
       if (instructions && instructions.trim()) {
         taskConfig.instructions = instructions.trim();
       }
@@ -1387,13 +1384,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       // Automatically assign the task based on the assignment target
       const targetUserIds = await getAssignmentTargetUsers(siteId, assignTo, specificUsers);
-      
+
       if (targetUserIds.length > 0) {
         // Create assignments for all target users
         const assignmentPromises = targetUserIds.map(targetUserId => 
           siteStorage.assignTaskToUser(task.id, targetUserId, userId)
         );
-        
+
         await Promise.all(assignmentPromises);
         logger.info(`Task ${task.id} assigned to ${targetUserIds.length} users`);
       }
@@ -1409,21 +1406,21 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   async function getAssignmentTargetUsers(siteId: string, assignTo: string, specificUsers?: string[]): Promise<string[]> {
     try {
       const siteMembers = await siteStorage.getSiteMembers(siteId);
-      
+
       switch (assignTo) {
         case 'all_members':
           return siteMembers.map((member: any) => member.id);
-          
+
         case 'brehons_only':
           return siteMembers
             .filter((member: any) => member.collectiveRole === 'brehon' || member.collectiveRole === 'ard_brehon')
             .map((member: any) => member.id);
-            
+
         case 'members_only':
           return siteMembers
             .filter((member: any) => member.collectiveRole === 'member')
             .map((member: any) => member.id);
-            
+
         case 'specific_users':
           if (specificUsers && specificUsers.length > 0) {
             // Filter to only include users who are actually members of this site
@@ -1431,7 +1428,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
             return specificUsers.filter(userId => memberIds.includes(userId));
           }
           return [];
-          
+
         default:
           return [];
       }
@@ -1670,7 +1667,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         const memberships = await siteStorage.getUserMemberships(userId);
         isMember = memberships.some(m => m.siteId === siteId);
       }
-      
+
       if (!isMember) {
         return res.status(403).json({ error: 'Membership required' });
       }
@@ -1715,7 +1712,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         const memberships = await siteStorage.getUserMemberships(userId);
         isMember = memberships.some(m => m.siteId === siteId);
       }
-      
+
       if (!isMember) {
         return res.status(403).json({ error: 'Membership required' });
       }
@@ -1769,7 +1766,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       } else {
         userRole = 'site_manager'; // Admin has highest privileges
       }
-      
+
       if (!isMember) {
         return res.status(403).json({ error: 'Membership required' });
       }
@@ -1816,13 +1813,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       } else {
         userRole = 'site_manager';
       }
-      
+
       if (!isMember) {
         return res.status(403).json({ error: 'Membership required' });
       }
 
       const blogPost = await siteStorage.getCollectiveBlogPostById(postId);
-      
+
       if (!blogPost || blogPost.siteId !== siteId) {
         return res.status(404).json({ error: 'Blog post not found' });
       }
@@ -1866,7 +1863,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Check membership and permissions
       let canCreatePosts = (req.user as any)?.isAdmin;
       let userRole = 'member';
-      
+
       if (!canCreatePosts) {
         const memberships = await siteStorage.getUserMemberships(userId);
         const membership = memberships.find(m => m.siteId === siteId);
@@ -1877,7 +1874,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       } else {
         userRole = 'site_manager';
       }
-      
+
       if (!canCreatePosts) {
         return res.status(403).json({ error: 'Only brehons and site managers can create blog posts' });
       }
@@ -1939,7 +1936,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Check membership and permissions
       let canEditPosts = (req.user as any)?.isAdmin;
       let userRole = 'member';
-      
+
       if (!canEditPosts) {
         const memberships = await siteStorage.getUserMemberships(userId);
         const membership = memberships.find(m => m.siteId === siteId);
@@ -1950,7 +1947,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       } else {
         userRole = 'site_manager';
       }
-      
+
       if (!canEditPosts) {
         return res.status(403).json({ error: 'Only brehons and site managers can edit blog posts' });
       }
@@ -2015,7 +2012,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Check membership and permissions
       let canPublishPosts = (req.user as any)?.isAdmin;
       let userRole = 'member';
-      
+
       if (!canPublishPosts) {
         const memberships = await siteStorage.getUserMemberships(userId);
         const membership = memberships.find(m => m.siteId === siteId);
@@ -2026,7 +2023,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       } else {
         userRole = 'site_manager';
       }
-      
+
       if (!canPublishPosts) {
         return res.status(403).json({ error: 'Only brehons and site managers can publish/unpublish blog posts' });
       }
@@ -2074,7 +2071,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       // Check permissions (author, brehons, site managers, or admins can delete)
       let canDelete = (req.user as any)?.isAdmin || existingPost.authorId === userId;
-      
+
       if (!canDelete) {
         const memberships = await siteStorage.getUserMemberships(userId);
         const membership = memberships.find(m => m.siteId === siteId);
@@ -2083,7 +2080,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           canDelete = userRole === 'brehon' || userRole === 'site_manager';
         }
       }
-      
+
       if (!canDelete) {
         return res.status(403).json({ error: 'You can only delete your own posts or you need brehon/site manager privileges' });
       }
