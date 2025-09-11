@@ -110,6 +110,14 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (updates.siteId && updates.siteId !== siteId) {
       // Use a transaction to update all related records
       const result = await db.transaction(async (tx) => {
+        // FIRST: Update the main sites record to create the new siteId
+        const [updatedSite] = await tx
+          .update(sites)
+          .set(updateData)
+          .where(eq(sites.siteId, siteId))
+          .returning();
+
+        // THEN: Update all related tables that reference the siteId
         // Update site_slides if they exist  
         await tx
           .update(siteSlides)
@@ -139,13 +147,6 @@ export class DatabaseSiteStorage implements ISiteStorage {
           .update(siteManagers)
           .set({ siteId: updates.siteId })
           .where(eq(siteManagers.siteId, siteId));
-
-        // Finally, update the main sites record
-        const [updatedSite] = await tx
-          .update(sites)
-          .set(updateData)
-          .where(eq(sites.siteId, siteId))
-          .returning();
         
         return updatedSite;
       });

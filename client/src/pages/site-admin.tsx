@@ -698,11 +698,9 @@ export function SiteAdmin(props: SiteAdminProps) {
   // Mutation for editing site settings
   const editSiteMutation = useMutation({
     mutationFn: async (updatedSite: any) => {
-      console.log('Updating site with data:', updatedSite);
       const response = await apiRequest('PUT', `/api/sites/${siteId}`, updatedSite);
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('Site update failed:', errorData);
         throw new Error(`Failed to update site: ${response.status} ${response.statusText}`);
       }
       return await response.json();
@@ -716,7 +714,6 @@ export function SiteAdmin(props: SiteAdminProps) {
       });
     },
     onError: (error: any) => {
-      console.error('Edit site mutation error:', error);
       toast({
         title: "Error", 
         description: error.message || "Failed to update site settings",
@@ -982,8 +979,6 @@ export function SiteAdmin(props: SiteAdminProps) {
   const handleEditSite = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submission started, formData:', formData);
-    
     const updatedSite = {
       name: formData.name,
       siteId: formData.siteId,
@@ -1005,7 +1000,6 @@ export function SiteAdmin(props: SiteAdminProps) {
       hubspotPortalId: formData.hubspotPortalId || '',
     };
     
-    console.log('Submitting site update:', updatedSite);
     editSiteMutation.mutate(updatedSite);
   };
   
