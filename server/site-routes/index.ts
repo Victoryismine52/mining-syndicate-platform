@@ -108,32 +108,26 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Update site
-  app.put("/api/sites/:siteId", isAuthenticated, checkSiteAccess, async (req, res) => {
+  app.put("/api/sites/:slug", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { slug: currentSlug } = req.params;
       const updates = req.body;
 
       // If updating slug, check availability first
-      if (updates.slug && updates.slug !== siteId) {
+      if (updates.slug && updates.slug !== currentSlug) {
         const existingSite = await siteStorage.getSite(updates.slug);
         if (existingSite) {
           return res.status(400).json({ error: "Site URL is already taken" });
         }
       }
 
-      // Handle siteId updates (legacy support)
-      if (updates.siteId && updates.siteId !== siteId) {
-        const existingSite = await siteStorage.getSite(updates.siteId);
-        if (existingSite) {
-          return res.status(400).json({ error: "Site URL is already taken" });
-        }
-        // Map siteId to slug field
-        updates.slug = updates.siteId;
+      // Remove any attempts to update siteId - it should remain immutable
+      if (updates.siteId) {
         delete updates.siteId;
       }
 
-      // Update the site with the current siteId as the lookup key
-      const site = await siteStorage.updateSite(siteId, updates);
+      // Update the site using the current slug as the lookup key
+      const site = await siteStorage.updateSite(currentSlug, updates);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
       }
@@ -146,7 +140,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.json(responseData);
     } catch (error) {
-      logger.error({ err: error }, `Error updating site ${req.params.siteId}`);
+      logger.error({ err: error }, `Error updating site ${req.params.slug}`);
       res.status(500).json({ error: "Failed to update site" });
     }
   });
@@ -819,7 +813,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
-  // ==== GLOBAL SLIDES ROUTES ====
+  // ==== GLOBAL SLIDESROUTES ====
 
   // Get all global slides (public endpoint for presentation viewer)
   app.get("/api/global-slides", async (req, res) => {

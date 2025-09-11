@@ -21,25 +21,25 @@ declare global {
  */
 export const checkSiteAccess = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const siteId = req.params.siteId;
+    const slug = req.params.slug; // Changed from siteId to slug
     const user = req.user as any;
 
     if (!user) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
-    if (!siteId) {
-      return res.status(400).json({ error: "Site ID required" });
+    if (!slug) { // Changed from siteId to slug
+      return res.status(400).json({ error: "Site slug required" }); // Changed error message
     }
 
     // Check if user is global admin (check both new role field and legacy isAdmin)
     const isAdmin = user.role === 'admin' || user.isAdmin || false;
-    
-    logger.info(`Site access check for ${siteId}: user=${user.email}, isAdmin=${isAdmin}`);
+
+    logger.info(`Site access check for ${slug}: user=${user.email}, isAdmin=${isAdmin}`); // Changed from siteId to slug
 
     // Global admins have access to all sites, no need to check site manager status
     if (isAdmin) {
-      logger.info(`Global admin ${user.email} granted access to site ${siteId}`);
+      logger.info(`Global admin ${user.email} granted access to site ${slug}`); // Changed from siteId to slug
       // Add access info to request object
       req.siteAccess = {
         canManage: true,
@@ -49,30 +49,28 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
       return next();
     }
 
-    // Check if user is site manager for this specific site (only for non-admins)
-    const isSiteManager = await siteStorage.isSiteManager(siteId, user.email);
-    logger.info(`Site manager check for ${siteId}: user=${user.email}, isSiteManager=${isSiteManager}`);
+    // Check if user is a site manager for this specific site
+    const isSiteManager = await siteStorage.isSiteManager(slug, user.email); // Changed from siteId to slug
 
-    // User has access if they are site manager
-    const canManage = isSiteManager;
+    logger.info(`Site manager check for ${slug}: user=${user.email}, isSiteManager=${isSiteManager}`); // Changed from siteId to slug
 
-    // Add access info to request object
-    req.siteAccess = {
-      canManage,
-      isAdmin,
-      isSiteManager,
-    };
-
-    if (!canManage) {
-      return res.status(403).json({ 
-        error: "Access denied. You must be an admin or site manager for this site." 
-      });
+    if (isSiteManager) {
+      logger.info(`Site manager ${user.email} granted access to site ${slug}`); // Changed from siteId to slug
+      // Add access info to request object
+      req.siteAccess = {
+        canManage: true,
+        isAdmin: false,
+        isSiteManager: true,
+      };
+      return next();
     }
 
-    next();
+    // User has no access to this site
+    logger.warn(`Access denied for user ${user.email} to site ${slug}`); // Changed from siteId to slug
+    return res.status(403).json({ error: "Access denied to this site" });
   } catch (error) {
-    logger.error("Error checking site access:", error);
-    res.status(500).json({ error: "Failed to check site access" });
+    logger.error({ err: error }, "Error checking site access");
+    return res.status(500).json({ error: "Failed to check site access" });
   }
 };
 
@@ -84,7 +82,7 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
 
   // Check both the new role field and legacy isAdmin for backward compatibility
   const isAdmin = user?.role === 'admin' || user?.isAdmin;
-  
+
   if (!isAdmin) {
     return res.status(403).json({ 
       error: "Admin access required" 

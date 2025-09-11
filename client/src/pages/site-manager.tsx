@@ -117,8 +117,8 @@ export function SiteManager() {
   });
 
   const updateSiteMutation = useMutation({
-    mutationFn: async ({ siteId, updates }: { siteId: string; updates: Partial<InsertSite> }) => {
-      const response = await apiRequest('PUT', `/api/sites/${siteId}`, updates);
+    mutationFn: async ({ slug, updates }: { slug: string; updates: Partial<InsertSite> }) => {
+      const response = await apiRequest('PUT', `/api/sites/${slug}`, updates);
       return await response.json();
     },
     onSuccess: () => {
@@ -140,8 +140,8 @@ export function SiteManager() {
   });
 
   const deleteSiteMutation = useMutation({
-    mutationFn: async (siteId: string) => {
-      const response = await apiRequest('DELETE', `/api/sites/${siteId}`);
+    mutationFn: async (slug: string) => {
+      const response = await apiRequest('DELETE', `/api/sites/${slug}`);
       return await response.json();
     },
     onSuccess: () => {
@@ -295,7 +295,7 @@ export function SiteManager() {
       },
     };
 
-    updateSiteMutation.mutate({ slug: editingSite.slug, updates });
+    updateSiteMutation.mutate({ slug: editingSite.siteId, updates });
   };
 
   if (isLoading) {
