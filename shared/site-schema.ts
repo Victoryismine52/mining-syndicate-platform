@@ -20,7 +20,7 @@ export const sites = pgTable('sites', {
   siteId: varchar('site_id', { length: 50 }).unique().notNull(), // Custom slug/URL identifier
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
-  
+
   // Presentation configuration
   presentationImages: jsonb('presentation_images').$type<string[]>().default([]),
   landingConfig: jsonb('landing_config').$type<{
@@ -34,31 +34,31 @@ export const sites = pgTable('sites', {
     formsTitle?: string; // Forms section title
     formsDescription?: string; // Forms section description
   }>().default({}),
-  
+
   // Form configuration
   hubspotFormIds: jsonb('hubspot_form_ids').$type<{
     learnMore?: string;
     miningPool?: string;
     lendingPool?: string;
   }>().default({}),
-  
+
   // Site settings
   isActive: boolean('is_active').default(true),
   isLaunched: boolean('is_launched').default(false), // Controls site visibility to non-managers
   password: varchar('password', { length: 100 }), // Optional site-specific password
   passwordProtected: boolean('password_protected').default(false), // Toggle password protection
-  
+
   // Site type and branding
   siteType: varchar('site_type', { length: 50 }).notNull(), // Site template type
   logoUrl: text('logo_url'), // Custom logo URL
   footerText: varchar('footer_text', { length: 255 }), // Custom footer text
-  qrCodeUrl: text('qr_code_url'), // Generated QR code image URL
-  
+  qrCodeUrl: text('qr_code_url'), // Generated QR code URL
+
   // HubSpot integration
   hubspotEnabled: boolean('hubspot_enabled').default(false), // Enable/disable HubSpot integration
   hubspotApiKey: text('hubspot_api_key'), // HubSpot Private App API key
   hubspotPortalId: varchar('hubspot_portal_id', { length: 100 }), // Optional HubSpot Portal ID
-  
+
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -75,39 +75,39 @@ export const siteManagers = pgTable('site_managers', {
 export const siteLeads = pgTable('site_leads', {
   id: uuid('id').primaryKey().defaultRandom(),
   siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
-  
+
   // Identifier-based aggregation fields
   identifier: varchar('identifier', { length: 255 }).notNull(), // Primary identifier value (email, googleId, etc.)
   identifierType: varchar('identifier_type', { length: 50 }).notNull().default('email'), // Type of identifier
-  
+
   // Form submission tracking
   formTemplateId: uuid('form_template_id'), // Reference to form template used
   formType: varchar('form_type', { length: 50 }).notNull(), // 'learn-more', 'mining-pool', 'lending-pool'
   lastFormSubmission: timestamp('last_form_submission').defaultNow(),
   submissionCount: varchar('submission_count', { length: 10 }).default('1'),
-  
+
   // Dynamic form data - stores all form field values as key-value pairs
   formData: jsonb('form_data').$type<Record<string, any>>().default({}),
-  
+
   // Core contact information (extracted from formData for easier querying)
   firstName: varchar('first_name', { length: 100 }),
   lastName: varchar('last_name', { length: 100 }),
   email: varchar('email', { length: 255 }),
   phone: varchar('phone', { length: 50 }),
   company: varchar('company', { length: 255 }),
-  
+
   // Legacy support for existing data
   interests: jsonb('interests').$type<string[]>().default([]),
   message: text('message'),
   miningAmount: varchar('mining_amount', { length: 100 }),
   lendingAmount: varchar('lending_amount', { length: 100 }),
-  
+
   // Tracking
   hubspotContactId: varchar('hubspot_contact_id', { length: 100 }),
   ipAddress: varchar('ip_address', { length: 45 }),
   userAgent: text('user_agent'),
   referrer: text('referrer'),
-  
+
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -116,17 +116,17 @@ export const siteLeads = pgTable('site_leads', {
 export const siteAnalytics = pgTable('site_analytics', {
   id: uuid('id').primaryKey().defaultRandom(),
   siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
-  
+
   // Event tracking
   eventType: varchar('event_type', { length: 50 }).notNull(), // 'page_view', 'form_open', 'form_submit', etc.
   eventData: jsonb('event_data').default({}),
-  
+
   // Session info
   sessionId: varchar('session_id', { length: 100 }),
   ipAddress: varchar('ip_address', { length: 45 }),
   userAgent: text('user_agent'),
   referrer: text('referrer'),
-  
+
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -137,14 +137,14 @@ export const legalDisclaimers = pgTable('legal_disclaimers', {
   version: varchar('version', { length: 50 }).notNull().default('1.0'), // Version like "1.0", "2.1", etc.
   language: varchar('language', { length: 10 }).notNull().default('en'), // Language code: en, es, zh, ja, etc.
   content: text('content').notNull(), // Full disclaimer text
-  
+
   // Scoping
   siteType: varchar('site_type', { length: 100 }), // NULL = global, specific value = site type only
-  
+
   // Metadata
   description: text('description'), // Optional description of the disclaimer
   isActive: boolean('is_active').default(true), // Whether this disclaimer is active/available
-  
+
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -154,11 +154,11 @@ export const siteDisclaimers = pgTable('site_disclaimers', {
   id: uuid('id').primaryKey().defaultRandom(),
   siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   disclaimerId: uuid('disclaimer_id').notNull().references(() => legalDisclaimers.id, { onDelete: 'cascade' }),
-  
+
   // Display options
   displayOrder: varchar('display_order', { length: 10 }).default('1'), // Order in footer/menu
   linkText: varchar('link_text', { length: 100 }), // Custom link text, defaults to disclaimer name
-  
+
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -166,19 +166,19 @@ export const siteDisclaimers = pgTable('site_disclaimers', {
 export const siteSlides = pgTable('site_slides', {
   id: uuid('id').primaryKey().defaultRandom(),
   siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
-  
+
   // Slide content
   title: varchar('title', { length: 255 }).notNull(),
   imageUrl: text('image_url').notNull(), // Object storage URL or static asset path
   slideOrder: text('slide_order').notNull(), // Position in presentation (0, 1, 2, etc.)
-  
+
   // Slide settings
   isVisible: boolean('is_visible').default(true),
   slideType: varchar('slide_type', { length: 50 }).default('image'), // 'image', 'interactive', etc.
-  
+
   // Metadata
   description: text('description'), // Optional slide description
-  
+
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -186,16 +186,16 @@ export const siteSlides = pgTable('site_slides', {
 // Global slides table - System-wide slides that appear on all sites (like final action slide)
 export const globalSlides = pgTable('global_slides', {
   id: uuid('id').primaryKey().defaultRandom(),
-  
+
   // Slide identification
   slideKey: varchar('slide_key', { length: 100 }).unique().notNull(), // Unique identifier like 'final-action-cards'
   title: varchar('title', { length: 255 }).notNull(),
   slideType: varchar('slide_type', { length: 50 }).default('action-cards'), // 'action-cards', 'image', etc.
-  
+
   // Display settings
   isVisible: boolean('is_visible').default(true), // Global toggle for this slide
   displayPosition: varchar('display_position', { length: 50 }).default('end'), // 'start', 'end', 'custom'
-  
+
   // Content configuration (for action cards slide)
   cardConfig: jsonb('card_config').$type<{
     cards: Array<{
@@ -209,11 +209,11 @@ export const globalSlides = pgTable('global_slides', {
     backgroundColor?: string;
     textColor?: string;
   }>().default({ cards: [] }),
-  
+
   // Alternative content (for image slides)
   imageUrl: text('image_url'),
   content: text('content'),
-  
+
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

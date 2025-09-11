@@ -309,7 +309,7 @@ export const landingPageTemplates = pgTable('landing_page_templates', {
 // Site sections - configurable sections on each site
 export const siteSections = pgTable('site_sections', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   name: varchar('name', { length: 100 }).notNull(), // e.g., "Hero Video", "Contact Forms", "Resources"
   description: text('description'),
   displayOrder: varchar('display_order', { length: 10 }).default('1'),
