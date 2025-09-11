@@ -113,14 +113,12 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const { siteId } = req.params;
       const updates = req.body;
 
-      // If updating slug, check availability and map to the correct field
+      // If updating slug, check availability first
       if (updates.slug && updates.slug !== siteId) {
         const existingSite = await siteStorage.getSite(updates.slug);
         if (existingSite) {
           return res.status(400).json({ error: "Site URL is already taken" });
         }
-        // Map slug to the database field name
-        updates.slug = updates.slug;
       }
 
       // Handle siteId updates (legacy support)
@@ -134,6 +132,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         delete updates.siteId;
       }
 
+      // Update the site with the current siteId as the lookup key
       const site = await siteStorage.updateSite(siteId, updates);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
