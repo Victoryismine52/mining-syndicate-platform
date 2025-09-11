@@ -26,7 +26,7 @@ interface SlugInputProps {
 export function SlugInput({
   label,
   name,
-  value,
+  value = '',
   onChange,
   className,
   placeholder,
@@ -84,10 +84,11 @@ export function SlugInput({
     return () => clearTimeout(timeoutId);
   }, [value, checkSlugAvailability]);
 
-  // Format slug as user types (lowercase, no spaces, etc.)
+  // Format slug as user types (lowercase, convert spaces to hyphens, etc.)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value
       .toLowerCase()
+      .replace(/\s+/g, '-') // Convert spaces to hyphens
       .replace(/[^a-z0-9-]/g, '') // Only allow lowercase letters, numbers, hyphens
       .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
       .replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
