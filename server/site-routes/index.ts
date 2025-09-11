@@ -26,7 +26,12 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
       }
-      res.json(site);
+      // Map slug to siteId for UI compatibility
+      const siteWithSiteId = {
+        ...site,
+        siteId: site.slug
+      };
+      res.json(siteWithSiteId);
     } catch (error) {
       logger.error({ err: error }, "Error fetching site");
       res.status(500).json({ error: "Failed to fetch site" });
@@ -43,14 +48,19 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         // Admins get all sites
         const sites = await siteStorage.listSites();
         // Ensure main site is always included
-        const mainSiteExists = sites.some(site => site.siteId === 'main-site');
+        const mainSiteExists = sites.some(site => site.slug === 'main');
         if (!mainSiteExists) {
-          const mainSite = await siteStorage.getSite('main-site');
+          const mainSite = await siteStorage.getSite('main');
           if (mainSite) {
             sites.unshift(mainSite); // Add to beginning of array
           }
         }
-        res.json(sites);
+        // Map sites to include siteId for backward compatibility with UI routing
+        const sitesWithSiteId = sites.map(site => ({
+          ...site,
+          siteId: site.slug // Map slug to siteId for UI compatibility
+        }));
+        res.json(sitesWithSiteId);
       } else {
         // Regular users get only public sites and sites they're members of
         const allSites = await siteStorage.listSites();
@@ -62,11 +72,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           // Include all launched sites (public access)
           if (site.isLaunched) return true;
           // Include sites user is a member of
-          if (memberSiteIds.includes(site.siteId)) return true;
+          if (memberSiteIds.includes(site.slug)) return true;
           return false;
         });
 
-        res.json(accessibleSites);
+        // Map sites to include siteId for backward compatibility with UI routing
+        const sitesWithSiteId = accessibleSites.map(site => ({
+          ...site,
+          siteId: site.slug // Map slug to siteId for UI compatibility
+        }));
+
+        res.json(sitesWithSiteId);
       }
     } catch (error) {
       logger.error({ err: error }, "Error listing sites");
