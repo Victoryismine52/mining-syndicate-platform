@@ -110,12 +110,6 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (updates.siteId && updates.siteId !== siteId) {
       // Use a transaction to update all related records
       const result = await db.transaction(async (tx) => {
-        // First update all site_form_assignments that reference this site
-        await tx
-          .update(siteFormAssignments)
-          .set({ siteId: updates.siteId })
-          .where(eq(siteFormAssignments.siteId, siteId));
-
         // Update site_slides if they exist  
         await tx
           .update(siteSlides)
