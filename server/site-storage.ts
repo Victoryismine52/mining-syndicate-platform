@@ -106,66 +106,18 @@ export class DatabaseSiteStorage implements ISiteStorage {
       updatedAt: new Date(),
     };
     
-    // If siteId is being changed, we need to handle foreign key constraints
-    if (updates.siteId && updates.siteId !== siteId) {
-      // Use a transaction to update all related records
-      const result = await db.transaction(async (tx) => {
-        // FIRST: Update the main sites record to create the new siteId
-        const [updatedSite] = await tx
-          .update(sites)
-          .set(updateData)
-          .where(eq(sites.siteId, siteId))
-          .returning();
-
-        // THEN: Update all related tables that reference the siteId
-        // Update site_slides if they exist  
-        await tx
-          .update(siteSlides)
-          .set({ siteId: updates.siteId })
-          .where(eq(siteSlides.siteId, siteId));
-
-        // Update site_leads if they exist
-        await tx
-          .update(siteLeads)
-          .set({ siteId: updates.siteId })
-          .where(eq(siteLeads.siteId, siteId));
-
-        // Update site_analytics if they exist
-        await tx
-          .update(siteAnalytics)
-          .set({ siteId: updates.siteId })
-          .where(eq(siteAnalytics.siteId, siteId));
-
-        // Update site_disclaimers if they exist
-        await tx
-          .update(siteDisclaimers)
-          .set({ siteId: updates.siteId })
-          .where(eq(siteDisclaimers.siteId, siteId));
-
-        // Update site_sections if they exist
-        await tx
-          .update(siteSections)
-          .set({ siteId: updates.siteId })
-          .where(eq(siteSections.siteId, siteId));
-
-        // Update site_managers if they exist
-        await tx
-          .update(siteManagers)
-          .set({ siteId: updates.siteId })
-          .where(eq(siteManagers.siteId, siteId));
-        
-        return updatedSite;
-      });
-      
-      return result;
-    }
-    
-    // Normal update (no siteId change)
+    // Simple single-table update - no cascading needed!
+    // The slug (siteId) should only be stored in one place: the sites table
     const [site] = await db
       .update(sites)
       .set(updateData)
       .where(eq(sites.siteId, siteId))
       .returning();
+    
+    if (!site) {
+      throw new Error(`Site not found: ${siteId}`);
+    }
+    
     return site;
   }
 
