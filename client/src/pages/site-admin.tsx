@@ -706,15 +706,44 @@ export function SiteAdmin(props: SiteAdminProps) {
       return await response.json();
     },
     onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: [`/api/sites/${siteId}`] });
+      const newSlug = data.siteId || data.slug;
+
+      // Update cached queries and form state if the slug changed
+      if (newSlug && newSlug !== siteId) {
+        // Remove all queries for the old slug
+        queryClient.removeQueries({
+          predicate: (query) =>
+            typeof query.queryKey[0] === 'string' &&
+            (query.queryKey[0] as string).startsWith(`/api/sites/${siteId}`),
+        });
+
+        // Seed cache for the new slug and refetch related queries
+        queryClient.setQueryData([`/api/sites/${newSlug}`], data);
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            typeof query.queryKey[0] === 'string' &&
+            (query.queryKey[0] as string).startsWith(`/api/sites/${newSlug}`),
+        });
+
+        // Update form state to reflect new slug
+        setFormData((prev) => ({ ...prev, siteId: newSlug }));
+
+        // Navigate to the admin page for the new slug
+        setLocation(`/sites/${newSlug}/admin`);
+      } else {
+        // Slug unchanged - simply invalidate existing queries
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            typeof query.queryKey[0] === 'string' &&
+            (query.queryKey[0] as string).startsWith(`/api/sites/${siteId}`),
+        });
+      }
+
       setIsEditSiteOpen(false);
       toast({
         title: "Success",
         description: "Site settings updated successfully",
       });
-      if (data.slug && data.slug !== siteId) {
-        window.location.replace(`/sites/${data.slug}`);
-      }
     },
     onError: (error: any) => {
       toast({
