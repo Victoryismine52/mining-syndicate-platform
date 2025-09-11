@@ -130,6 +130,12 @@ export class DatabaseSiteStorage implements ISiteStorage {
           .set({ siteId: updates.siteId })
           .where(eq(siteLeads.siteId, siteId));
 
+        // Update site_analytics if they exist
+        await tx
+          .update(siteAnalytics)
+          .set({ siteId: updates.siteId })
+          .where(eq(siteAnalytics.siteId, siteId));
+
         // Update site_disclaimers if they exist
         await tx
           .update(siteDisclaimers)
