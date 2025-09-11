@@ -118,7 +118,7 @@ export const sites = pgTable('sites', {
 // Site-scoped leads table
 export const siteLeads = pgTable('site_leads', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   
   // Contact information
   firstName: varchar('first_name', { length: 100 }).notNull(),
@@ -148,7 +148,7 @@ export const siteLeads = pgTable('site_leads', {
 // Site analytics table
 export const siteAnalytics = pgTable('site_analytics', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   
   // Event tracking
   eventType: varchar('event_type', { length: 50 }).notNull(), // 'page_view', 'form_open', 'form_submit', etc.
@@ -321,7 +321,7 @@ export const siteSections = pgTable('site_sections', {
 // Site Form Assignments table - Which forms are available on which sites
 export const siteFormAssignments = pgTable('site_form_assignments', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   formTemplateId: uuid('form_template_id').notNull().references(() => formTemplates.id, { onDelete: 'cascade' }),
   sectionId: uuid('section_id').references(() => siteSections.id, { onDelete: 'set null' }), // NEW: assign cards to sections
   
@@ -358,7 +358,7 @@ export const siteFormAssignments = pgTable('site_form_assignments', {
 // Site Landing Config table - Enhanced landing page configuration per site
 export const siteLandingConfigs = pgTable('site_landing_configs', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).unique().notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').unique().notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   
   // Template reference (optional - can customize without template)
   landingPageTemplateId: uuid('landing_page_template_id').references(() => landingPageTemplates.id),
@@ -401,7 +401,7 @@ export const siteLandingConfigs = pgTable('site_landing_configs', {
 export const siteMemberships = pgTable('site_memberships', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: varchar('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   
   // Membership metadata
   membershipStatus: varchar('membership_status', { length: 50 }).notNull().default('active'), // active, inactive, pending, suspended
@@ -460,7 +460,7 @@ export const siteMemberProfiles = pgTable('site_member_profiles', {
 // Collective join requests - For private collectives that require approval
 export const collectiveJoinRequests = pgTable('collective_join_requests', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   userId: varchar('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   
   // Request details
@@ -482,7 +482,7 @@ export const collectiveJoinRequests = pgTable('collective_join_requests', {
 // Collective tasks - Core task management for collectives
 export const collectiveTasks = pgTable('collective_tasks', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   
   // Task details
   title: varchar('title', { length: 255 }).notNull(),
@@ -565,7 +565,7 @@ export const taskAssignments = pgTable('task_assignments', {
 // Collective messages - Chat system for collective members
 export const collectiveMessages = pgTable('collective_messages', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   
   // Message details
   senderId: varchar('sender_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
@@ -604,7 +604,7 @@ export const collectiveMessages = pgTable('collective_messages', {
 // Collective blog posts - Blog system for collectives
 export const collectiveBlogPosts = pgTable('collective_blog_posts', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }),
+  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
   
   // Post details
   title: varchar('title', { length: 255 }).notNull(),
@@ -667,7 +667,7 @@ export const siteMembershipsRelations = relations(siteMemberships, ({ one }) => 
   }),
   site: one(sites, {
     fields: [siteMemberships.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
   profile: one(siteMemberProfiles, {
     fields: [siteMemberships.id],
@@ -685,14 +685,14 @@ export const siteMemberProfilesRelations = relations(siteMemberProfiles, ({ one 
 export const siteLeadsRelations = relations(siteLeads, ({ one }) => ({
   site: one(sites, {
     fields: [siteLeads.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
 }));
 
 export const siteAnalyticsRelations = relations(siteAnalytics, ({ one }) => ({
   site: one(sites, {
     fields: [siteAnalytics.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
 }));
 
@@ -719,7 +719,7 @@ export const formTemplateFieldsRelations = relations(formTemplateFields, ({ one 
 export const siteFormAssignmentsRelations = relations(siteFormAssignments, ({ one }) => ({
   site: one(sites, {
     fields: [siteFormAssignments.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
   formTemplate: one(formTemplates, {
     fields: [siteFormAssignments.formTemplateId],
@@ -730,7 +730,7 @@ export const siteFormAssignmentsRelations = relations(siteFormAssignments, ({ on
 export const siteLandingConfigsRelations = relations(siteLandingConfigs, ({ one }) => ({
   site: one(sites, {
     fields: [siteLandingConfigs.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
   landingPageTemplate: one(landingPageTemplates, {
     fields: [siteLandingConfigs.landingPageTemplateId],
@@ -746,7 +746,7 @@ export const landingPageTemplatesRelations = relations(landingPageTemplates, ({ 
 export const collectiveJoinRequestsRelations = relations(collectiveJoinRequests, ({ one }) => ({
   site: one(sites, {
     fields: [collectiveJoinRequests.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
   user: one(users, {
     fields: [collectiveJoinRequests.userId],
@@ -761,7 +761,7 @@ export const collectiveJoinRequestsRelations = relations(collectiveJoinRequests,
 export const collectiveTasksRelations = relations(collectiveTasks, ({ one, many }) => ({
   site: one(sites, {
     fields: [collectiveTasks.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
   creator: one(users, {
     fields: [collectiveTasks.createdBy],
@@ -792,7 +792,7 @@ export const taskAssignmentsRelations = relations(taskAssignments, ({ one }) => 
 export const collectiveMessagesRelations = relations(collectiveMessages, ({ one }) => ({
   site: one(sites, {
     fields: [collectiveMessages.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
   sender: one(users, {
     fields: [collectiveMessages.senderId],
@@ -803,7 +803,7 @@ export const collectiveMessagesRelations = relations(collectiveMessages, ({ one 
 export const collectiveBlogPostsRelations = relations(collectiveBlogPosts, ({ one }) => ({
   site: one(sites, {
     fields: [collectiveBlogPosts.siteId],
-    references: [sites.siteId],
+    references: [sites.id], // Reference permanent ID
   }),
   author: one(users, {
     fields: [collectiveBlogPosts.authorId],

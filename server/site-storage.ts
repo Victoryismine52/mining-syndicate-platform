@@ -12,23 +12,23 @@ export interface ISiteStorage {
   updateSite(siteId: string, updates: Partial<InsertSite>): Promise<Site>;
   deleteSite(siteId: string): Promise<void>;
   listSites(): Promise<Site[]>;
-  
+
   // Lead operations (scoped to site)
   createSiteLead(lead: InsertSiteLead & { siteId: string }): Promise<SiteLead>;
   getSiteLeads(siteId: string): Promise<SiteLead[]>;
   getSiteLeadsByType(siteId: string, formType: string): Promise<SiteLead[]>;
   updateSiteLead(leadId: string, updates: Partial<InsertSiteLead>): Promise<SiteLead>;
-  
+
   // Analytics operations
   createSiteAnalytics(analytics: InsertSiteAnalytics & { siteId: string }): Promise<SiteAnalytics>;
   getSiteAnalytics(siteId: string, limit?: number): Promise<SiteAnalytics[]>;
-  
+
   // Site manager operations
   addSiteManager(siteId: string, userEmail: string): Promise<SiteManager>;
   removeSiteManager(siteId: string, userEmail: string): Promise<void>;
   getSiteManagers(siteId: string): Promise<SiteManager[]>;
   isSiteManager(siteId: string, userEmail: string): Promise<boolean>;
-  
+
   // Legal disclaimer operations
   createLegalDisclaimer(disclaimer: InsertLegalDisclaimer): Promise<LegalDisclaimer>;
   getLegalDisclaimer(id: string): Promise<LegalDisclaimer | undefined>;
@@ -36,12 +36,12 @@ export interface ISiteStorage {
   deleteLegalDisclaimer(id: string): Promise<void>;
   listLegalDisclaimers(): Promise<LegalDisclaimer[]>;
   getAvailableDisclaimersForSiteType(siteType: string): Promise<LegalDisclaimer[]>;
-  
+
   // Site disclaimer attachment operations
   attachDisclaimerToSite(siteId: string, disclaimerId: string, options?: { displayOrder?: string; linkText?: string }): Promise<SiteDisclaimer>;
   detachDisclaimerFromSite(siteId: string, disclaimerId: string): Promise<void>;
   getSiteDisclaimers(siteId: string): Promise<Array<SiteDisclaimer & { disclaimer: LegalDisclaimer }>>;
-  
+
   // Slide operations
   createSiteSlide(slide: InsertSiteSlide & { siteId: string }): Promise<SiteSlide>;
   getSiteSlides(siteId: string): Promise<SiteSlide[]>;
@@ -49,27 +49,27 @@ export interface ISiteStorage {
   updateSiteSlide(slideId: string, updates: Partial<InsertSiteSlide>): Promise<SiteSlide>;
   deleteSiteSlide(slideId: string): Promise<void>;
   reorderSiteSlides(siteId: string, slideOrders: Array<{ id: string; slideOrder: string }>): Promise<void>;
-  
+
   // Global slide operations
   getGlobalSlides(): Promise<GlobalSlide[]>;
   getGlobalSlideByKey(slideKey: string): Promise<GlobalSlide | undefined>;
   createGlobalSlide(slideData: InsertGlobalSlide): Promise<GlobalSlide>;
   updateGlobalSlideVisibility(slideKey: string, isVisible: boolean): Promise<GlobalSlide | null>;
-  
+
   // Site sections operations
   getSiteSections(siteId: string): Promise<SiteSection[]>;
   getSiteSection(sectionId: string): Promise<SiteSection | undefined>;
   createSiteSection(sectionData: InsertSiteSection): Promise<SiteSection>;
   updateSiteSection(sectionId: string, updates: Partial<InsertSiteSection>): Promise<SiteSection>;
   deleteSiteSection(sectionId: string): Promise<void>;
-  
+
   // Site membership operations
   getUserMemberships(userId: string): Promise<any[]>;
   getSiteMemberships(siteId: string): Promise<any[]>;
   createSiteMembership(membershipData: any): Promise<any>;
   updateSiteMembership(siteId: string, userId: string, updates: any): Promise<any>;
   deleteSiteMembership(siteId: string, userId: string): Promise<boolean>;
-  
+
   // Access control
   checkSiteAccess(siteId: string, userEmail: string, isAdmin: boolean): Promise<boolean>;
 }
@@ -100,24 +100,24 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return site;
   }
 
-  async updateSite(siteId: string, updates: Partial<InsertSite>): Promise<Site> {
+  async updateSite(siteSlug: string, updates: Partial<InsertSite>): Promise<Site> {
     const updateData: any = {
       ...updates,
       updatedAt: new Date(),
     };
-    
-    // Simple single-table update - no cascading needed!
-    // The slug (siteId) should only be stored in one place: the sites table
+
+    // Simple update - since foreign keys now reference the permanent ID,
+    // changing the siteId (slug) doesn't require cascading updates
     const [site] = await db
       .update(sites)
       .set(updateData)
-      .where(eq(sites.siteId, siteId))
+      .where(eq(sites.siteId, siteSlug)) // Find by current slug
       .returning();
-    
+
     if (!site) {
-      throw new Error(`Site not found: ${siteId}`);
+      throw new Error(`Site not found with slug: ${siteSlug}`);
     }
-    
+
     return site;
   }
 
@@ -280,8 +280,8 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
   // Site disclaimer attachment operations
   async attachDisclaimerToSite(
-    siteId: string, 
-    disclaimerId: string, 
+    siteId: string,
+    disclaimerId: string,
     options?: { displayOrder?: string; linkText?: string }
   ): Promise<SiteDisclaimer> {
     const [attachment] = await db
@@ -402,7 +402,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
   async updateGlobalSlideVisibility(slideKey: string, isVisible: boolean): Promise<GlobalSlide | null> {
     const [slide] = await db
       .update(globalSlides)
-      .set({ 
+      .set({
         isVisible,
         updatedAt: new Date(),
       })
@@ -415,20 +415,20 @@ export class DatabaseSiteStorage implements ISiteStorage {
     const result = await db
       .delete(globalSlides)
       .where(eq(globalSlides.slideKey, slideKey));
-    
+
     return (result.rowCount ?? 0) > 0;
   }
 
   async updateGlobalSlideOrder(slideKey: string, order: number): Promise<GlobalSlide | null> {
     const [slide] = await db
       .update(globalSlides)
-      .set({ 
+      .set({
         createdAt: new Date(Date.now() + order * 1000), // Use createdAt for ordering
-        updatedAt: new Date() 
+        updatedAt: new Date()
       })
       .where(eq(globalSlides.slideKey, slideKey))
       .returning();
-    
+
     return slide || null;
   }
 
@@ -461,7 +461,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
   async updateSiteSection(sectionId: string, updates: Partial<InsertSiteSection>): Promise<SiteSection> {
     const [section] = await db
       .update(siteSections)
-      .set({ 
+      .set({
         ...updates,
         updatedAt: new Date(),
       })
@@ -583,7 +583,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (isAdmin) {
       return true;
     }
-    
+
     // Check if user is a site manager
     return await this.isSiteManager(siteId, userEmail);
   }
@@ -619,7 +619,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .orderBy(desc(collectiveMessages.createdAt))
         .limit(options.limit)
         .offset(options.offset);
-      
+
       return messages;
     } catch (error) {
       logger.error('Error getting collective messages:', error);
@@ -671,7 +671,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .from(collectiveMessages)
         .leftJoin(users, eq(collectiveMessages.senderId, users.id))
         .where(eq(collectiveMessages.id, messageId));
-      
+
       return message;
     } catch (error) {
       logger.error('Error getting collective message with sender:', error);
@@ -681,18 +681,18 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
   // ===== COLLECTIVE BLOG POSTS METHODS =====
 
-  async getCollectiveBlogPosts(siteId: string, options: { 
-    status?: string; 
-    userRole?: string; 
-    limit?: number; 
-    offset?: number 
+  async getCollectiveBlogPosts(siteId: string, options: {
+    status?: string;
+    userRole?: string;
+    limit?: number;
+    offset?: number
   }): Promise<any[]> {
     try {
       const { collectiveBlogPosts, users } = await import("@shared/schema");
-      
+
       // Build the where conditions
       let whereConditions = [eq(collectiveBlogPosts.siteId, siteId)];
-      
+
       // Apply status filter
       if (options.status) {
         whereConditions.push(eq(collectiveBlogPosts.status, options.status));
@@ -789,7 +789,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .from(collectiveBlogPosts)
         .leftJoin(users, eq(collectiveBlogPosts.authorId, users.id))
         .where(eq(collectiveBlogPosts.id, postId));
-      
+
       return post;
     } catch (error) {
       logger.error('Error getting collective blog post by ID:', error);
@@ -878,9 +878,9 @@ export class DatabaseSiteStorage implements ISiteStorage {
   }): Promise<any[]> {
     try {
       const { collectiveTasks, users } = await import("@shared/schema");
-      
+
       let whereConditions = [eq(collectiveTasks.siteId, siteId)];
-      
+
       if (options.status) {
         whereConditions.push(eq(collectiveTasks.status, options.status));
       }
@@ -943,7 +943,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .from(collectiveTasks)
         .leftJoin(users, eq(collectiveTasks.createdBy, users.id))
         .where(eq(collectiveTasks.id, taskId));
-      
+
       return task;
     } catch (error) {
       logger.error('Error getting collective task by ID:', error);
@@ -1006,10 +1006,10 @@ export class DatabaseSiteStorage implements ISiteStorage {
   async getUserTasks(siteId: string, userId: string): Promise<any[]> {
     try {
       logger.info(`getUserTasks called with siteId: ${siteId}, userId: ${userId}`);
-      
+
       // Use raw SQL to avoid Drizzle schema import issues
       const result = await db.execute(sql`
-        SELECT 
+        SELECT
           ct.id,
           ct.site_id as "siteId",
           ct.title,
@@ -1043,7 +1043,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       `);
 
       logger.info(`Query executed successfully, found ${result.rows.length} tasks for user ${userId}`);
-      
+
       // Transform the raw database results to match the expected format
       const tasks = result.rows.map((row: any) => ({
         id: row.id,
@@ -1114,7 +1114,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
   async getTaskAssignments(taskId: string): Promise<any[]> {
     try {
       const { taskAssignments, users } = await import("@shared/schema");
-      
+
       const assignments = await db
         .select({
           id: taskAssignments.id,
