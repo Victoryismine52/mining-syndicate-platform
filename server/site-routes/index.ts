@@ -11,7 +11,7 @@ import { insertSiteSchema, insertSiteLeadSchema, insertLegalDisclaimerSchema, in
 import { users } from "@shared/schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
-import { checkSiteAccess, requireAdmin, requireSiteManagerAccess } from "../site-access-control";
+import { checkSiteAccess, requireAdmin } from "../site-access-control";
 import { isAuthenticated } from "../google-auth";
 import { z } from "zod";
 import { registerSiteCreateRoutes } from "./site-create";
@@ -92,7 +92,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Update site
-  app.put("/api/sites/:siteId", requireSiteManagerAccess, async (req, res) => {
+  app.put("/api/sites/:siteId", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const { siteId } = req.params;
       const updates = req.body;
