@@ -113,12 +113,25 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const { siteId } = req.params;
       const updates = req.body;
 
-      // If updating siteId (slug), check availability
+      // If updating slug, check availability and map to the correct field
       if (updates.slug && updates.slug !== siteId) {
         const existingSite = await siteStorage.getSite(updates.slug);
         if (existingSite) {
           return res.status(400).json({ error: "Site URL is already taken" });
         }
+        // Map slug to the database field name
+        updates.slug = updates.slug;
+      }
+
+      // Handle siteId updates (legacy support)
+      if (updates.siteId && updates.siteId !== siteId) {
+        const existingSite = await siteStorage.getSite(updates.siteId);
+        if (existingSite) {
+          return res.status(400).json({ error: "Site URL is already taken" });
+        }
+        // Map siteId to slug field
+        updates.slug = updates.siteId;
+        delete updates.siteId;
       }
 
       const site = await siteStorage.updateSite(siteId, updates);
@@ -126,7 +139,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(404).json({ error: "Site not found" });
       }
 
-      res.json(site);
+      // Map slug back to siteId for UI compatibility
+      const responseData = {
+        ...site,
+        siteId: site.slug
+      };
+
+      res.json(responseData);
     } catch (error) {
       logger.error({ err: error }, `Error updating site ${req.params.siteId}`);
       res.status(500).json({ error: "Failed to update site" });
