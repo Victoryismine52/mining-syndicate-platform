@@ -267,7 +267,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Track analytics events for a site
   app.post("/api/sites/:siteId/analytics", async (req, res, next) => {
     try {
-      const { siteId } = req.params;
+      const { siteId } = z.object({
+        siteId: z.string().min(1, "Site slug required")
+      }).parse(req.params);
       const consentSchema = z.object({ status: z.literal('granted'), timestamp: z.number() });
       try {
         consentSchema.parse(req.body.consent);
@@ -339,7 +341,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Get site managers (admin or site managers can view)
   app.get("/api/sites/:siteId/managers", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
-      const { siteId } = req.params;
+      const { siteId } = z.object({
+        siteId: z.string().min(1, "Site slug required")
+      }).parse(req.params);
       const rows = await db
         .select({
           id: siteManagers.id,
@@ -1322,7 +1326,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Check role permissions (site manager or admin)
-      const userRole = await siteAccessControl.getUserRole(userId, siteId);
+      const userRole = await checkSiteAccess(siteId, userId, (req.user as any)?.isAdmin);
       if (!['site_manager', 'admin'].includes(userRole)) {
         return res.status(403).json({ error: 'Site manager permissions required' });
       }
@@ -1379,7 +1383,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Check role permissions (site manager or admin)
-      const userRole = await siteAccessControl.getUserRole(userId, siteId);
+      const userRole = await checkSiteAccess(siteId, userId, (req.user as any)?.isAdmin);
       if (!['site_manager', 'admin'].includes(userRole)) {
         return res.status(403).json({ error: 'Site manager permissions required' });
       }
@@ -1490,7 +1494,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Check role permissions (site manager or admin)
-      const userRole = await siteAccessControl.getUserRole(userId, siteId);
+      const userRole = await checkSiteAccess(siteId, userId, (req.user as any)?.isAdmin);
       if (!['site_manager', 'admin'].includes(userRole)) {
         return res.status(403).json({ error: 'Site manager permissions required' });
       }
@@ -1539,7 +1543,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Check role permissions (site manager or admin)
-      const userRole = await siteAccessControl.getUserRole(userId, siteId);
+      const userRole = await checkSiteAccess(siteId, userId, (req.user as any)?.isAdmin);
       if (!['site_manager', 'admin'].includes(userRole)) {
         return res.status(403).json({ error: 'Site manager permissions required' });
       }
@@ -1580,7 +1584,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Check role permissions (site manager or admin)
-      const userRole = await siteAccessControl.getUserRole(userId, siteId);
+      const userRole = await checkSiteAccess(siteId, userId, (req.user as any)?.isAdmin);
       if (!['site_manager', 'admin'].includes(userRole)) {
         return res.status(403).json({ error: 'Site manager permissions required' });
       }
@@ -1623,7 +1627,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Check role permissions (site manager or admin)
-      const userRole = await siteAccessControl.getUserRole(userId, siteId);
+      const userRole = await checkSiteAccess(siteId, userId, (req.user as any)?.isAdmin);
       if (!['site_manager', 'admin'].includes(userRole)) {
         return res.status(403).json({ error: 'Site manager permissions required' });
       }
@@ -1659,7 +1663,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       // Check role permissions (site manager or admin)
-      const userRole = await siteAccessControl.getUserRole(userId, siteId);
+      const userRole = await checkSiteAccess(siteId, userId, (req.user as any)?.isAdmin);
       if (!['site_manager', 'admin'].includes(userRole)) {
         return res.status(403).json({ error: 'Site manager permissions required' });
       }
