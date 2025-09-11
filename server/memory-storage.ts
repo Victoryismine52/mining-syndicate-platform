@@ -93,6 +93,10 @@ export class MemorySiteStorage implements ISiteStorage {
     return site;
   }
 
+  async updateSiteBySlug(slug: string, updates: Partial<InsertSite>): Promise<Site> {
+    return this.updateSite(slug, updates);
+  }
+
   async deleteSite(siteId: string): Promise<void> {
     this.data.sites = this.data.sites.filter((s) => s.siteId !== siteId);
   }

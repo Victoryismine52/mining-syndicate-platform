@@ -705,13 +705,16 @@ export function SiteAdmin(props: SiteAdminProps) {
       }
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: [`/api/sites/${siteId}`] });
       setIsEditSiteOpen(false);
       toast({
         title: "Success",
         description: "Site settings updated successfully",
       });
+      if (data.slug && data.slug !== siteId) {
+        window.location.replace(`/sites/${data.slug}`);
+      }
     },
     onError: (error: any) => {
       toast({
