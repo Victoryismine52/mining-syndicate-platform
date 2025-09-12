@@ -135,13 +135,13 @@ export async function setupAuth(app: Express) {
             profilePicture: profile.photos?.[0]?.value,
           };
 
-          logger.info('Upserting user:', userData.email);
+          logger.info(`Upserting user: ${userData.email}`);
           const user = await storage.upsertUser(userData);
           
-          logger.info('User authenticated successfully:', user.email);
+          logger.info(`User authenticated successfully: ${user.email}`);
           return done(null, user);
         } catch (error) {
-          logger.error('Error in Google OAuth strategy:', error);
+          logger.error(`Error in Google OAuth strategy: ${error}`);
           return done(error, false);
         }
       }
@@ -150,23 +150,23 @@ export async function setupAuth(app: Express) {
 
   // Serialize user for session
   passport.serializeUser((user: any, done) => {
-    logger.info('Serializing user:', user.id);
+    logger.info(`Serializing user: ${user.id}`);
     done(null, user.id);
   });
 
   // Deserialize user from session
   passport.deserializeUser(async (id: string, done) => {
     try {
-      logger.info('Deserializing user:', id);
+      logger.info(`Deserializing user: ${id}`);
       const user = await storage.getUser(id);
       if (!user) {
-        logger.info('User not found during deserialization:', id);
+        logger.info(`User not found during deserialization: ${id}`);
         return done(null, false);
       }
-      logger.info('Deserializing user:', user);
+      logger.info(`Deserializing user: ${user.email}`);
       done(null, user);
     } catch (error) {
-      logger.error('Error deserializing user:', error);
+      logger.error(`Error deserializing user: ${error}`);
       done(error, false);
     }
   });
@@ -177,7 +177,7 @@ export async function setupAuth(app: Express) {
     // Store redirect path in session if provided
     if (req.query.redirect) {
       req.session.redirectPath = req.query.redirect as string;
-      logger.info('Stored redirect path:', req.session.redirectPath);
+      logger.info(`Stored redirect path: ${req.session.redirectPath}`);
     }
     
     passport.authenticate('google', { 
@@ -192,11 +192,11 @@ export async function setupAuth(app: Express) {
     }),
     (req, res) => {
       logger.info('Google OAuth callback successful');
-      // Get redirect path from session or default to /sites
-      const redirectPath = req.session.redirectPath || '/sites';
+      // Get redirect path from session or default to /my-sites
+      const redirectPath = req.session.redirectPath || '/my-sites';
       delete req.session.redirectPath; // Clean up
       
-      logger.info('Redirecting user to:', redirectPath);
+      logger.info(`Redirecting user to: ${redirectPath}`);
       res.redirect(redirectPath);
     }
   );

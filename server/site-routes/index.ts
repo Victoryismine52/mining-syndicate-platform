@@ -38,6 +38,36 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
+  // Get sites that the current user manages
+  app.get("/api/user/managed-sites", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const isAdmin = user?.role === 'admin' || user?.isAdmin;
+
+      if (isAdmin) {
+        // Admins manage all sites
+        const sites = await siteStorage.listSites();
+        res.json(sites);
+      } else {
+        // Get sites where this user is a site manager
+        const allSites = await siteStorage.listSites();
+        const managedSites = [];
+        
+        for (const site of allSites) {
+          const isSiteManager = await siteStorage.isSiteManager(site.slug, user.email);
+          if (isSiteManager) {
+            managedSites.push(site);
+          }
+        }
+        
+        res.json(managedSites);
+      }
+    } catch (error) {
+      logger.error({ err: error }, "Error listing managed sites");
+      res.status(500).json({ error: "Failed to list managed sites" });
+    }
+  });
+
   // List all sites (including main site)
   app.get("/api/sites", isAuthenticated, async (req, res) => {
     try {
@@ -139,7 +169,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(404).json({ error: "Site not found" });
       }
 
-      logger.info(`Site updated successfully:`, site);
+      logger.info(`Site updated successfully: ${JSON.stringify(site)}`);
 
       // Map slug back to siteId for UI compatibility
       const responseData = {
@@ -230,7 +260,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
             logger.info(`Contact created/updated in HubSpot with ID: ${result.id}`);
             // Update the lead with HubSpot contact ID
             try {
-              await siteStorage.updateSiteLead(lead.id, { hubspotContactId: result.id });
+              await siteStorage.updateSiteLead(lead.id, { hubspotContactId: result.id } as any);
               logger.info(`Lead ${lead.id} updated with HubSpot contact ID ${result.id}`);
             } catch (updateError) {
               logger.error(
@@ -354,10 +384,10 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(404).json({ error: "Site not found" });
       }
 
-      const siteUrl = `${req.protocol}://${req.get('host')}/site/${site.siteId}`;
-      const qrCodeUrl = await qrGenerator.generateQRCode(siteUrl, site.siteId);
+      const siteUrl = `${req.protocol}://${req.get('host')}/site/${site.slug}`;
+      const qrCodeUrl = await qrGenerator.generateQRCode(siteUrl, site.slug);
 
-      const updatedSite = await siteStorage.updateSite(site.siteId, {
+      const updatedSite = await siteStorage.updateSite(site.id, {
         qrCodeUrl: qrCodeUrl
       });
 
@@ -545,7 +575,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const disclaimer = await siteStorage.createLegalDisclaimer(validatedData);
       res.json(disclaimer);
     } catch (error) {
-      logger.error("Error creating disclaimer:", error);
+      logger.error({ err: error }, "Error creating disclaimer");
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
@@ -559,7 +589,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const disclaimers = await siteStorage.listLegalDisclaimers();
       res.json(disclaimers);
     } catch (error) {
-      logger.error("Error fetching disclaimers:", error);
+      logger.error({ err: error }, "Error fetching disclaimers");
       res.status(500).json({ error: "Failed to fetch disclaimers" });
     }
   });
@@ -575,7 +605,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const disclaimers = await siteStorage.getAvailableDisclaimersForSiteType(site.siteType || 'general');
       res.json(disclaimers);
     } catch (error) {
-      logger.error("Error fetching available disclaimers:", error);
+      logger.error({ err: error }, "Error fetching available disclaimers");
       res.status(500).json({ error: "Failed to fetch available disclaimers" });
     }
   });
@@ -589,7 +619,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
       res.json(disclaimer);
     } catch (error) {
-      logger.error("Error fetching disclaimer:", error);
+      logger.error({ err: error }, "Error fetching disclaimer");
       res.status(500).json({ error: "Failed to fetch disclaimer" });
     }
   });
@@ -601,7 +631,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const disclaimer = await siteStorage.updateLegalDisclaimer(req.params.id, validatedData);
       res.json(disclaimer);
     } catch (error) {
-      logger.error("Error updating disclaimer:", error);
+      logger.error({ err: error }, "Error updating disclaimer");
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
@@ -615,7 +645,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.deleteLegalDisclaimer(req.params.id);
       res.json({ success: true });
     } catch (error) {
-      logger.error("Error deleting disclaimer:", error);
+      logger.error({ err: error }, "Error deleting disclaimer");
       res.status(500).json({ error: "Failed to delete disclaimer" });
     }
   });
@@ -642,7 +672,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       );
       res.json(attachment);
     } catch (error) {
-      logger.error("Error attaching disclaimer:", error);
+      logger.error({ err: error }, "Error attaching disclaimer");
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
@@ -656,7 +686,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const disclaimers = await siteStorage.getSiteDisclaimers(req.params.slug);
       res.json(disclaimers);
     } catch (error) {
-      logger.error("Error fetching site disclaimers:", error);
+      logger.error({ err: error }, "Error fetching site disclaimers");
       res.status(500).json({ error: "Failed to fetch site disclaimers" });
     }
   });
@@ -667,7 +697,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.detachDisclaimerFromSite(req.params.slug, req.params.disclaimerId);
       res.json({ success: true });
     } catch (error) {
-      logger.error("Error detaching disclaimer:", error);
+      logger.error({ err: error }, "Error detaching disclaimer");
       res.status(500).json({ error: "Failed to detach disclaimer" });
     }
   });
@@ -717,7 +747,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const uploadURL = await objectStorageService.getSlideUploadURL();
       res.json({ uploadURL });
     } catch (error) {
-      logger.error("Error getting upload URL:", error);
+      logger.error({ err: error }, "Error getting upload URL");
       res.status(500).json({ error: "Failed to get upload URL" });
     }
   });
@@ -739,7 +769,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const slide = await siteStorage.createSiteSlide(validatedData);
       res.json(slide);
     } catch (error) {
-      logger.error("Error creating slide:", error);
+      logger.error({ err: error }, "Error creating slide");
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
@@ -760,7 +790,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const slide = await siteStorage.updateSiteSlide(req.params.slideId, validatedData);
       res.json(slide);
     } catch (error) {
-      logger.error("Error updating slide:", error);
+      logger.error({ err: error }, "Error updating slide");
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
@@ -774,7 +804,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.deleteSiteSlide(req.params.slideId);
       res.json({ success: true });
     } catch (error) {
-      logger.error("Error deleting slide:", error);
+      logger.error({ err: error }, "Error deleting slide");
       res.status(500).json({ error: "Failed to delete slide" });
     }
   });
@@ -791,7 +821,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.reorderSiteSlides(req.params.slug, slideOrders);
       res.json({ success: true });
     } catch (error) {
-      logger.error("Error reordering slides:", error);
+      logger.error({ err: error }, "Error reordering slides");
       res.status(500).json({ error: "Failed to reorder slides" });
     }
   });
@@ -864,7 +894,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const globalSlides = await siteStorage.getGlobalSlides();
       res.json(globalSlides);
     } catch (error) {
-      logger.error("Error fetching global slides:", error);
+      logger.error({ err: error }, "Error fetching global slides");
       res.status(500).json({ error: "Failed to fetch global slides" });
     }
   });
@@ -878,7 +908,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
       res.json(globalSlide);
     } catch (error) {
-      logger.error("Error fetching global slide:", error);
+      logger.error({ err: error }, "Error fetching global slide");
       res.status(500).json({ error: "Failed to fetch global slide" });
     }
   });
@@ -905,7 +935,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       });
       res.json(newSlide);
     } catch (error) {
-      logger.error("Error creating global slide:", error);
+      logger.error({ err: error }, "Error creating global slide");
       res.status(500).json({ error: "Failed to create global slide" });
     }
   });
@@ -917,7 +947,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const uploadURL = await objectStorageService.getSlideUploadURL();
       res.json({ uploadURL });
     } catch (error) {
-      logger.error("Error generating upload URL:", error);
+      logger.error({ err: error }, "Error generating upload URL");
       res.status(500).json({ error: "Failed to generate upload URL" });
     }
   });
@@ -932,7 +962,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
       res.json(updatedSlide);
     } catch (error) {
-      logger.error("Error updating global slide visibility:", error);
+      logger.error({ err: error }, "Error updating global slide visibility");
       res.status(500).json({ error: "Failed to update global slide visibility" });
     }
   });
@@ -948,7 +978,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
       res.json({ success: true, message: "Global slide deleted successfully" });
     } catch (error) {
-      logger.error("Error deleting global slide:", error);
+      logger.error({ err: error }, "Error deleting global slide");
       res.status(500).json({ error: "Failed to delete global slide" });
     }
   });
@@ -970,7 +1000,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const updatedSlides = await siteStorage.getGlobalSlides();
       res.json(updatedSlides);
     } catch (error) {
-      logger.error("Error reordering global slides:", error);
+      logger.error({ err: error }, "Error reordering global slides");
       res.status(500).json({ error: "Failed to reorder global slides" });
     }
   });
@@ -1008,7 +1038,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const sections = await siteStorage.getSiteSections(siteId);
       res.json(sections);
     } catch (error) {
-      logger.error("Error fetching sections:", error);
+      logger.error({ err: error }, "Error fetching sections");
       res.status(500).json({ error: "Failed to fetch sections" });
     }
   });
@@ -1047,7 +1077,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const newSection = await siteStorage.createSiteSection(sectionData);
       res.json(newSection);
     } catch (error) {
-      logger.error("Error creating section:", error);
+      logger.error({ err: error }, "Error creating section");
       res.status(500).json({ error: "Failed to create section" });
     }
   });
@@ -1074,7 +1104,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const updatedSection = await siteStorage.updateSiteSection(sectionId, updates);
       res.json(updatedSection);
     } catch (error) {
-      logger.error("Error updating section:", error);
+      logger.error({ err: error }, "Error updating section");
       res.status(500).json({ error: "Failed to update section" });
     }
   });
@@ -1100,7 +1130,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.deleteSiteSection(sectionId);
       res.json({ success: true, message: "Section deleted successfully" });
     } catch (error) {
-      logger.error("Error deleting section:", error);
+      logger.error({ err: error }, "Error deleting section");
       res.status(500).json({ error: "Failed to delete section" });
     }
   });
@@ -1125,7 +1155,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const memberships = await siteStorage.getSiteMemberships(siteId);
       res.json(memberships);
     } catch (error) {
-      logger.error("Error fetching site memberships:", error);
+      logger.error({ err: error }, "Error fetching site memberships");
       res.status(500).json({ error: "Failed to fetch site memberships" });
     }
   });
@@ -1149,7 +1179,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.status(201).json(membership);
     } catch (error) {
-      logger.error("Error creating site membership:", error);
+      logger.error({ err: error }, "Error creating site membership");
       res.status(500).json({ error: "Failed to create site membership" });
     }
   });
@@ -1167,7 +1197,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.json(membership);
     } catch (error) {
-      logger.error("Error updating site membership:", error);
+      logger.error({ err: error }, "Error updating site membership");
       res.status(500).json({ error: "Failed to update site membership" });
     }
   });
@@ -1184,7 +1214,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       res.json({ success: true, message: "Membership deleted successfully" });
     } catch (error) {
-      logger.error("Error deleting site membership:", error);
+      logger.error({ err: error }, "Error deleting site membership");
       res.status(500).json({ error: "Failed to delete site membership" });
     }
   });
@@ -1196,7 +1226,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const memberships = await siteStorage.getUserMemberships(user.id);
       res.json(memberships);
     } catch (error) {
-      logger.error("Error fetching user memberships:", error);
+      logger.error({ err: error }, "Error fetching user memberships");
       res.status(500).json({ error: "Failed to fetch user memberships" });
     }
   });
@@ -1231,7 +1261,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         permissions: membership.permissions
       });
     } catch (error) {
-      logger.error('Error checking membership:', error);
+      logger.error({ err: error }, 'Error checking membership');
       res.status(500).json({ error: 'Failed to check membership' });
     }
   });
@@ -1262,7 +1292,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(memberships);
     } catch (error) {
-      logger.error('Error getting members:', error);
+      logger.error({ err: error }, 'Error getting members');
       res.status(500).json({ error: 'Failed to get members' });
     }
   });
@@ -1312,7 +1342,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         redirectUrl: `/site/${siteId}/home`
       });
     } catch (error) {
-      logger.error('Error joining collective:', error);
+      logger.error({ err: error }, 'Error joining collective');
       res.status(500).json({ error: 'Failed to join collective' });
     }
   });
@@ -1342,7 +1372,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const userTasks = await siteStorage.getUserTasks(siteId, userId);
       return res.json(userTasks);
     } catch (error) {
-      logger.error('Error getting user tasks:', error);
+      logger.error({ err: error }, 'Error getting user tasks');
       res.status(500).json({ error: 'Failed to get tasks' });
     }
   });
@@ -1379,7 +1409,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(tasks);
     } catch (error) {
-      logger.error('Error getting collective tasks:', error);
+      logger.error({ err: error }, 'Error getting collective tasks');
       res.status(500).json({ error: 'Failed to get tasks' });
     }
   });
@@ -1474,7 +1504,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json({ ...task, assignedCount: targetUserIds.length });
     } catch (error) {
-      logger.error('Error creating task:', error);
+      logger.error({ err: error }, 'Error creating task');
       res.status(500).json({ error: 'Failed to create task' });
     }
   });
@@ -1510,7 +1540,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           return [];
       }
     } catch (error) {
-      logger.error('Error getting assignment target users:', error);
+      logger.error({ err: error }, 'Error getting assignment target users');
       return [];
     }
   }
@@ -1560,7 +1590,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const updatedTask = await siteStorage.updateCollectiveTask(taskId, updates);
       return res.json(updatedTask);
     } catch (error) {
-      logger.error('Error updating task:', error);
+      logger.error({ err: error }, 'Error updating task');
       res.status(500).json({ error: 'Failed to update task' });
     }
   });
@@ -1596,7 +1626,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.deleteCollectiveTask(taskId);
       return res.json({ success: true, message: 'Task deleted successfully' });
     } catch (error) {
-      logger.error('Error deleting task:', error);
+      logger.error({ err: error }, 'Error deleting task');
       res.status(500).json({ error: 'Failed to delete task' });
     }
   });
@@ -1644,7 +1674,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const assignment = await siteStorage.assignTaskToUser(taskId, assigneeUserId, userId);
       return res.json(assignment);
     } catch (error) {
-      logger.error('Error assigning task:', error);
+      logger.error({ err: error }, 'Error assigning task');
       res.status(500).json({ error: 'Failed to assign task' });
     }
   });
@@ -1680,7 +1710,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       await siteStorage.unassignTaskFromUser(taskId, assigneeUserId);
       return res.json({ success: true, message: 'Task unassigned successfully' });
     } catch (error) {
-      logger.error('Error unassigning task:', error);
+      logger.error({ err: error }, 'Error unassigning task');
       res.status(500).json({ error: 'Failed to unassign task' });
     }
   });
@@ -1716,7 +1746,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const assignments = await siteStorage.getTaskAssignments(taskId);
       return res.json(assignments);
     } catch (error) {
-      logger.error('Error getting task assignments:', error);
+      logger.error({ err: error }, 'Error getting task assignments');
       res.status(500).json({ error: 'Failed to get task assignments' });
     }
   });
@@ -1757,7 +1787,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(messages);
     } catch (error) {
-      logger.error('Error getting messages:', error);
+      logger.error({ err: error }, 'Error getting messages');
       res.status(500).json({ error: 'Failed to get messages' });
     }
   });
@@ -1808,7 +1838,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(messageWithSender);
     } catch (error) {
-      logger.error('Error sending message:', error);
+      logger.error({ err: error }, 'Error sending message');
       res.status(500).json({ error: 'Failed to send message' });
     }
   });
@@ -1858,7 +1888,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(blogPosts);
     } catch (error) {
-      logger.error('Error getting blog posts:', error);
+      logger.error({ err: error }, 'Error getting blog posts');
       res.status(500).json({ error: 'Failed to get blog posts' });
     }
   });
@@ -1911,7 +1941,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(blogPost);
     } catch (error) {
-      logger.error('Error getting blog post:', error);
+      logger.error({ err: error }, 'Error getting blog post');
       res.status(500).json({ error: 'Failed to get blog post' });
     }
   });
@@ -1981,7 +2011,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(blogPost);
     } catch (error) {
-      logger.error('Error creating blog post:', error);
+      logger.error({ err: error }, 'Error creating blog post');
       if (error.message?.includes('duplicate key')) {
         return res.status(409).json({ error: 'A post with this title already exists for this site' });
       }
@@ -2057,7 +2087,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(updatedPost);
     } catch (error) {
-      logger.error('Error updating blog post:', error);
+      logger.error({ err: error }, 'Error updating blog post');
       if (error.message?.includes('duplicate key')) {
         return res.status(409).json({ error: 'A post with this title already exists for this site' });
       }
@@ -2119,7 +2149,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json(updatedPost);
     } catch (error) {
-      logger.error('Error updating blog post status:', error);
+      logger.error({ err: error }, 'Error updating blog post status');
       res.status(500).json({ error: 'Failed to update blog post status' });
     }
   });
@@ -2166,7 +2196,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       return res.json({ success: true, message: 'Blog post deleted successfully' });
     } catch (error) {
-      logger.error('Error deleting blog post:', error);
+      logger.error({ err: error }, 'Error deleting blog post');
       res.status(500).json({ error: 'Failed to delete blog post' });
     }
   });

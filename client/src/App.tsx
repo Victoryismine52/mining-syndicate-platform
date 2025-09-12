@@ -29,6 +29,7 @@ import BuilderLab from "@/pages/BuilderLab";
 import { CardBuilderApp } from "../../packages/card-builder";
 import { CodeExplorerApp } from "../../packages/code-explorer";
 import FunctionSearchPage from "@/pages/function-search";
+import { MySites } from "@/pages/my-sites";
 
 function Router() {
   return (
@@ -39,6 +40,9 @@ function Router() {
       <AdminRoute path="/admin" component={AdminDashboard} />
       <AdminRoute path="/sites" component={SiteManager} />
       <AdminRoute path="/disclaimers" component={LegalDisclaimers} />
+      
+      {/* Site manager routes */}
+      <ProtectedRoute path="/my-sites" component={MySites} />
       <Route path="/site/:slug/admin">
         {(params) => (
           <SiteAdminRoute

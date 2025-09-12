@@ -14,7 +14,7 @@ export function Login() {
     if (!isLoading && user) {
       // Check if there's a redirect parameter in the URL
       const params = new URLSearchParams(window.location.search);
-      const redirectTo = params.get('redirect') || '/sites';
+      const redirectTo = params.get('redirect') || '/my-sites';
       
       // Decode the redirect URL if it was encoded
       const decodedRedirectTo = decodeURIComponent(redirectTo);
