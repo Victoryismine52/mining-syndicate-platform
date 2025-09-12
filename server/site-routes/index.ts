@@ -176,11 +176,26 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(404).json({ error: "Site not found" });
       }
 
-      const leadData = insertSiteLeadSchema.parse(req.body);
+      // Separate standard lead fields from dynamic form fields
+      const { 
+        firstName, lastName, email, phone, company, 
+        identifier, identifierType, formType, submissionCount,
+        miningAmount, lendingAmount, slug, ...dynamicFormData 
+      } = req.body;
 
-      // Add tracking information
+      // Validate standard fields using the schema
+      const standardLeadData = {
+        firstName, lastName, email, phone, company,
+        identifier, identifierType, formType, submissionCount,
+        miningAmount, lendingAmount, slug
+      };
+      
+      const validatedData = insertSiteLeadSchema.parse(standardLeadData);
+
+      // Add tracking information and dynamic form data
       const fullLeadData = {
-        ...leadData,
+        ...validatedData,
+        formData: dynamicFormData, // Store extensible_list arrays and other dynamic fields in formData JSONB
         siteId,
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
