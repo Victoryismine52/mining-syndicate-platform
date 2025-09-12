@@ -63,9 +63,9 @@ export const sites = pgTable('sites', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// Site managers table - Junction table for site access control
+// Site managers table - Junction table for site access control  
 export const siteManagers = pgTable('site_managers', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: varchar('id').primaryKey().default(sql`gen_random_uuid()`), // Keep existing varchar type
   siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
   userEmail: varchar('user_email', { length: 255 }).notNull(), // Email of the site manager
   createdAt: timestamp('created_at').defaultNow(),
