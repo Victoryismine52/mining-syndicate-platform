@@ -169,7 +169,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteLeads)
-      .where(eq(siteLeads.siteId, site.slug))
+      .where(eq(siteLeads.siteId, site.id))
       .orderBy(desc(siteLeads.createdAt));
   }
 
@@ -183,7 +183,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteLeads)
-      .where(and(eq(siteLeads.siteId, site.slug), eq(siteLeads.formType, formType)))
+      .where(and(eq(siteLeads.siteId, site.id), eq(siteLeads.formType, formType)))
       .orderBy(desc(siteLeads.createdAt));
   }
 
@@ -218,7 +218,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteAnalytics)
-      .where(eq(siteAnalytics.siteId, site.slug))
+      .where(eq(siteAnalytics.siteId, site.id))
       .orderBy(desc(siteAnalytics.createdAt))
       .limit(limit);
   }
@@ -237,7 +237,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .select()
       .from(siteManagers)
       .where(and(
-        eq(siteManagers.siteId, site.id),
+        eq(siteManagers.siteId, site.slug),
         sql`LOWER(${siteManagers.userEmail}) = LOWER(${userEmail})`
       ))
       .limit(1);

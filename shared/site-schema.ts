@@ -66,7 +66,7 @@ export const sites = pgTable('sites', {
 // Site managers table - Junction table for site access control
 export const siteManagers = pgTable('site_managers', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
+  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
   userEmail: varchar('user_email', { length: 255 }).notNull(), // Email of the site manager
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -242,7 +242,7 @@ export const sitesRelations = relations(sites, ({ many }) => ({
 export const siteManagersRelations = relations(siteManagers, ({ one }) => ({
   site: one(sites, {
     fields: [siteManagers.siteId],
-    references: [sites.id], // Reference permanent ID
+    references: [sites.slug], // Reference site slug
   }),
 }));
 

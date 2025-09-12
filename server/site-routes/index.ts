@@ -423,7 +423,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         })
         .from(siteManagers)
         .leftJoin(users, eq(siteManagers.userEmail, users.email))
-        .where(eq(siteManagers.siteId, site.id));
+        .where(eq(siteManagers.siteId, site.slug));
 
       const managers: SiteManagerWithAccount[] = rows.map((row) => ({
         id: row.id,
