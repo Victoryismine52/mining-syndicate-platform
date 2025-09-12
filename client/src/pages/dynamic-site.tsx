@@ -204,7 +204,7 @@ export function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorT
       let fieldSchema: any;
 
       // Handle array fields first since they have completely different schema structure
-      if (field.fieldLibrary.dataType === 'array') {
+      if (field.fieldLibrary.dataType === 'array' || field.fieldLibrary.dataType === 'extensible_list') {
         const options = field.fieldLibrary.defaultValidation?.options || [];
         if (options.length > 0) {
           // For array fields with predefined options (multiselect)
@@ -228,12 +228,15 @@ export function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorT
         } else {
           // For array fields without predefined options (extensible lists)
           const minItems = field.fieldLibrary.defaultValidation?.minItems || 0;
-          fieldSchema = z.array(z.string());
+          fieldSchema = z.array(z.string().min(1)); // Ensure each item is a non-empty string
 
           if (field.isRequired && minItems > 0) {
             fieldSchema = fieldSchema.min(minItems, msgs.atLeastOne);
           } else if (field.isRequired) {
             fieldSchema = fieldSchema.min(1, msgs.atLeastOne);
+          } else {
+            // For optional extensible lists, allow empty arrays
+            fieldSchema = fieldSchema.optional().default([]);
           }
         }
       }
@@ -312,8 +315,8 @@ export function DynamicFormModal({ isOpen, onClose, formTemplate, siteId, colorT
         return;
       }
       const fieldName = field.fieldLibrary.name;
-      // Array fields should default to empty array, others to empty string
-      defaultValues[fieldName] = field.fieldLibrary.dataType === 'array' ? [] : "";
+      // Array and extensible_list fields should default to empty array, others to empty string
+      defaultValues[fieldName] = (field.fieldLibrary.dataType === 'array' || field.fieldLibrary.dataType === 'extensible_list') ? [] : "";
     });
 
     return defaultValues;
