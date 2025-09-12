@@ -440,8 +440,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
-  // Add site manager (admin only)
-  app.post("/api/sites/:slug/managers", isAuthenticated, requireAdmin, async (req, res) => {
+  // Add site manager (admin or site manager only)
+  app.post("/api/sites/:slug/managers", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const { userEmail } = req.body;
       const { slug } = req.params;
@@ -513,8 +513,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
-  // Remove site manager (admin only)
-  app.delete("/api/sites/:slug/managers/:userEmail", isAuthenticated, requireAdmin, async (req, res) => {
+  // Remove site manager (admin or site manager only)
+  app.delete("/api/sites/:slug/managers/:userEmail", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const { slug, userEmail } = req.params;
       const decodedEmail = decodeURIComponent(userEmail);

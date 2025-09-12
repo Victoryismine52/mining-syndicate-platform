@@ -231,9 +231,24 @@ export class DatabaseSiteStorage implements ISiteStorage {
       throw new Error(`Site not found with slug: ${slug}`);
     }
 
+    // Check if manager already exists (case-insensitive)
+    const existingManager = await db
+      .select()
+      .from(siteManagers)
+      .where(and(
+        eq(siteManagers.siteId, site.id),
+        sql`LOWER(${siteManagers.userEmail}) = LOWER(${userEmail})`
+      ))
+      .limit(1);
+    
+    if (existingManager.length > 0) {
+      throw new Error('User is already a site manager');
+    }
+
+    // Normalize email to lowercase before insertion
     const [manager] = await db
       .insert(siteManagers)
-      .values({ siteId: site.id, userEmail })
+      .values({ siteId: site.id, userEmail: userEmail.toLowerCase() })
       .returning();
     return manager;
   }
@@ -249,7 +264,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .delete(siteManagers)
       .where(and(
         eq(siteManagers.siteId, site.id),
-        eq(siteManagers.userEmail, userEmail)
+        sql`LOWER(${siteManagers.userEmail}) = LOWER(${userEmail})`
       ));
   }
 
@@ -278,7 +293,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .from(siteManagers)
       .where(and(
         eq(siteManagers.siteId, site.id),
-        eq(siteManagers.userEmail, userEmail)
+        sql`LOWER(${siteManagers.userEmail}) = LOWER(${userEmail})`
       ));
     return !!manager;
   }

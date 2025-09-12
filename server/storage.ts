@@ -1,7 +1,7 @@
 import { users, leads, slideSettings, accessRequests, accessList, formTemplates, fieldLibrary, formTemplateFields, landingPageTemplates, siteFormAssignments, siteLandingConfigs, siteMemberships, siteMemberProfiles, type User, type InsertUser, type Lead, type InsertLead, type SlideSetting, type InsertSlideSetting, type AccessRequest, type InsertAccessRequest, type AccessListEntry, type UpsertUser, type FormTemplate, type InsertFormTemplate, type FieldLibrary, type InsertFieldLibrary, type FormTemplateField, type InsertFormTemplateField, type LandingPageTemplate, type InsertLandingPageTemplate, type SiteFormAssignment, type InsertSiteFormAssignment, type SiteLandingConfig, type InsertSiteLandingConfig, type SiteMembership, type InsertSiteMembership, type SiteMemberProfile, type InsertSiteMemberProfile } from "@shared/schema";
 import { siteLeads, sites, type SiteLead } from "@shared/site-schema";
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { logger } from './logger';
 
 export interface IStorage {
@@ -90,7 +90,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
+    const [user] = await db.select().from(users).where(sql`LOWER(${users.email}) = LOWER(${email})`);
     return user || undefined;
   }
 
@@ -100,8 +100,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser & { isAdmin?: boolean }): Promise<User> {
-    // Check if user is bnelson523@gmail.com and make them admin
-    const isAdmin = insertUser.email === "bnelson523@gmail.com" || insertUser.isAdmin || false;
+    // Check if user is bnelson523@gmail.com and make them admin (case-insensitive)
+    const isAdmin = insertUser.email.toLowerCase() === "bnelson523@gmail.com" || insertUser.isAdmin || false;
     
     const [user] = await db
       .insert(users)
@@ -260,13 +260,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async checkUserAccess(email: string): Promise<boolean> {
-    // bnelson523@gmail.com always has access
-    if (email === "bnelson523@gmail.com") {
+    // bnelson523@gmail.com always has access (case-insensitive)
+    if (email.toLowerCase() === "bnelson523@gmail.com") {
       return true;
     }
 
-    // Check if user is in the access list
-    const [accessEntry] = await db.select().from(accessList).where(eq(accessList.email, email));
+    // Check if user is in the access list (case-insensitive)
+    const [accessEntry] = await db.select().from(accessList).where(sql`LOWER(${accessList.email}) = LOWER(${email})`);
     return !!accessEntry;
   }
 
