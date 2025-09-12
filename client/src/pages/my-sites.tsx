@@ -1,20 +1,49 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Eye, BarChart3, Users, ArrowRight, Globe } from 'lucide-react';
+import { Settings, Eye, BarChart3, Users, ArrowRight, Globe, Layers } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 import type { Site } from '@shared/site-schema';
 
 export function MySites() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch sites that this user is a manager for
   const { data: managedSites = [], isLoading } = useQuery<Site[]>({
     queryKey: ['/api/user/managed-sites'],
     enabled: !!user,
+  });
+
+  // Mutation to toggle isLaunched status
+  const toggleLaunchMutation = useMutation({
+    mutationFn: async ({ slug, isLaunched }: { slug: string; isLaunched: boolean }) => {
+      return await apiRequest(`/api/sites/${slug}`, {
+        method: 'PUT',
+        body: { isLaunched }
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/managed-sites'] });
+      toast({
+        title: "Status Updated",
+        description: `Site is now ${data.isLaunched ? 'launched' : 'in draft mode'}.`
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update site status",
+        variant: "destructive"
+      });
+    }
   });
 
   const getSiteTypeDisplay = (siteType: string | null) => {
@@ -76,26 +105,45 @@ export function MySites() {
               return (
                 <Card key={site.id} className="bg-slate-800 border-slate-600 hover:border-slate-500 transition-colors">
                   <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-white text-lg mb-2 truncate">
-                          {site.name}
+                    <div className="flex items-start gap-3">
+                      {/* Status badge moved to left */}
+                      <Badge variant={site.isLaunched ? "default" : "secondary"} className="shrink-0">
+                        {site.isLaunched ? "Live" : "Draft"}
+                      </Badge>
+                      
+                      {/* Site name moved to center/main area with improved truncation */}
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-white text-lg mb-1 truncate" title={site.name}>
+                          {site.name.length > 25 ? `${site.name.substring(0, 25)}...` : site.name}
                         </CardTitle>
-                        <CardDescription className="text-slate-400 text-sm">
+                        <CardDescription className="text-slate-400 text-sm truncate">
                           {site.slug}
                         </CardDescription>
                       </div>
+                      
+                      {/* Site type badge moved to right */}
                       <Badge className={`${typeDisplay.color} text-white shrink-0`}>
                         {typeDisplay.text}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {/* Launch status toggle for site managers */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">Status:</span>
-                      <Badge variant={site.isLaunched ? "default" : "secondary"}>
-                        {site.isLaunched ? "Launched" : "Draft"}
-                      </Badge>
+                      <span className="text-slate-400">Launch Status:</span>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={site.isLaunched}
+                          onCheckedChange={(checked) => {
+                            toggleLaunchMutation.mutate({ slug: site.slug, isLaunched: checked });
+                          }}
+                          disabled={toggleLaunchMutation.isPending}
+                          data-testid={`switch-launch-${site.slug}`}
+                        />
+                        <span className="text-xs text-slate-400">
+                          {site.isLaunched ? "Live" : "Draft"}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-2">
@@ -111,9 +159,10 @@ export function MySites() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setLocation(`/site/${site.slug}/admin`)}
+                        onClick={() => setLocation(`/site/${site.slug}/admin?tab=settings`)}
                         className="text-purple-400 border-purple-400 hover:bg-purple-400/10"
-                        data-testid={`button-admin-${site.slug}`}
+                        data-testid={`button-settings-${site.slug}`}
+                        title="Site Settings"
                       >
                         <Settings className="w-4 h-4" />
                       </Button>
@@ -123,6 +172,7 @@ export function MySites() {
                         onClick={() => setLocation(`/site/${site.slug}/admin?tab=leads`)}
                         className="text-green-400 border-green-400 hover:bg-green-400/10"
                         data-testid={`button-leads-${site.slug}`}
+                        title="Analytics"
                       >
                         <BarChart3 className="w-4 h-4" />
                       </Button>
@@ -130,10 +180,12 @@ export function MySites() {
 
                     <div className="pt-2">
                       <Button
-                        onClick={() => setLocation(`/site/${site.slug}/admin`)}
+                        onClick={() => setLocation(`/site/${site.slug}/admin?tab=forms`)}
                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                         data-testid={`button-manage-${site.slug}`}
+                        title="Card Management"
                       >
+                        <Layers className="w-4 h-4 mr-2" />
                         Manage Site
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
