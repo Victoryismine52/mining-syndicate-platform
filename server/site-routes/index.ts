@@ -218,13 +218,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         email: dynamicFormData.email || otherFields.email,
         phone: dynamicFormData.phone || otherFields.phone,
         company: dynamicFormData.company || otherFields.company,
-        identifier: otherFields.identifier || dynamicFormData.email || dynamicFormData.identifier,
+        identifier: otherFields.identifier || dynamicFormData.email || dynamicFormData.identifier || dynamicFormData.email || `unknown-${Date.now()}`,
         identifierType: otherFields.identifierType || 'email',
         formType: otherFields.formType || 'dynamic-form',
         submissionCount: otherFields.submissionCount || '1',
         miningAmount: dynamicFormData.miningAmount || otherFields.miningAmount,
         lendingAmount: dynamicFormData.lendingAmount || otherFields.lendingAmount,
-        slug: siteId // Will be replaced with site.slug in fullLeadData
+        slug: siteId // Use slug from URL params for validation
       };
       
       const validatedData = insertSiteLeadSchema.parse(standardLeadData);
