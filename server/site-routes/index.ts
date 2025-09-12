@@ -71,8 +71,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         const accessibleSites = allSites.filter(site => {
           // Include all launched sites (public access)
           if (site.isLaunched) return true;
-          // Include sites user is a member of
-          if (memberSiteIds.includes(site.slug)) return true;
+          // Include sites user is a member of (compare UUIDs to UUIDs)
+          if (memberSiteIds.includes(site.id)) return true;
           return false;
         });
 
