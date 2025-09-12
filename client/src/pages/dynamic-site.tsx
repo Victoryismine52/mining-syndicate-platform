@@ -108,7 +108,7 @@ function getSiteGradient(gradientType?: string) {
 }
 
 interface DynamicSiteParams {
-  siteId: string;
+  slug: string;
 }
 
 interface PitchSiteInterfaceProps {
@@ -1488,7 +1488,7 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
 }
 
 export function DynamicSite() {
-  const { siteId } = useParams<DynamicSiteParams>();
+  const { slug: siteId } = useParams<DynamicSiteParams>();
   const { user } = useAuth();
   
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
