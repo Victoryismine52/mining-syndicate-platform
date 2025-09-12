@@ -176,18 +176,25 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(404).json({ error: "Site not found" });
       }
 
-      // Separate standard lead fields from dynamic form fields
-      const { 
-        firstName, lastName, email, phone, company, 
-        identifier, identifierType, formType, submissionCount,
-        miningAmount, lendingAmount, slug, ...dynamicFormData 
-      } = req.body;
-
-      // Validate standard fields using the schema
+      // Handle payload from SimpleFormModal: { formTemplateId?, formData: {...} } or direct fields
+      const { formTemplateId, formData: submittedFormData, ...otherFields } = req.body;
+      
+      const dynamicFormData = submittedFormData || {};
+      
+      // Extract or derive standard fields for validation (exclude fields not in schema)
       const standardLeadData = {
-        firstName, lastName, email, phone, company,
-        identifier, identifierType, formType, submissionCount,
-        miningAmount, lendingAmount, slug
+        firstName: dynamicFormData.firstName || otherFields.firstName,
+        lastName: dynamicFormData.lastName || otherFields.lastName,
+        email: dynamicFormData.email || otherFields.email,
+        phone: dynamicFormData.phone || otherFields.phone,
+        company: dynamicFormData.company || otherFields.company,
+        identifier: otherFields.identifier || dynamicFormData.email || dynamicFormData.identifier,
+        identifierType: otherFields.identifierType || 'email',
+        formType: otherFields.formType || 'dynamic-form',
+        submissionCount: otherFields.submissionCount || '1',
+        miningAmount: dynamicFormData.miningAmount || otherFields.miningAmount,
+        lendingAmount: dynamicFormData.lendingAmount || otherFields.lendingAmount,
+        slug: siteId // Will be replaced with site.slug in fullLeadData
       };
       
       const validatedData = insertSiteLeadSchema.parse(standardLeadData);
@@ -195,8 +202,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Add tracking information and dynamic form data
       const fullLeadData = {
         ...validatedData,
+        formTemplateId,
         formData: dynamicFormData, // Store extensible_list arrays and other dynamic fields in formData JSONB
-        siteId,
+        siteId: site.id, // Use the actual UUID, not slug
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
         referrer: req.get('Referrer'),
@@ -210,11 +218,11 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       if (hubspotService) {
         try {
           const contactData: ContactData = {
-            firstName: leadData.firstName || undefined,
-            lastName: leadData.lastName || undefined,
-            email: leadData.email || undefined,
-            phone: leadData.phone || undefined,
-            company: leadData.company || undefined,
+            firstName: validatedData.firstName || undefined,
+            lastName: validatedData.lastName || undefined,
+            email: validatedData.email || undefined,
+            phone: validatedData.phone || undefined,
+            company: validatedData.company || undefined,
           };
 
           const result = await hubspotService.createContact(contactData);
@@ -242,7 +250,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         const formIds = site.hubspotFormIds as any;
         let hubspotFormId = '';
 
-        switch (leadData.formType) {
+        switch (validatedData.formType) {
           case 'learn-more':
             hubspotFormId = formIds.learnMore || '';
             break;
@@ -257,19 +265,19 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         if (hubspotFormId) {
           try {
             await submitToHubSpotForm(hubspotFormId, {
-              firstName: leadData.firstName,
-              lastName: leadData.lastName,
-              email: leadData.email,
-              phone: leadData.phone || '',
-              interests: leadData.interests || [],
-              formType: leadData.formType,
-              message: leadData.message,
-              miningAmount: leadData.miningAmount,
-              lendingAmount: leadData.lendingAmount,
+              firstName: validatedData.firstName,
+              lastName: validatedData.lastName,
+              email: validatedData.email,
+              phone: validatedData.phone || '',
+              interests: dynamicFormData.interests || [],
+              formType: validatedData.formType,
+              message: dynamicFormData.message,
+              miningAmount: validatedData.miningAmount,
+              lendingAmount: validatedData.lendingAmount,
               // Add site-specific qualifiers
               siteName: site.name,
-              siteId: site.siteId,
-              leadSource: `Site: ${site.name} (${site.siteId})`,
+              siteId: site.id,
+              leadSource: `Site: ${site.name} (${site.slug})`,
             });
           } catch (hubspotError) {
             logger.error({ err: hubspotError }, "HubSpot form submission failed");
