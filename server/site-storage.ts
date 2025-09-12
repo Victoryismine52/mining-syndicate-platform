@@ -169,7 +169,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteLeads)
-      .where(eq(siteLeads.siteId, site.id))
+      .where(eq(siteLeads.siteId, site.slug))
       .orderBy(desc(siteLeads.createdAt));
   }
 
@@ -183,7 +183,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteLeads)
-      .where(and(eq(siteLeads.siteId, site.id), eq(siteLeads.formType, formType)))
+      .where(and(eq(siteLeads.siteId, site.slug), eq(siteLeads.formType, formType)))
       .orderBy(desc(siteLeads.createdAt));
   }
 
@@ -218,7 +218,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteAnalytics)
-      .where(eq(siteAnalytics.siteId, site.id))
+      .where(eq(siteAnalytics.siteId, site.slug))
       .orderBy(desc(siteAnalytics.createdAt))
       .limit(limit);
   }
@@ -230,6 +230,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     if (!site) {
       throw new Error(`Site not found with slug: ${slug}`);
     }
+
 
     // Check if manager already exists (case-insensitive)
     const existingManager = await db
@@ -248,7 +249,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     // Normalize email to lowercase before insertion
     const [manager] = await db
       .insert(siteManagers)
-      .values({ siteId: site.id, userEmail: userEmail.toLowerCase() })
+      .values({ siteId: site.slug, userEmail: userEmail.toLowerCase() })
       .returning();
     return manager;
   }
@@ -263,7 +264,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     await db
       .delete(siteManagers)
       .where(and(
-        eq(siteManagers.siteId, site.id),
+        eq(siteManagers.siteId, site.slug),
         sql`LOWER(${siteManagers.userEmail}) = LOWER(${userEmail})`
       ));
   }
@@ -278,7 +279,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteManagers)
-      .where(eq(siteManagers.siteId, site.id));
+      .where(eq(siteManagers.siteId, site.slug));
   }
 
   async isSiteManager(slug: string, userEmail: string): Promise<boolean> {
@@ -292,7 +293,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .select()
       .from(siteManagers)
       .where(and(
-        eq(siteManagers.siteId, site.id),
+        eq(siteManagers.siteId, site.slug),
         sql`LOWER(${siteManagers.userEmail}) = LOWER(${userEmail})`
       ));
     return !!manager;
