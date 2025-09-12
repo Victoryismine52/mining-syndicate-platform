@@ -25,10 +25,8 @@ export function MySites() {
   // Mutation to toggle isLaunched status
   const toggleLaunchMutation = useMutation({
     mutationFn: async ({ slug, isLaunched }: { slug: string; isLaunched: boolean }) => {
-      return await apiRequest(`/api/sites/${slug}`, {
-        method: 'PUT',
-        body: { isLaunched }
-      });
+      const response = await apiRequest('PUT', `/api/sites/${slug}`, { isLaunched });
+      return await response.json();
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/user/managed-sites'] });
