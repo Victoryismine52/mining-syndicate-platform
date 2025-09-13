@@ -840,24 +840,38 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   const handleAssetRequest = async (req: any, res: any, assetType: string) => {
     const objectPath = req.path.replace(`/${assetType}`, '');
 
+    // Use human-friendly asset labels for logging and responses
+    const assetLabel =
+      assetType === 'slide-images'
+        ? 'slide'
+        : assetType === 'document-files'
+          ? 'document'
+          : 'asset';
+
     // Prevent multiple responses to the same request
     if (res.headersSent) {
       return;
     }
 
     try {
-      logger.info(`Serving ${assetType} asset:`, {
+      logger.info(`Serving ${assetLabel} asset:`, {
         originalPath: req.path,
         objectPath,
-        assetType
+        assetType: assetLabel
       });
 
       // Validate allowed paths
-      const allowedPrefixes = ['/replit-objstore-', '/.private/', '/public/'];
+      const allowedPrefixes = [
+        '/replit-objstore-',
+        '/.private/',
+        '/public/',
+        '/documents/',
+        '/legal/'
+      ];
       const isAllowed = allowedPrefixes.some(prefix => objectPath.startsWith(prefix));
       
       if (!isAllowed) {
-        logger.warn(`Rejected asset request - invalid path:`, { objectPath, assetType });
+        logger.warn(`Rejected asset request - invalid path:`, { objectPath, assetType: assetLabel });
         return res.status(403).json({ error: 'Access denied' });
       }
 
@@ -879,23 +893,23 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       await objectStorageService.downloadObject(file, res);
       
-      logger.info(`Successfully served ${assetType} asset:`, { objectPath });
+      logger.info(`Successfully served ${assetLabel} asset:`, { objectPath });
     } catch (error: any) {
-      logger.error(`Error serving ${assetType} asset:`, {
+      logger.error(`Error serving ${assetLabel} asset:`, {
         error: error.message,
         stack: error.stack,
         objectPath,
         originalPath: req.path,
-        assetType,
+        assetType: assetLabel,
         errorType: error.constructor.name
       });
 
       // Only send response if headers haven't been sent
       if (!res.headersSent) {
         if (error instanceof ObjectNotFoundError) {
-          return res.status(404).json({ error: `${assetType} not found` });
+          return res.status(404).json({ error: `${assetLabel} not found` });
         }
-        res.status(500).json({ error: `Failed to serve ${assetType}` });
+        res.status(500).json({ error: `Failed to serve ${assetLabel}` });
       }
     }
   };
