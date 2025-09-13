@@ -3,11 +3,13 @@ import { Response } from "express";
 import { randomUUID } from "crypto";
 import { MemoryStorage } from "./memoryStorage";
 
-const REPLIT_SIDECAR_ENDPOINT = process.env.REPLIT_SIDECAR_ENDPOINT;
-const USE_REPLIT_STORAGE = !!REPLIT_SIDECAR_ENDPOINT;
+const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+
+// Check if we're running on Replit with object storage enabled
+const HAS_OBJECT_STORAGE = !!(process.env.PRIVATE_OBJECT_DIR && process.env.PUBLIC_OBJECT_SEARCH_PATHS);
 
 // The object storage client is used to interact with the object storage service.
-export const objectStorageClient: any = USE_REPLIT_STORAGE
+export const objectStorageClient: any = HAS_OBJECT_STORAGE
   ? new Storage({
       credentials: {
         audience: "replit",
@@ -94,8 +96,15 @@ export class ObjectStorageService {
   // Downloads an object to the response.
   async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
     try {
+      console.log('Debug downloadObject: starting download for file');
+      
       // Get file metadata
       const [metadata] = await file.getMetadata();
+      console.log('Debug downloadObject: metadata retrieved', {
+        contentType: metadata.contentType,
+        size: metadata.size,
+        name: metadata.name
+      });
 
       // Set appropriate headers
       res.set({
@@ -103,6 +112,8 @@ export class ObjectStorageService {
         "Content-Length": metadata.size,
         "Cache-Control": `public, max-age=${cacheTtlSec}`,
       });
+
+      console.log('Debug downloadObject: headers set, starting stream');
 
       // Stream the file to the response
       const stream = file.createReadStream();
@@ -112,6 +123,10 @@ export class ObjectStorageService {
         if (!res.headersSent) {
           res.status(500).json({ error: "Error streaming file" });
         }
+      });
+
+      stream.on("end", () => {
+        console.log('Debug downloadObject: stream completed successfully');
       });
 
       stream.pipe(res);
@@ -208,7 +223,7 @@ async function signObjectURL({
   method: "GET" | "PUT" | "DELETE" | "HEAD";
   ttlSec: number;
 }): Promise<string> {
-  if (!USE_REPLIT_STORAGE) {
+  if (!HAS_OBJECT_STORAGE) {
     return `/${bucketName}/${objectName}`;
   }
 
