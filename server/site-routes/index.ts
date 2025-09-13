@@ -218,13 +218,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         email: dynamicFormData.email || otherFields.email,
         phone: dynamicFormData.phone || otherFields.phone,
         company: dynamicFormData.company || otherFields.company,
-        identifier: otherFields.identifier || dynamicFormData.email || dynamicFormData.identifier || dynamicFormData.email || `unknown-${Date.now()}`,
+        identifier: otherFields.identifier || dynamicFormData.email || `unknown-${Date.now()}`,
         identifierType: otherFields.identifierType || 'email',
         formType: otherFields.formType || 'dynamic-form',
         submissionCount: otherFields.submissionCount || '1',
         miningAmount: dynamicFormData.miningAmount || otherFields.miningAmount,
         lendingAmount: dynamicFormData.lendingAmount || otherFields.lendingAmount,
-        slug: siteId // Use slug from URL params for validation
+        siteId: site.id // Use the permanent UUID, not the changeable slug
       };
       
       const validatedData = insertSiteLeadSchema.parse(standardLeadData);
@@ -234,7 +234,6 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         ...validatedData,
         formTemplateId,
         formData: dynamicFormData, // Store extensible_list arrays and other dynamic fields in formData JSONB
-        siteId: site.id, // Use the actual UUID, not slug
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
         referrer: req.get('Referrer'),
