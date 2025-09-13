@@ -846,36 +846,22 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
 
     try {
-      logger.info('Slide image request:', {
-        originalPath: req.path,
-        objectPath,
-        method: req.method
-      });
-
       // Set headers to allow image display in browsers
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'public, max-age=3600');
       res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
 
-      logger.info('Attempting to get slide file from object storage:', { objectPath });
       const file = await objectStorageService.getSlideFile(objectPath);
-      logger.info('Successfully retrieved file reference:', {
-        file: file ? 'found' : 'null',
-        objectPath
-      });
 
       // Check again before streaming
       if (res.headersSent) {
         return;
       }
 
-      logger.info('Starting download stream for slide image:', { objectPath });
       await objectStorageService.downloadObject(file, res);
-      logger.info('Successfully served slide image:', { objectPath });
     } catch (error: any) {
       logger.error('Error serving slide image:', {
         error: error.message,
-        stack: error.stack,
         objectPath,
         originalPath: req.path,
         errorType: error.constructor.name
@@ -884,11 +870,49 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Only send response if headers haven't been sent
       if (!res.headersSent) {
         if (error instanceof ObjectNotFoundError) {
-          logger.warn('Slide image not found in object storage:', { objectPath });
           return res.status(404).json({ error: 'Slide image not found' });
         }
-        logger.error('Internal server error serving slide image:', { objectPath, error: error.message });
         res.status(500).json({ error: 'Failed to serve slide image' });
+      }
+    }
+  });
+
+  // Serve document files from object storage
+  app.get('/document-files/*', async (req, res) => {
+    const objectPath = req.path.replace('/document-files', '');
+
+    // Prevent multiple responses to the same request
+    if (res.headersSent) {
+      return;
+    }
+
+    try {
+      // Set headers for document downloads
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      
+      const file = await objectStorageService.getSlideFile(objectPath);
+
+      // Check again before streaming
+      if (res.headersSent) {
+        return;
+      }
+
+      await objectStorageService.downloadObject(file, res);
+    } catch (error: any) {
+      logger.error('Error serving document file:', {
+        error: error.message,
+        objectPath,
+        originalPath: req.path,
+        errorType: error.constructor.name
+      });
+
+      // Only send response if headers haven't been sent
+      if (!res.headersSent) {
+        if (error instanceof ObjectNotFoundError) {
+          return res.status(404).json({ error: 'Document file not found' });
+        }
+        res.status(500).json({ error: 'Failed to serve document file' });
       }
     }
   });
