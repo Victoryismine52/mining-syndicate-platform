@@ -670,14 +670,24 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
               alt={currentSlideData.title}
               className="max-w-full max-h-full object-contain"
               draggable={false}
-              onLoad={() => console.log('Image loaded successfully:', currentSlideData.content)}
+              onLoad={(e) => {
+                console.log('🎯 Image loaded successfully:', currentSlideData.content);
+                console.log('🎯 Image dimensions:', {
+                  naturalWidth: e.target.naturalWidth,
+                  naturalHeight: e.target.naturalHeight,
+                  displayWidth: e.target.width,
+                  displayHeight: e.target.height,
+                  environment: import.meta.env.MODE || 'unknown'
+                });
+              }}
               onError={(e) => {
-                console.error('Image failed to load:', {
+                console.error('❌ Image failed to load:', {
                   src: currentSlideData.content,
                   slide: currentSlideData,
-                  error: e
+                  error: e,
+                  environment: import.meta.env.MODE || 'unknown'
                 });
-                console.log('Attempting to fetch image directly to check server response...');
+                console.log('🔍 Attempting to fetch image directly to check server response...');
                 // Add cache-busting to get fresh response
                 const testUrl = `${currentSlideData.content}?_t=${Date.now()}`;
                 fetch(testUrl, {
@@ -685,15 +695,16 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
                   cache: 'no-cache'
                 })
                   .then(response => {
-                    console.log('Direct fetch response:', {
+                    console.log('🔍 Direct fetch response:', {
                       url: currentSlideData.content,
                       status: response.status,
                       statusText: response.statusText,
-                      headers: Object.fromEntries(response.headers.entries())
+                      headers: Object.fromEntries(response.headers.entries()),
+                      environment: import.meta.env.MODE || 'unknown'
                     });
                   })
                   .catch(fetchError => {
-                    console.error('Direct fetch failed:', fetchError);
+                    console.error('❌ Direct fetch failed:', fetchError);
                   });
               }}
             />
