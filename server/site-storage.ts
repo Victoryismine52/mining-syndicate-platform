@@ -88,7 +88,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
   async getSite(slug: string): Promise<Site | undefined> {
     // Runtime debug: Check if sites.slug is undefined
     if (!slug) {
-      logger.error('getSite called with falsy slug:', slug);
+      logger.error('getSite called with falsy slug:', slug as any);
       return undefined;
     }
     
@@ -117,7 +117,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         return null;
       }
 
-      logger.info(`Updating site ${currentSite.id} (slug: ${slug}) with updates:`, updates);
+      logger.info(`Updating site ${currentSite.id} (slug: ${slug}) with updates:`, updates as any);
 
       // Update the site using the permanent ID
       const [updatedSite] = await db
@@ -125,7 +125,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .set({
           ...updates,
           updatedAt: new Date(),
-        })
+        } as any)
         .where(eq(sites.id, currentSite.id)) // Use permanent ID for the update
         .returning();
 
@@ -134,10 +134,10 @@ export class DatabaseSiteStorage implements ISiteStorage {
         return null;
       }
 
-      logger.info(`Successfully updated site ${currentSite.id}:`, updatedSite);
+      logger.info(`Successfully updated site ${currentSite.id}:`, updatedSite as any);
       return updatedSite;
     } catch (error) {
-      logger.error('Error updating site:', error);
+      logger.error('Error updating site:', error as any);
       return null;
     }
   }
@@ -200,7 +200,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .set({
         ...updates,
         updatedAt: new Date(),
-      })
+      } as any)
       .where(eq(siteLeads.id, leadId))
       .returning();
     return lead;
@@ -329,7 +329,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .set({
         ...updates,
         updatedAt: new Date(),
-      })
+      } as any)
       .where(eq(legalDisclaimers.id, id))
       .returning();
     return disclaimer;
@@ -425,17 +425,44 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
   // Slide operations
   async createSiteSlide(slideData: InsertSiteSlide & { siteId: string }): Promise<SiteSlide> {
+    // Get the site to obtain the permanent UUID
+    const site = await this.getSite(slideData.siteId);
+    if (!site) {
+      throw new Error(`Site not found with slug: ${slideData.siteId}`);
+    }
+
+    // Dual write: populate both legacy siteId (slug) and new siteUuid (permanent ID)
     const [slide] = await db
       .insert(siteSlides)
-      .values(slideData)
+      .values({
+        ...slideData,
+        siteId: slideData.siteId, // Legacy slug field
+        siteUuid: site.id, // New permanent UUID field
+      })
       .returning();
     return slide;
   }
 
   async getSiteSlides(slug: string): Promise<SiteSlide[]> {
-    // Direct column reference using the mapped field from schema
-    // The siteSlides.siteId field maps to the site_id database column
-    // Cast slideOrder to integer for proper numeric ordering
+    // First get the site to get the permanent UUID
+    const site = await this.getSite(slug);
+    if (!site) {
+      throw new Error(`Site not found with slug: ${slug}`);
+    }
+
+    // Try UUID-first query for better performance and slug-change resilience
+    const slidesByUuid = await db
+      .select()
+      .from(siteSlides)
+      .where(eq(siteSlides.siteUuid, site.id))
+      .orderBy(sql`(slide_order)::int ASC`);
+
+    // If UUID query returns results, use those (preferred path)
+    if (slidesByUuid.length > 0) {
+      return slidesByUuid;
+    }
+
+    // Fallback to legacy slug-based query for backward compatibility
     return await db
       .select()
       .from(siteSlides)
@@ -457,7 +484,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .set({
         ...updates,
         updatedAt: new Date(),
-      })
+      } as any)
       .where(eq(siteSlides.id, slideId))
       .returning();
     return slide;
@@ -581,7 +608,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       .set({
         ...updates,
         updatedAt: new Date(),
-      })
+      } as any)
       .where(eq(siteSections.id, sectionId))
       .returning();
     return section;
@@ -603,7 +630,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .where(eq(siteMemberships.userId, userId));
       return memberships;
     } catch (error) {
-      logger.error('Error getting user memberships:', error);
+      logger.error('Error getting user memberships:', error as any);
       return [];
     }
   }
@@ -631,7 +658,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .where(eq(siteMemberships.siteId, siteId));
       return memberships;
     } catch (error) {
-      logger.error('Error getting site memberships:', error);
+      logger.error('Error getting site memberships:', error as any);
       return [];
     }
   }
@@ -652,7 +679,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return membership;
     } catch (error) {
-      logger.error('Error creating site membership:', error);
+      logger.error('Error creating site membership:', error as any);
       throw error;
     }
   }
@@ -673,7 +700,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return membership;
     } catch (error) {
-      logger.error('Error updating site membership:', error);
+      logger.error('Error updating site membership:', error as any);
       throw error;
     }
   }
@@ -689,7 +716,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         ));
       return (result.rowCount ?? 0) > 0;
     } catch (error) {
-      logger.error('Error deleting site membership:', error);
+      logger.error('Error deleting site membership:', error as any);
       return false;
     }
   }
@@ -739,7 +766,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return messages;
     } catch (error) {
-      logger.error('Error getting collective messages:', error);
+      logger.error('Error getting collective messages:', error as any);
       throw error;
     }
   }
@@ -759,7 +786,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return message;
     } catch (error) {
-      logger.error('Error creating collective message:', error);
+      logger.error('Error creating collective message:', error as any);
       throw error;
     }
   }
@@ -791,7 +818,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return message;
     } catch (error) {
-      logger.error('Error getting collective message with sender:', error);
+      logger.error('Error getting collective message with sender:', error as any);
       throw error;
     }
   }
@@ -827,7 +854,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
             eq(collectiveBlogPosts.visibility, 'members_only'),
             eq(collectiveBlogPosts.visibility, 'brehons_only'),
             eq(collectiveBlogPosts.visibility, 'public')
-          )
+          )!
         );
       }
       // site_managers and admins can see all posts (no additional filter)
@@ -868,7 +895,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return posts;
     } catch (error) {
-      logger.error('Error getting collective blog posts:', error);
+      logger.error('Error getting collective blog posts:', error as any);
       throw error;
     }
   }
@@ -909,7 +936,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return post;
     } catch (error) {
-      logger.error('Error getting collective blog post by ID:', error);
+      logger.error('Error getting collective blog post by ID:', error as any);
       throw error;
     }
   }
@@ -935,7 +962,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return post;
     } catch (error) {
-      logger.error('Error creating collective blog post:', error);
+      logger.error('Error creating collective blog post:', error as any);
       throw error;
     }
   }
@@ -953,7 +980,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return post;
     } catch (error) {
-      logger.error('Error updating collective blog post:', error);
+      logger.error('Error updating collective blog post:', error as any);
       throw error;
     }
   }
@@ -965,7 +992,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .delete(collectiveBlogPosts)
         .where(eq(collectiveBlogPosts.id, postId));
     } catch (error) {
-      logger.error('Error deleting collective blog post:', error);
+      logger.error('Error deleting collective blog post:', error as any);
       throw error;
     }
   }
@@ -981,7 +1008,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         })
         .where(eq(collectiveBlogPosts.id, postId));
     } catch (error) {
-      logger.error('Error incrementing blog post view count:', error);
+      logger.error('Error incrementing blog post view count:', error as any);
       // Don't throw error for view count - it's not critical
     }
   }
@@ -1011,8 +1038,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
           status: collectiveTasks.status,
           priority: collectiveTasks.priority,
           dueDate: collectiveTasks.dueDate,
-          createdById: collectiveTasks.createdById,
-          completedAt: collectiveTasks.completedAt,
+          createdBy: collectiveTasks.createdBy,
           createdAt: collectiveTasks.createdAt,
           updatedAt: collectiveTasks.updatedAt,
           // Creator info
@@ -1030,7 +1056,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return tasks;
     } catch (error) {
-      logger.error('Error getting collective tasks:', error);
+      logger.error('Error getting collective tasks:', error as any);
       throw error;
     }
   }
@@ -1047,8 +1073,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
           status: collectiveTasks.status,
           priority: collectiveTasks.priority,
           dueDate: collectiveTasks.dueDate,
-          createdById: collectiveTasks.createdById,
-          completedAt: collectiveTasks.completedAt,
+          createdBy: collectiveTasks.createdBy,
           createdAt: collectiveTasks.createdAt,
           updatedAt: collectiveTasks.updatedAt,
           // Creator info
@@ -1063,7 +1088,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return task;
     } catch (error) {
-      logger.error('Error getting collective task by ID:', error);
+      logger.error('Error getting collective task by ID:', error as any);
       throw error;
     }
   }
@@ -1080,12 +1105,12 @@ export class DatabaseSiteStorage implements ISiteStorage {
           status: taskData.status || 'pending',
           priority: taskData.priority || 'medium',
           dueDate: taskData.dueDate,
-          createdById: taskData.createdById
+          createdBy: taskData.createdBy
         })
         .returning();
       return task;
     } catch (error) {
-      logger.error('Error creating collective task:', error);
+      logger.error('Error creating collective task:', error as any);
       throw error;
     }
   }
@@ -1103,7 +1128,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return task;
     } catch (error) {
-      logger.error('Error updating collective task:', error);
+      logger.error('Error updating collective task:', error as any);
       throw error;
     }
   }
@@ -1115,7 +1140,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .delete(collectiveTasks)
         .where(eq(collectiveTasks.id, taskId));
     } catch (error) {
-      logger.error('Error deleting collective task:', error);
+      logger.error('Error deleting collective task:', error as any);
       throw error;
     }
   }
@@ -1188,10 +1213,10 @@ export class DatabaseSiteStorage implements ISiteStorage {
         creatorProfilePicture: row.creatorProfilePicture,
       }));
 
-      logger.info('Sample task data:', tasks[0] ? JSON.stringify(tasks[0], null, 2) : 'No tasks found');
+      logger.info('Sample task data:', (tasks[0] ? JSON.stringify(tasks[0], null, 2) : 'No tasks found') as any);
       return tasks;
     } catch (error) {
-      logger.error('Error getting user tasks:', error);
+      logger.error('Error getting user tasks:', error as any);
       throw error;
     }
   }
@@ -1208,7 +1233,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         .returning();
       return assignment;
     } catch (error) {
-      logger.error('Error assigning task to user:', error);
+      logger.error('Error assigning task to user:', error as any);
       throw error;
     }
   }
@@ -1223,7 +1248,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
           eq(taskAssignments.userId, userId)
         ));
     } catch (error) {
-      logger.error('Error unassigning task from user:', error);
+      logger.error('Error unassigning task from user:', error as any);
       throw error;
     }
   }
@@ -1237,8 +1262,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
           id: taskAssignments.id,
           taskId: taskAssignments.taskId,
           userId: taskAssignments.userId,
-          assignedById: taskAssignments.assignedById,
-          assignedAt: taskAssignments.assignedAt,
+          assignedBy: taskAssignments.assignedBy,
           // User info
           userFirstName: users.firstName,
           userLastName: users.lastName,
@@ -1252,7 +1276,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
 
       return assignments;
     } catch (error) {
-      logger.error('Error getting task assignments:', error);
+      logger.error('Error getting task assignments:', error as any);
       throw error;
     }
   }
@@ -1268,5 +1292,5 @@ export async function updateSiteLead(
   leadId: string,
   hubspotContactId: string
 ) {
-  return siteStorage.updateSiteLead(leadId, { hubspotContactId });
+  return siteStorage.updateSiteLead(leadId, { hubspotContactId } as any);
 }
