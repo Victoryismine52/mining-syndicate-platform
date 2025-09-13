@@ -4,7 +4,13 @@ import { randomUUID } from "crypto";
 import { MemoryStorage } from "./memoryStorage";
 
 // Check if we're in a published deployment (production)
-const isPublishedDeployment = !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT);
+// Also check for REPLIT_DOMAINS which is set in published deployments
+const isPublishedDeployment = !!(
+  process.env.REPLIT_DEPLOYMENT || 
+  process.env.REPL_DEPLOYMENT ||
+  process.env.REPLIT_DOMAINS ||
+  process.env.REPL_ID
+);
 
 // Use environment-appropriate endpoint
 const REPLIT_SIDECAR_ENDPOINT = isPublishedDeployment 
