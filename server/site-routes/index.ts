@@ -880,7 +880,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       res.setHeader('Cache-Control', 'public, max-age=3600');
       
       // Set CSP for images only
-      if (assetType === 'slide-images') {
+      if (assetLabel === 'slide-images') {
         res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
       }
 
@@ -901,7 +901,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         objectPath,
         originalPath: req.path,
         assetType: assetLabel,
-        errorType: error.constructor.name
+        errorType: error.constructor.name,
+        requestUrl: req.url,
+        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error))
       });
 
       // Only send response if headers haven't been sent
