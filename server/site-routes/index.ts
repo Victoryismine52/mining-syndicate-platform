@@ -203,7 +203,10 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       // Check if site exists
       const site = await siteStorage.getSite(siteId);
-      logger.info(`Site lookup result for slug ${siteId}:`, { site });
+      logger.info(`Site lookup result for slug ${siteId}:`, { 
+        siteExists: !!site,
+        siteData: site ? { id: site.id, slug: site.slug, name: site.name } : null 
+      });
       
       if (!site) {
         logger.error(`Site not found for slug: ${siteId}`);
