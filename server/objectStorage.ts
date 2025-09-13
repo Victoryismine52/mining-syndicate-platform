@@ -15,14 +15,6 @@ const REPLIT_SIDECAR_ENDPOINT = isPublishedDeployment
   ? "https://util.replit.com" 
   : "http://127.0.0.1:1106";
 
-console.log('Debug object storage config:', {
-  isPublishedDeployment,
-  REPLIT_SIDECAR_ENDPOINT,
-  REPLIT_DEPLOYMENT: process.env.REPLIT_DEPLOYMENT || 'undefined',
-  REPL_DEPLOYMENT: process.env.REPL_DEPLOYMENT || 'undefined',
-  REPLIT_DOMAINS: process.env.REPLIT_DOMAINS || 'undefined',
-  REPL_ID: process.env.REPL_ID || 'undefined'
-});
 
 // Check if we're running on Replit with object storage enabled
 const HAS_OBJECT_STORAGE = !!(process.env.PRIVATE_OBJECT_DIR && process.env.PUBLIC_OBJECT_SEARCH_PATHS);
@@ -115,15 +107,8 @@ export class ObjectStorageService {
   // Downloads an object to the response.
   async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
     try {
-      console.log('Debug downloadObject: starting download for file');
-      
       // Get file metadata
       const [metadata] = await file.getMetadata();
-      console.log('Debug downloadObject: metadata retrieved', {
-        contentType: metadata.contentType,
-        size: metadata.size,
-        name: metadata.name
-      });
 
       // Set appropriate headers
       res.set({
@@ -131,8 +116,6 @@ export class ObjectStorageService {
         "Content-Length": metadata.size,
         "Cache-Control": `public, max-age=${cacheTtlSec}`,
       });
-
-      console.log('Debug downloadObject: headers set, starting stream');
 
       // Stream the file to the response
       const stream = file.createReadStream();
@@ -142,10 +125,6 @@ export class ObjectStorageService {
         if (!res.headersSent) {
           res.status(500).json({ error: "Error streaming file" });
         }
-      });
-
-      stream.on("end", () => {
-        console.log('Debug downloadObject: stream completed successfully');
       });
 
       stream.pipe(res);
@@ -184,37 +163,21 @@ export class ObjectStorageService {
   // Gets slide file from object storage path
   async getSlideFile(objectPath: string): Promise<File> {
     try {
-      console.log('Debug getSlideFile: objectPath received:', objectPath);
-      
       if (!objectPath.startsWith("/")) {
         objectPath = `/${objectPath}`;
       }
-      console.log('Debug getSlideFile: normalized objectPath:', objectPath);
 
       const { bucketName, objectName } = parseObjectPath(objectPath);
-      console.log('Debug getSlideFile: parsed path:', { bucketName, objectName });
-      
       const bucket = objectStorageClient.bucket(bucketName);
       const file = bucket.file(objectName);
-      console.log('Debug getSlideFile: created file object');
 
-      console.log('Debug getSlideFile: checking if file exists...');
       const [exists] = await file.exists();
-      console.log('Debug getSlideFile: file exists check result:', exists);
-      
       if (!exists) {
         throw new ObjectNotFoundError();
       }
 
-      console.log('Debug getSlideFile: file found, returning file object');
       return file;
     } catch (error) {
-      console.error('Debug getSlideFile: error occurred:', {
-        message: error.message,
-        name: error.name,
-        objectPath: objectPath,
-        stack: error.stack
-      });
       throw error;
     }
   }
