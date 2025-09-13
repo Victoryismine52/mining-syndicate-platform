@@ -15,7 +15,9 @@ const connectionString = config.databaseUrl;
 const url = new URL(connectionString);
 const isLocal = ["localhost", "127.0.0.1"].includes(url.hostname);
 
-const schemas = { ...schema, ...siteSchema };
+// Exclude old sites table from schema to prevent collision with siteSchema.sites
+const { sites: _oldSites, ...baseSchema } = schema as any;
+const schemas = { ...baseSchema, ...siteSchema };
 
 let pool: NeonPool | PgPool;
 let db:
