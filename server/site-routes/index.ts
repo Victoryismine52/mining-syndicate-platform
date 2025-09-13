@@ -1051,7 +1051,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   });
 
   // Create a new section
-  app.post("/api/sites/:slug/sections", isAuthenticated, async (req, res) => {
+  app.post("/api/sites/:slug/sections", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
       const { slug: siteId } = req.params;
       const { name, description, displayOrder } = req.body;
@@ -1063,11 +1063,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(404).json({ error: "Site not found" });
       }
 
-      // Check if user has access to this site
-      const hasAccess = await siteStorage.checkSiteAccess(site.id, user.email, user.isAdmin);
-      if (!hasAccess) {
-        return res.status(403).json({ error: "Access denied to this site" });
-      }
+      // Access control is handled by checkSiteAccess middleware
 
       if (!name || !name.trim()) {
         return res.status(400).json({ error: "Section name is required" });
@@ -1089,7 +1085,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
-  // Update a section
+  // Update a section (note: uses sectionId not slug, so we need custom access check)
   app.put("/api/site-sections/:sectionId", isAuthenticated, async (req, res) => {
     try {
       const { sectionId } = req.params;
@@ -1102,9 +1098,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(404).json({ error: "Section not found" });
       }
 
-      // Check if user has access to this site
-      const hasAccess = await siteStorage.checkSiteAccess(section.siteId, user.email, user.isAdmin);
-      if (!hasAccess) {
+      // Get the site by slug to check access (section.siteId is actually a slug)
+      const site = await siteStorage.getSite(section.siteId);
+      if (!site) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+
+      // Check if user is global admin or site manager
+      const isAdmin = user.role === 'admin' || user.isAdmin || false;
+      const isSiteManager = await siteStorage.isSiteManager(site.slug, user.email);
+      
+      if (!isAdmin && !isSiteManager) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
 
@@ -1128,9 +1132,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         return res.status(404).json({ error: "Section not found" });
       }
 
-      // Check if user has access to this site
-      const hasAccess = await siteStorage.checkSiteAccess(section.siteId, user.email, user.isAdmin);
-      if (!hasAccess) {
+      // Get the site by slug to check access (section.siteId is actually a slug)
+      const site = await siteStorage.getSite(section.siteId);
+      if (!site) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+
+      // Check if user is global admin or site manager
+      const isAdmin = user.role === 'admin' || user.isAdmin || false;
+      const isSiteManager = await siteStorage.isSiteManager(site.slug, user.email);
+      
+      if (!isAdmin && !isSiteManager) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
 
