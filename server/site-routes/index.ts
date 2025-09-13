@@ -199,10 +199,14 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   app.post("/api/sites/:slug/leads", async (req, res) => {
     try {
       const siteId = req.params.slug;
+      logger.info(`Starting lead submission for slug: ${siteId}`);
 
       // Check if site exists
       const site = await siteStorage.getSite(siteId);
+      logger.info(`Site lookup result for slug ${siteId}:`, { site });
+      
       if (!site) {
+        logger.error(`Site not found for slug: ${siteId}`);
         return res.status(404).json({ error: "Site not found" });
       }
 
@@ -211,7 +215,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       
       const dynamicFormData = submittedFormData || {};
       
-      // Extract or derive standard fields for validation (exclude fields not in schema)
+      // Extract or derive standard fields for validation  
       const standardLeadData = {
         firstName: dynamicFormData.firstName || otherFields.firstName,
         lastName: dynamicFormData.lastName || otherFields.lastName,
@@ -224,7 +228,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         submissionCount: otherFields.submissionCount || '1',
         miningAmount: dynamicFormData.miningAmount || otherFields.miningAmount,
         lendingAmount: dynamicFormData.lendingAmount || otherFields.lendingAmount,
-        siteId: site.id // Use the permanent UUID, not the changeable slug
+        slug: siteId, // Validation schema expects slug field
+        siteId: site.id // Actual UUID for database
       };
       
       const validatedData = insertSiteLeadSchema.parse(standardLeadData);
