@@ -176,7 +176,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteLeads)
-      .where(eq(siteLeads.siteId, site.id))
+      .where(eq(siteLeads.siteId, site.slug))
       .orderBy(desc(siteLeads.createdAt));
   }
 
@@ -190,7 +190,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteLeads)
-      .where(and(eq(siteLeads.siteId, site.id), eq(siteLeads.formType, formType)))
+      .where(and(eq(siteLeads.siteId, site.slug), eq(siteLeads.formType, formType)))
       .orderBy(desc(siteLeads.createdAt));
   }
 
@@ -225,7 +225,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     return await db
       .select()
       .from(siteAnalytics)
-      .where(eq(siteAnalytics.siteId, site.id))
+      .where(eq(siteAnalytics.siteId, site.slug))
       .orderBy(desc(siteAnalytics.createdAt))
       .limit(limit);
   }
@@ -376,7 +376,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     const [attachment] = await db
       .insert(siteDisclaimers)
       .values({
-        siteId: site.id,
+        siteId: site.slug,
         disclaimerId,
         displayOrder: options?.displayOrder || '1',
         linkText: options?.linkText,
@@ -395,7 +395,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     await db
       .delete(siteDisclaimers)
       .where(and(
-        eq(siteDisclaimers.siteId, site.id),
+        eq(siteDisclaimers.siteId, site.slug),
         eq(siteDisclaimers.disclaimerId, disclaimerId)
       ));
   }
@@ -419,7 +419,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
       })
       .from(siteDisclaimers)
       .innerJoin(legalDisclaimers, eq(siteDisclaimers.disclaimerId, legalDisclaimers.id))
-      .where(eq(siteDisclaimers.siteId, site.id))
+      .where(eq(siteDisclaimers.siteId, site.slug))
       .orderBy(siteDisclaimers.displayOrder);
   }
 
@@ -480,7 +480,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
         await tx
           .update(siteSlides)
           .set({ slideOrder, updatedAt: new Date() })
-          .where(and(eq(siteSlides.id, id), eq(siteSlides.siteId, site.id)));
+          .where(and(eq(siteSlides.id, id), eq(siteSlides.siteId, site.slug)));
       }
     });
   }
@@ -553,7 +553,7 @@ export class DatabaseSiteStorage implements ISiteStorage {
     const sections = await db
       .select()
       .from(siteSections)
-      .where(eq(siteSections.siteId, site.id))
+      .where(eq(siteSections.siteId, site.slug))
       .orderBy(siteSections.displayOrder, siteSections.createdAt);
     return sections;
   }

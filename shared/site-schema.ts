@@ -165,7 +165,7 @@ export const siteDisclaimers = pgTable('site_disclaimers', {
 // Site-specific slides table - Each site can have its own custom slide set
 export const siteSlides = pgTable('site_slides', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }), // Reference site slug
+  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
 
   // Slide content
   title: varchar('title', { length: 255 }).notNull(),
@@ -249,14 +249,14 @@ export const siteManagersRelations = relations(siteManagers, ({ one }) => ({
 export const siteLeadsRelations = relations(siteLeads, ({ one }) => ({
   site: one(sites, {
     fields: [siteLeads.siteId],
-    references: [sites.id], // Reference permanent ID
+    references: [sites.slug], // Reference site slug
   }),
 }));
 
 export const siteAnalyticsRelations = relations(siteAnalytics, ({ one }) => ({
   site: one(sites, {
     fields: [siteAnalytics.siteId],
-    references: [sites.id], // Reference permanent ID
+    references: [sites.slug], // Reference site slug
   }),
 }));
 
@@ -267,7 +267,7 @@ export const legalDisclaimersRelations = relations(legalDisclaimers, ({ many }) 
 export const siteDisclaimersRelations = relations(siteDisclaimers, ({ one }) => ({
   site: one(sites, {
     fields: [siteDisclaimers.siteId],
-    references: [sites.id], // Reference permanent ID
+    references: [sites.slug], // Reference site slug
   }),
   disclaimer: one(legalDisclaimers, {
     fields: [siteDisclaimers.disclaimerId],
@@ -278,7 +278,7 @@ export const siteDisclaimersRelations = relations(siteDisclaimers, ({ one }) => 
 export const siteSlidesRelations = relations(siteSlides, ({ one }) => ({
   site: one(sites, {
     fields: [siteSlides.siteId],
-    references: [sites.id], // Reference permanent ID
+    references: [sites.slug], // Reference site slug
   }),
 }));
 
