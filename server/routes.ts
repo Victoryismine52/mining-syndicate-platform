@@ -1,5 +1,4 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { siteStorage } from "./site-storage";
 import { setupAuth, isAuthenticated } from "./google-auth";
@@ -15,7 +14,7 @@ import rateLimit from "express-rate-limit";
 import { logger } from './logger';
 import { config } from './config';
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express): Promise<void> {
   logger.info('Registering routes...');
   
   // Setup Google authentication (includes session middleware)
@@ -583,8 +582,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register multi-site routes
   registerSiteRoutes(app, storage);
-  logger.info('Site management routes registered');
-
-  const httpServer = createServer(app);
-  return httpServer;
 }

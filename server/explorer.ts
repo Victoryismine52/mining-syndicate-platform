@@ -110,16 +110,18 @@ const server = createServer(app);
   "notes": "Automatically opens the explorer URL in the default browser."
 }
 */
-(async () => {
-  const rootDir = path.resolve(import.meta.dirname, "..", "packages", "code-explorer");
-  await setupViteFor(app, server, rootDir, "/code-explorer");
+// Disabled to prevent port conflicts during main server startup
+// This should only run via "npm run dev:explorer"
+// (async () => {
+//   const rootDir = path.resolve(import.meta.dirname, "..", "packages", "code-explorer");
+//   await setupViteFor(app, server, rootDir, "/code-explorer");
 
-  const port = config.port;
-  server.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
-    log(`explorer dev server running on port ${port}`);
-    void open(`http://localhost:${port}/code-explorer`, { wait: false }).catch(
-      () => {},
-    );
-  });
-})();
+//   const port = config.port;
+//   server.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
+//     log(`explorer dev server running on port ${port}`);
+//     void open(`http://localhost:${port}/code-explorer`, { wait: false }).catch(
+//       () => {},
+//     );
+//   });
+// })();
 
