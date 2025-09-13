@@ -433,16 +433,12 @@ export class DatabaseSiteStorage implements ISiteStorage {
   }
 
   async getSiteSlides(slug: string): Promise<SiteSlide[]> {
-    // First get the site to get the permanent ID
-    const site = await this.getSite(slug);
-    if (!site) {
-      return [];
-    }
-
+    // Direct column reference using the mapped field from schema
+    // The siteSlides.siteId field maps to the site_id database column
     return await db
       .select()
       .from(siteSlides)
-      .where(eq(siteSlides.siteId, site.id))
+      .where(eq(siteSlides.siteId, slug))
       .orderBy(siteSlides.slideOrder);
   }
 

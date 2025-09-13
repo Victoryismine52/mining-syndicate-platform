@@ -165,7 +165,7 @@ export const siteDisclaimers = pgTable('site_disclaimers', {
 // Site-specific slides table - Each site can have its own custom slide set
 export const siteSlides = pgTable('site_slides', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
+  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.siteId, { onDelete: 'cascade' }), // Reference site slug
 
   // Slide content
   title: varchar('title', { length: 255 }).notNull(),
