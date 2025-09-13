@@ -176,20 +176,40 @@ export class ObjectStorageService {
 
   // Gets slide file from object storage path
   async getSlideFile(objectPath: string): Promise<File> {
-    if (!objectPath.startsWith("/")) {
-      objectPath = `/${objectPath}`;
+    try {
+      console.log('Debug getSlideFile: objectPath received:', objectPath);
+      
+      if (!objectPath.startsWith("/")) {
+        objectPath = `/${objectPath}`;
+      }
+      console.log('Debug getSlideFile: normalized objectPath:', objectPath);
+
+      const { bucketName, objectName } = parseObjectPath(objectPath);
+      console.log('Debug getSlideFile: parsed path:', { bucketName, objectName });
+      
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+      console.log('Debug getSlideFile: created file object');
+
+      console.log('Debug getSlideFile: checking if file exists...');
+      const [exists] = await file.exists();
+      console.log('Debug getSlideFile: file exists check result:', exists);
+      
+      if (!exists) {
+        throw new ObjectNotFoundError();
+      }
+
+      console.log('Debug getSlideFile: file found, returning file object');
+      return file;
+    } catch (error) {
+      console.error('Debug getSlideFile: error occurred:', {
+        message: error.message,
+        name: error.name,
+        objectPath: objectPath,
+        stack: error.stack
+      });
+      throw error;
     }
-
-    const { bucketName, objectName } = parseObjectPath(objectPath);
-    const bucket = objectStorageClient.bucket(bucketName);
-    const file = bucket.file(objectName);
-
-    const [exists] = await file.exists();
-    if (!exists) {
-      throw new ObjectNotFoundError();
-    }
-
-    return file;
   }
 
   normalizeSlideObjectPath(rawPath: string): string {

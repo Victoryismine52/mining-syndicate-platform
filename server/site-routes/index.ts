@@ -880,7 +880,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       res.setHeader('Cache-Control', 'public, max-age=3600');
 
       // Set CSP for images only
-      if (assetLabel === 'slide-images') {
+      if (assetType === 'slide-images') {
         res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
       }
 
@@ -895,16 +895,27 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       logger.info(`Successfully served ${assetLabel} asset:`, { objectPath });
     } catch (error: any) {
-      logger.error(`Error serving ${assetLabel} asset:`, {
-        error: error.message,
-        stack: error.stack,
-        objectPath,
-        originalPath: req.path,
-        assetType: assetLabel,
-        errorType: error.constructor.name,
-        requestUrl: req.url,
-        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error))
+      // Basic error logging first
+      logger.error(`Error serving ${assetLabel} asset - basic info:`, {
+        message: error?.message || 'No message',
+        name: error?.name || 'No name',
+        objectPath: objectPath
       });
+      
+      // Try detailed logging
+      try {
+        logger.error(`Error serving ${assetLabel} asset - detailed:`, {
+          error: error.message,
+          stack: error.stack,
+          objectPath,
+          originalPath: req.path,
+          assetType: assetLabel,
+          errorType: error.constructor.name,
+          requestUrl: req.url
+        });
+      } catch (logError) {
+        logger.error(`Failed to log detailed error info: ${logError}`);
+      }
 
       // Only send response if headers haven't been sent
       if (!res.headersSent) {
