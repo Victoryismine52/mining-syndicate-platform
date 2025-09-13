@@ -1041,7 +1041,10 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
       return;
     } else if (cardType === 'document') {
       // Handle document cards
+      // documentUrl takes precedence; fileKey is used only when documentUrl is absent
       const documentUrl = cardTemplate.config?.documentUrl || cardAssignment.overrideConfig?.documentUrl;
+      const fileKey = cardTemplate.config?.fileKey || cardAssignment.overrideConfig?.fileKey;
+
       if (documentUrl) {
         // Convert direct Google Storage URLs to use local document-files route for proper authentication
         let finalUrl = documentUrl;
@@ -1050,6 +1053,11 @@ function PitchSiteInterface({ site, siteId, showPresentation, setShowPresentatio
           const url = new URL(documentUrl);
           finalUrl = `/document-files${url.pathname}`;
         }
+        // Open document in new tab for download
+        window.open(finalUrl, '_blank', 'noopener,noreferrer');
+      } else if (fileKey) {
+        // When no documentUrl is provided, fall back to serving the uploaded file by key
+        const finalUrl = `/document-files/${fileKey}`;
         // Open document in new tab for download
         window.open(finalUrl, '_blank', 'noopener,noreferrer');
       }
