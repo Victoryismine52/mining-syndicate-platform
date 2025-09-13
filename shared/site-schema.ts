@@ -74,7 +74,7 @@ export const siteManagers = pgTable('site_managers', {
 // Site-scoped leads table with identifier-based aggregation
 export const siteLeads = pgTable('site_leads', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
+  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
 
   // Identifier-based aggregation fields
   identifier: varchar('identifier', { length: 255 }).notNull(), // Primary identifier value (email, googleId, etc.)
@@ -115,7 +115,7 @@ export const siteLeads = pgTable('site_leads', {
 // Site analytics table
 export const siteAnalytics = pgTable('site_analytics', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
+  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
 
   // Event tracking
   eventType: varchar('event_type', { length: 50 }).notNull(), // 'page_view', 'form_open', 'form_submit', etc.
@@ -152,7 +152,7 @@ export const legalDisclaimers = pgTable('legal_disclaimers', {
 // Site disclaimers junction table - Links sites to their attached disclaimers
 export const siteDisclaimers = pgTable('site_disclaimers', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
+  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
   disclaimerId: uuid('disclaimer_id').notNull().references(() => legalDisclaimers.id, { onDelete: 'cascade' }),
 
   // Display options
@@ -165,7 +165,7 @@ export const siteDisclaimers = pgTable('site_disclaimers', {
 // Site-specific slides table - Each site can have its own custom slide set
 export const siteSlides = pgTable('site_slides', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
+  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
 
   // Slide content
   title: varchar('title', { length: 255 }).notNull(),
@@ -221,7 +221,7 @@ export const globalSlides = pgTable('global_slides', {
 // Site sections table - For organizing cards into sections
 export const siteSections = pgTable('site_sections', {
   id: uuid('id').primaryKey().defaultRandom(),
-  siteId: uuid('site_id').notNull().references(() => sites.id, { onDelete: 'cascade' }), // Reference permanent ID
+  siteId: varchar('site_id', { length: 50 }).notNull().references(() => sites.slug, { onDelete: 'cascade' }), // Reference site slug
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
   displayOrder: integer('display_order').default(1),

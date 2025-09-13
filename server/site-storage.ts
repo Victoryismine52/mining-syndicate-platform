@@ -86,10 +86,17 @@ export class DatabaseSiteStorage implements ISiteStorage {
   }
 
   async getSite(slug: string): Promise<Site | undefined> {
+    // Runtime debug: Check if sites.slug is undefined
+    if (!slug) {
+      logger.error('getSite called with falsy slug:', slug);
+      return undefined;
+    }
+    
+    // Use raw SQL to avoid undefined column reference
     const [site] = await db
       .select()
       .from(sites)
-      .where(eq(sites.slug, slug));
+      .where(sql`sites.site_id = ${slug}`);
     return site;
   }
 

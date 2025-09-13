@@ -232,7 +232,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         miningAmount: dynamicFormData.miningAmount || otherFields.miningAmount,
         lendingAmount: dynamicFormData.lendingAmount || otherFields.lendingAmount,
         slug: siteId, // Validation schema expects slug field
-        siteId: site.id // Actual UUID for database
+        siteId: site.slug // Use slug for foreign key as database expects
       };
       
       const validatedData = insertSiteLeadSchema.parse(standardLeadData);
