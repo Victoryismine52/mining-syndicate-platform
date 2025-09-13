@@ -435,11 +435,12 @@ export class DatabaseSiteStorage implements ISiteStorage {
   async getSiteSlides(slug: string): Promise<SiteSlide[]> {
     // Direct column reference using the mapped field from schema
     // The siteSlides.siteId field maps to the site_id database column
+    // Cast slideOrder to integer for proper numeric ordering
     return await db
       .select()
       .from(siteSlides)
       .where(eq(siteSlides.siteId, slug))
-      .orderBy(siteSlides.slideOrder);
+      .orderBy(sql`(slide_order)::int ASC`);
   }
 
   async getSiteSlide(slideId: string): Promise<SiteSlide | undefined> {
