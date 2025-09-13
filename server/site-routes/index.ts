@@ -52,14 +52,14 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         // Get sites where this user is a site manager
         const allSites = await siteStorage.listSites();
         const managedSites = [];
-        
+
         for (const site of allSites) {
           const isSiteManager = await siteStorage.isSiteManager(site.slug, user.email);
           if (isSiteManager) {
             managedSites.push(site);
           }
         }
-        
+
         res.json(managedSites);
       }
     } catch (error) {
@@ -207,7 +207,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         siteExists: !!site,
         siteData: site ? { id: site.id, slug: site.slug, name: site.name } : null 
       });
-      
+
       if (!site) {
         logger.error(`Site not found for slug: ${siteId}`);
         return res.status(404).json({ error: "Site not found" });
@@ -215,9 +215,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
       // Handle payload from SimpleFormModal: { formTemplateId?, formData: {...} } or direct fields
       const { formTemplateId, formData: submittedFormData, ...otherFields } = req.body;
-      
+
       const dynamicFormData = submittedFormData || {};
-      
+
       // Extract or derive standard fields for validation  
       const standardLeadData = {
         firstName: dynamicFormData.firstName || otherFields.firstName,
@@ -234,7 +234,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         slug: siteId, // Validation schema expects slug field
         siteId: site.slug // Use slug for foreign key as database expects
       };
-      
+
       const validatedData = insertSiteLeadSchema.parse(standardLeadData);
 
       // Add tracking information and dynamic form data
@@ -413,13 +413,13 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       const { slug } = z.object({
         slug: z.string().min(1, "Site slug required")
       }).parse(req.params);
-      
+
       // Get the site to get the permanent ID
       const site = await siteStorage.getSite(slug);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
       }
-      
+
       const rows = await db
         .select({
           id: siteManagers.id,
@@ -869,7 +869,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         '/legal/'
       ];
       const isAllowed = allowedPrefixes.some(prefix => objectPath.startsWith(prefix));
-      
+
       if (!isAllowed) {
         logger.warn(`Rejected asset request - invalid path:`, { objectPath, assetType: assetLabel });
         return res.status(403).json({ error: 'Access denied' });
@@ -878,7 +878,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Set appropriate headers
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'public, max-age=3600');
-      
+
       // Set CSP for images only
       if (assetLabel === 'slide-images') {
         res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
@@ -892,7 +892,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       await objectStorageService.downloadObject(file, res);
-      
+
       logger.info(`Successfully served ${assetLabel} asset:`, { objectPath });
     } catch (error: any) {
       logger.error(`Error serving ${assetLabel} asset:`, {
@@ -1144,7 +1144,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Check if user is global admin or site manager
       const isAdmin = user.role === 'admin' || user.isAdmin || false;
       const isSiteManager = await siteStorage.isSiteManager(site.slug, user.email);
-      
+
       if (!isAdmin && !isSiteManager) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
@@ -1178,7 +1178,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Check if user is global admin or site manager
       const isAdmin = user.role === 'admin' || user.isAdmin || false;
       const isSiteManager = await siteStorage.isSiteManager(site.slug, user.email);
-      
+
       if (!isAdmin && !isSiteManager) {
         return res.status(403).json({ error: "Access denied to this site" });
       }
