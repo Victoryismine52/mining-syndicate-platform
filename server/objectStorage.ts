@@ -3,7 +3,13 @@ import { Response } from "express";
 import { randomUUID } from "crypto";
 import { MemoryStorage } from "./memoryStorage";
 
-const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+// Check for development vs production environment
+const isDevelopment = process.env.NODE_ENV !== 'production' && !process.env.REPLIT_DEPLOYMENT;
+
+// Use different sidecar endpoints for development vs production
+const REPLIT_SIDECAR_ENDPOINT = isDevelopment 
+  ? "http://127.0.0.1:1106" 
+  : "https://util.replit.com";
 
 // Check if we're running on Replit with object storage enabled
 const HAS_OBJECT_STORAGE = !!(process.env.PRIVATE_OBJECT_DIR && process.env.PUBLIC_OBJECT_SEARCH_PATHS);
