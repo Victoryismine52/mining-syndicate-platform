@@ -4,18 +4,25 @@ import { randomUUID } from "crypto";
 import { MemoryStorage } from "./memoryStorage";
 
 // Check if we're in a published deployment (production)
-// Also check for REPLIT_DOMAINS which is set in published deployments
+// Only use REPLIT_DEPLOYMENT as the definitive indicator
 const isPublishedDeployment = !!(
   process.env.REPLIT_DEPLOYMENT || 
-  process.env.REPL_DEPLOYMENT ||
-  process.env.REPLIT_DOMAINS ||
-  process.env.REPL_ID
+  process.env.REPL_DEPLOYMENT
 );
 
 // Use environment-appropriate endpoint
 const REPLIT_SIDECAR_ENDPOINT = isPublishedDeployment 
   ? "https://util.replit.com" 
   : "http://127.0.0.1:1106";
+
+console.log('Debug object storage config:', {
+  isPublishedDeployment,
+  REPLIT_SIDECAR_ENDPOINT,
+  REPLIT_DEPLOYMENT: process.env.REPLIT_DEPLOYMENT || 'undefined',
+  REPL_DEPLOYMENT: process.env.REPL_DEPLOYMENT || 'undefined',
+  REPLIT_DOMAINS: process.env.REPLIT_DOMAINS || 'undefined',
+  REPL_ID: process.env.REPL_ID || 'undefined'
+});
 
 // Check if we're running on Replit with object storage enabled
 const HAS_OBJECT_STORAGE = !!(process.env.PRIVATE_OBJECT_DIR && process.env.PUBLIC_OBJECT_SEARCH_PATHS);
