@@ -836,9 +836,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Serve static slide images directly from the filesystem
   app.use('/static', express.static(path.join(process.cwd(), 'client/public/static')));
 
-  // Serve slide images from object storage
-  app.get('/slide-images/*', async (req, res) => {
-    const objectPath = req.path.replace('/slide-images', '');
+  // Unified asset handler for all object storage content
+  const handleAssetRequest = async (req: any, res: any, assetType: string) => {
+    const objectPath = req.path.replace(`/${assetType}`, '');
 
     // Prevent multiple responses to the same request
     if (res.headersSent) {
@@ -846,51 +846,30 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
 
     try {
-      // Set headers to allow image display in browsers
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-      res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
-
-      const file = await objectStorageService.getSlideFile(objectPath);
-
-      // Check again before streaming
-      if (res.headersSent) {
-        return;
-      }
-
-      await objectStorageService.downloadObject(file, res);
-    } catch (error: any) {
-      logger.error('Error serving slide image:', {
-        error: error.message,
-        objectPath,
+      logger.info(`Serving ${assetType} asset:`, {
         originalPath: req.path,
-        errorType: error.constructor.name
+        objectPath,
+        assetType
       });
 
-      // Only send response if headers haven't been sent
-      if (!res.headersSent) {
-        if (error instanceof ObjectNotFoundError) {
-          return res.status(404).json({ error: 'Slide image not found' });
-        }
-        res.status(500).json({ error: 'Failed to serve slide image' });
+      // Validate allowed paths
+      const allowedPrefixes = ['/replit-objstore-', '/.private/', '/public/'];
+      const isAllowed = allowedPrefixes.some(prefix => objectPath.startsWith(prefix));
+      
+      if (!isAllowed) {
+        logger.warn(`Rejected asset request - invalid path:`, { objectPath, assetType });
+        return res.status(403).json({ error: 'Access denied' });
       }
-    }
-  });
 
-  // Serve document files from object storage
-  app.get('/document-files/*', async (req, res) => {
-    const objectPath = req.path.replace('/document-files', '');
-
-    // Prevent multiple responses to the same request
-    if (res.headersSent) {
-      return;
-    }
-
-    try {
-      // Set headers for document downloads
+      // Set appropriate headers
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'public, max-age=3600');
       
+      // Set CSP for images only
+      if (assetType === 'slide-images') {
+        res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: blob:;");
+      }
+
       const file = await objectStorageService.getSlideFile(objectPath);
 
       // Check again before streaming
@@ -899,22 +878,40 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       }
 
       await objectStorageService.downloadObject(file, res);
+      
+      logger.info(`Successfully served ${assetType} asset:`, { objectPath });
     } catch (error: any) {
-      logger.error('Error serving document file:', {
+      logger.error(`Error serving ${assetType} asset:`, {
         error: error.message,
+        stack: error.stack,
         objectPath,
         originalPath: req.path,
+        assetType,
         errorType: error.constructor.name
       });
 
       // Only send response if headers haven't been sent
       if (!res.headersSent) {
         if (error instanceof ObjectNotFoundError) {
-          return res.status(404).json({ error: 'Document file not found' });
+          return res.status(404).json({ error: `${assetType} not found` });
         }
-        res.status(500).json({ error: 'Failed to serve document file' });
+        res.status(500).json({ error: `Failed to serve ${assetType}` });
       }
     }
+  };
+
+  // Unified assets endpoint
+  app.get('/assets/*', async (req, res) => {
+    await handleAssetRequest(req, res, 'assets');
+  });
+
+  // Backward compatibility shims
+  app.get('/slide-images/*', async (req, res) => {
+    await handleAssetRequest(req, res, 'slide-images');
+  });
+
+  app.get('/document-files/*', async (req, res) => {
+    await handleAssetRequest(req, res, 'document-files');
   });
 
   // ==== GLOBAL SLIDESROUTES ====
