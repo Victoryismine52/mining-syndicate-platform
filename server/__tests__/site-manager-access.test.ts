@@ -7,7 +7,7 @@ vi.mock('../logger', () => ({ logger: { info: vi.fn(), error: vi.fn() } }));
 // the user has an account. Once the user signs up (via upsertUser),
 // checkSiteAccess should treat them as a manager and allow site operations.
 
-const SITE_ID = 'access-site';
+const SITE_SLUG = 'access-site';
 const managerEmail = 'precreated-manager@example.com';
 
 let checkSiteAccess: any;
@@ -34,9 +34,9 @@ describe('site manager access after account creation', () => {
     setSiteStorage(new MemorySiteStorage());
 
     const { siteStorage } = await import('../site-storage');
-    await siteStorage.createSite({ siteId: SITE_ID, name: 'Test', siteType: 'standard' } as any);
+    await siteStorage.createSite({ siteId: SITE_SLUG, name: 'Test', siteType: 'standard' } as any);
     // Pre-create a site_managers entry for an email with no user account yet
-    await siteStorage.addSiteManager(SITE_ID, managerEmail);
+    await siteStorage.addSiteManager(SITE_SLUG, managerEmail);
 
     // Import after env setup to avoid config failures
     ({ checkSiteAccess } = await import('../site-access-control'));
@@ -61,9 +61,9 @@ describe('site manager access after account creation', () => {
     });
 
     const { siteStorage } = await import('../site-storage');
-    const site = await siteStorage.getSite(SITE_ID);
+    const site = await siteStorage.getSite(SITE_SLUG);
 
-    const req: any = { params: { slug: SITE_ID }, user };
+    const req: any = { params: { slug: SITE_SLUG }, user };
     const res: any = { status: vi.fn().mockReturnThis(), json: vi.fn() };
     const next = vi.fn();
 

@@ -22,7 +22,7 @@ declare global {
  */
 export const checkSiteAccess = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { slug } = req.params;
+    const slug = req.params.slug;
     const user = req.user as any;
 
     if (!user) {
@@ -45,7 +45,7 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
 
     // Global admins have access to all sites, no need to check site manager status
     if (isAdmin) {
-      logger.info(`Global admin ${user.email} granted access to site ${slug}`); // Changed from siteId to slug
+      logger.info(`Global admin ${user.email} granted access to site ${slug}`);
       // Add access info to request object
       req.siteAccess = {
         siteId: site.id,
@@ -62,7 +62,7 @@ export const checkSiteAccess = async (req: Request, res: Response, next: NextFun
     logger.info(`Site manager check for ${slug}: user=${user.email}, isSiteManager=${isSiteManager}`);
 
     if (isSiteManager) {
-      logger.info(`Site manager ${user.email} granted access to site ${slug}`); // Changed from siteId to slug
+      logger.info(`Site manager ${user.email} granted access to site ${slug}`);
       // Add access info to request object
       req.siteAccess = {
         siteId: site.id,
