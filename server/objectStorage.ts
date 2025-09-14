@@ -15,9 +15,17 @@ const REPLIT_SIDECAR_ENDPOINT = isPublishedDeployment
   ? "https://util.replit.com" 
   : "http://127.0.0.1:1106";
 
-
 // Check if we're running on Replit with object storage enabled
-const HAS_OBJECT_STORAGE = !!(process.env.PRIVATE_OBJECT_DIR && process.env.PUBLIC_OBJECT_SEARCH_PATHS);
+// In deployment, we might only have one of these set
+const HAS_OBJECT_STORAGE = !!(process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS);
+
+console.log('Object Storage Configuration:', {
+  isPublishedDeployment,
+  hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
+  hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+  hasObjectStorage: HAS_OBJECT_STORAGE,
+  endpoint: REPLIT_SIDECAR_ENDPOINT
+});
 
 // The object storage client is used to interact with the object storage service.
 export const objectStorageClient: any = HAS_OBJECT_STORAGE
@@ -63,6 +71,13 @@ export class ObjectStorageService {
           .filter((path) => path.length > 0)
       )
     );
+    
+    // In deployment, if no public paths are set, try to use private dir as fallback
+    if (paths.length === 0 && process.env.PRIVATE_OBJECT_DIR) {
+      console.log('No public paths found, using private dir as fallback');
+      return [process.env.PRIVATE_OBJECT_DIR];
+    }
+    
     if (paths.length === 0) {
       throw new Error(
         "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
@@ -167,17 +182,35 @@ export class ObjectStorageService {
         objectPath = `/${objectPath}`;
       }
 
+      console.log('Getting slide file:', { objectPath, hasObjectStorage: HAS_OBJECT_STORAGE });
+
+      // If we don't have object storage properly configured, throw an error
+      if (!HAS_OBJECT_STORAGE) {
+        throw new Error('Object storage not configured');
+      }
+
       const { bucketName, objectName } = parseObjectPath(objectPath);
+      console.log('Parsed object path:', { bucketName, objectName });
+      
       const bucket = objectStorageClient.bucket(bucketName);
       const file = bucket.file(objectName);
 
       const [exists] = await file.exists();
+      console.log('File exists check:', { objectPath, exists });
+      
       if (!exists) {
         throw new ObjectNotFoundError();
       }
 
       return file;
     } catch (error) {
+      console.error('Error in getSlideFile:', {
+        objectPath,
+        error: error.message,
+        hasObjectStorage: HAS_OBJECT_STORAGE,
+        privateDir: process.env.PRIVATE_OBJECT_DIR,
+        publicPaths: process.env.PUBLIC_OBJECT_SEARCH_PATHS
+      });
       throw error;
     }
   }

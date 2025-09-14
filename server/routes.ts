@@ -46,6 +46,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Object storage health check
+  app.get("/api/health/object-storage", async (_req, res) => {
+    try {
+      const status = {
+        hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
+        hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+        isDeployment: !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT),
+        privateDir: process.env.PRIVATE_OBJECT_DIR || 'not set',
+        publicPaths: process.env.PUBLIC_OBJECT_SEARCH_PATHS || 'not set'
+      };
+      
+      res.json({ 
+        ok: status.hasPrivateDir || status.hasPublicPaths,
+        status 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        ok: false, 
+        error: error.message,
+        status: {
+          hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
+          hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+          isDeployment: !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT)
+        }
+      });
+    }
+  });
+
   // Lead generation endpoint (for main site)
   const leadsLimiter = rateLimit({
     windowMs: 60 * 1000,

@@ -857,7 +857,8 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       logger.info(`Serving ${assetLabel} asset:`, {
         originalPath: req.path,
         objectPath,
-        assetType: assetLabel
+        assetType: assetLabel,
+        hasObjectStorage: !!process.env.PRIVATE_OBJECT_DIR
       });
 
       // Validate allowed paths
@@ -873,6 +874,16 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       if (!isAllowed) {
         logger.warn(`Rejected asset request - invalid path:`, { objectPath, assetType: assetLabel });
         return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Check if object storage is properly configured
+      if (!process.env.PRIVATE_OBJECT_DIR && !process.env.PUBLIC_OBJECT_SEARCH_PATHS) {
+        logger.error(`Object storage not configured for ${assetLabel} request:`, { 
+          objectPath, 
+          hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
+          hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS
+        });
+        return res.status(503).json({ error: 'Object storage not available' });
       }
 
       // Set appropriate headers
@@ -899,7 +910,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       logger.error(`Error serving ${assetLabel} asset - basic info:`, {
         message: error?.message || 'No message',
         name: error?.name || 'No name',
-        objectPath: objectPath
+        objectPath: objectPath,
+        hasObjectStorage: !!process.env.PRIVATE_OBJECT_DIR,
+        errorConstructor: error?.constructor?.name
       });
       
       // Try detailed logging
@@ -911,7 +924,12 @@ export function registerSiteRoutes(app: Express, storage?: any) {
           originalPath: req.path,
           assetType: assetLabel,
           errorType: error.constructor.name,
-          requestUrl: req.url
+          requestUrl: req.url,
+          objectStorageConfig: {
+            hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
+            hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+            hasReplicatDeployment: !!process.env.REPLIT_DEPLOYMENT
+          }
         });
       } catch (logError) {
         logger.error(`Failed to log detailed error info: ${logError}`);
