@@ -927,9 +927,9 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   };
 
-  // Unified assets endpoint
-  app.get('/assets/*', async (req, res) => {
-    await handleAssetRequest(req, res, 'assets');
+  // Specific object storage asset endpoints (avoid catching Vite's /assets/* files)
+  app.get('/object-assets/*', async (req, res) => {
+    await handleAssetRequest(req, res, 'object-assets');
   });
 
   // Backward compatibility shims
