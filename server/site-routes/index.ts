@@ -759,6 +759,17 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     }
   });
 
+  // Get upload URL for documents
+  app.post("/api/documents/upload", isAuthenticated, async (req, res) => {
+    try {
+      const uploadURL = await objectStorageService.getDocumentUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      logger.error({ err: error }, "Error getting document upload URL");
+      res.status(500).json({ error: "Failed to get document upload URL" });
+    }
+  });
+
   // Create new slide after upload
   app.post("/api/sites/:slug/slides", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {

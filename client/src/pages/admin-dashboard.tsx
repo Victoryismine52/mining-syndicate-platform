@@ -727,19 +727,56 @@ function FormLibraryManagement() {
 
                   {/* Document-specific fields */}
                   <div id="document-fields" className="space-y-4" style={{display: 'none'}}>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       <div>
-                        <Label htmlFor="documentUrl" className="text-slate-300">Document URL</Label>
+                        <Label className="text-slate-300">Upload Document</Label>
+                        <ObjectUploader
+                          maxNumberOfFiles={1}
+                          maxFileSize={20971520} // 20MB for documents
+                          acceptedFileTypes="documents"
+                          onGetUploadParameters={async () => {
+                            const response = await fetch('/api/documents/upload', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' }
+                            });
+                            const data = await response.json();
+                            return { method: 'PUT', url: data.uploadURL };
+                          }}
+                          onComplete={(result) => {
+                            if (result.successful && result.successful.length > 0) {
+                              const uploadedFile = result.successful[0];
+                              const documentUrlField = document.getElementById('documentUrl') as HTMLInputElement;
+                              if (documentUrlField) {
+                                documentUrlField.value = uploadedFile.uploadURL;
+                              }
+                              toast({
+                                title: "Success",
+                                description: "Document uploaded successfully!",
+                              });
+                            }
+                          }}
+                          buttonClassName="w-full"
+                          data-testid="button-upload-document"
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload Document
+                        </ObjectUploader>
+                        <p className="text-xs text-slate-400 mt-1">Upload PDF, Word, Excel, PowerPoint, or text files (max 20MB)</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="documentUrl" className="text-slate-300">Document URL (Auto-filled after upload)</Label>
                         <Input
                           id="documentUrl"
                           name="documentUrl"
                           type="url"
-                          placeholder="Upload document first, then copy URL here"
+                          placeholder="Will be filled automatically after upload"
                           className="bg-slate-700/50 border-slate-600"
                           data-testid="input-document-url"
+                          readOnly
                         />
-                        <p className="text-xs text-slate-400 mt-1">Use the file uploader below to upload your document</p>
                       </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="documentTitle" className="text-slate-300">Document Title</Label>
                         <Input

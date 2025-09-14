@@ -14,6 +14,7 @@ interface ObjectUploaderProps {
   buttonClassName?: string;
   children?: ReactNode;
   disabled?: boolean;
+  acceptedFileTypes?: 'images' | 'documents' | 'all';
 }
 
 /**
@@ -28,6 +29,7 @@ export function ObjectUploader({
   buttonClassName,
   children,
   disabled = false,
+  acceptedFileTypes = 'images',
 }: ObjectUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,10 +50,28 @@ export function ObjectUploader({
         alert(`File "${file.name}" is too large. File size must be less than ${Math.round(maxFileSize / 1024 / 1024)}MB`);
         return;
       }
-      if (!file.type.startsWith('image/')) {
+      
+      // File type validation based on acceptedFileTypes
+      if (acceptedFileTypes === 'images' && !file.type.startsWith('image/')) {
         alert(`File "${file.name}" is not an image. Please select image files only (PNG, JPG, GIF, etc.)`);
         return;
+      } else if (acceptedFileTypes === 'documents') {
+        const documentTypes = [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/vnd.ms-excel',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.ms-powerpoint',
+          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          'text/plain'
+        ];
+        if (!documentTypes.includes(file.type)) {
+          alert(`File "${file.name}" is not a supported document. Please select PDF, Word, Excel, PowerPoint, or text files.`);
+          return;
+        }
       }
+      // acceptedFileTypes === 'all' allows any file type
     }
 
     try {
