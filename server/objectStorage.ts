@@ -153,16 +153,18 @@ export class ObjectStorageService {
 
   // Gets the upload URL for a slide image.
   async getSlideUploadURL(): Promise<string> {
-    const privateObjectDir = this.getPrivateObjectDir();
-    if (!privateObjectDir) {
+    // Use public directory for slides so they're accessible in deployments
+    const publicPaths = this.getPublicObjectSearchPaths();
+    if (!publicPaths || publicPaths.length === 0) {
       throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
+        "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
+          "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var."
       );
     }
 
     const slideId = randomUUID();
-    const fullPath = `${privateObjectDir}/slides/${slideId}.jpg`;
+    const publicDir = publicPaths[0]; // Use first public directory
+    const fullPath = `${publicDir}/slides/${slideId}.jpg`;
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
@@ -175,7 +177,7 @@ export class ObjectStorageService {
     });
   }
 
-  // Gets slide file from object storage path
+  // Gets slide file from object storage path - tries both public and private directories
   async getSlideFile(objectPath: string): Promise<File> {
     try {
       if (!objectPath.startsWith("/")) {
@@ -199,6 +201,21 @@ export class ObjectStorageService {
       console.log('File exists check:', { objectPath, exists });
       
       if (!exists) {
+        // For slides in private directory that fail in deployment, try to serve from public directory
+        if (objectPath.includes('/.private/slides/')) {
+          console.log('Private slide not accessible, trying public directory fallback');
+          const publicPath = objectPath.replace('/.private/', '/public/');
+          console.log('Trying public path:', publicPath);
+          
+          const { bucketName: pubBucketName, objectName: pubObjectName } = parseObjectPath(publicPath);
+          const pubFile = bucket.file(pubObjectName);
+          const [pubExists] = await pubFile.exists();
+          
+          if (pubExists) {
+            console.log('Found slide in public directory');
+            return pubFile;
+          }
+        }
         throw new ObjectNotFoundError();
       }
 
