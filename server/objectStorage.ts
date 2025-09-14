@@ -230,7 +230,7 @@ export class ObjectStorageService {
         const pathParts = objectPath.split('/');
         const filename = pathParts[pathParts.length - 1];
         
-        // Try public/documents directory
+        // All files now go to public/documents directory
         const publicDocumentsPath = objectPath.replace('/.private/slides/', '/public/documents/').replace('/.private/documents/', '/public/documents/').replace('/public/slides/', '/public/documents/');
         console.log('Trying public documents path:', publicDocumentsPath);
         
