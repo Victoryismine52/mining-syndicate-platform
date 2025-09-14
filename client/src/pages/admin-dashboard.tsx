@@ -385,6 +385,19 @@ function FormLibraryManagement() {
       }
     }
 
+    // Validate Document fields if cardType is document
+    if (cardType === 'document') {
+      const documentUrl = formData.get('documentUrl') as string;
+      if (!documentUrl) {
+        toast({
+          title: "Error",
+          description: "Document URL is required for document cards",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     const config: any = {
       title: formData.get('cardTitle') as string,
       subtitle: formData.get('cardSubtitle') as string,
@@ -416,6 +429,14 @@ function FormLibraryManagement() {
       config.vimeoHash = formData.get('vimeoHash') as string;
       config.autoplay = formData.get('autoplay') === 'on';
       config.showControls = formData.get('showControls') === 'on';
+    }
+
+    // Add Document-specific config
+    if (cardType === 'document') {
+      config.documentUrl = formData.get('documentUrl') as string;
+      config.documentTitle = formData.get('documentTitle') as string;
+      config.fileSize = formData.get('fileSize') as string;
+      config.documentType = formData.get('documentType') as string;
     }
 
     const newForm: InsertFormTemplate = {
@@ -561,15 +582,18 @@ function FormLibraryManagement() {
                         const selectedType = e.target.value;
                         const formFieldsSection = document.getElementById('form-fields-section');
                         const hyperlinkFieldsSection = document.getElementById('hyperlink-fields');
+                        const documentFieldsSection = document.getElementById('document-fields');
                         const youtubeFieldsSection = document.getElementById('youtube-fields');
                         const vimeoFieldsSection = document.getElementById('vimeo-fields');
                         const urlField = document.getElementById('url') as HTMLInputElement;
                         const videoIdField = document.getElementById('videoId') as HTMLInputElement;
                         const vimeoVideoIdField = document.getElementById('vimeoVideoId') as HTMLInputElement;
+                        const documentUrlField = document.getElementById('documentUrl') as HTMLInputElement;
 
                         // Hide all conditional sections first
                         if (formFieldsSection) formFieldsSection.style.display = 'none';
                         if (hyperlinkFieldsSection) hyperlinkFieldsSection.style.display = 'none';
+                        if (documentFieldsSection) documentFieldsSection.style.display = 'none';
                         if (youtubeFieldsSection) youtubeFieldsSection.style.display = 'none';
                         if (vimeoFieldsSection) vimeoFieldsSection.style.display = 'none';
 
@@ -579,27 +603,38 @@ function FormLibraryManagement() {
                           if (urlField) urlField.required = true;
                           if (videoIdField) videoIdField.required = false;
                           if (vimeoVideoIdField) vimeoVideoIdField.required = false;
+                          if (documentUrlField) documentUrlField.required = false;
+                        } else if (selectedType === 'document') {
+                          if (documentFieldsSection) documentFieldsSection.style.display = 'block';
+                          if (documentUrlField) documentUrlField.required = true;
+                          if (urlField) urlField.required = false;
+                          if (videoIdField) videoIdField.required = false;
+                          if (vimeoVideoIdField) vimeoVideoIdField.required = false;
                         } else if (selectedType === 'youtube') {
                           if (youtubeFieldsSection) youtubeFieldsSection.style.display = 'block';
                           if (videoIdField) videoIdField.required = true;
                           if (urlField) urlField.required = false;
                           if (vimeoVideoIdField) vimeoVideoIdField.required = false;
+                          if (documentUrlField) documentUrlField.required = false;
                         } else if (selectedType === 'vimeo') {
                           if (vimeoFieldsSection) vimeoFieldsSection.style.display = 'block';
                           if (vimeoVideoIdField) vimeoVideoIdField.required = true;
                           if (videoIdField) videoIdField.required = false;
                           if (urlField) urlField.required = false;
+                          if (documentUrlField) documentUrlField.required = false;
                         }
                         else { // form
                           if (formFieldsSection) formFieldsSection.style.display = 'block';
                           if (urlField) urlField.required = false;
                           if (videoIdField) videoIdField.required = false;
                           if (vimeoVideoIdField) vimeoVideoIdField.required = false;
+                          if (documentUrlField) documentUrlField.required = false;
                         }
                       }}
                     >
                       <option value="form">Form Card - Collects user information</option>
                       <option value="hyperlink">Hyperlink Card - Links to external content</option>
+                      <option value="document">Document Card - Displays downloadable documents</option>
                       <option value="youtube">YouTube Video Card - Embeds YouTube videos</option>
                       <option value="vimeo">Vimeo Video Card - Embeds Vimeo videos</option>
                     </select>
@@ -687,6 +722,56 @@ function FormLibraryManagement() {
                         data-testid="checkbox-open-new-tab"
                       />
                       <Label htmlFor="openInNewTab" className="text-slate-300">Open in new tab</Label>
+                    </div>
+                  </div>
+
+                  {/* Document-specific fields */}
+                  <div id="document-fields" className="space-y-4" style={{display: 'none'}}>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="documentUrl" className="text-slate-300">Document URL</Label>
+                        <Input
+                          id="documentUrl"
+                          name="documentUrl"
+                          type="url"
+                          placeholder="Upload document first, then copy URL here"
+                          className="bg-slate-700/50 border-slate-600"
+                          data-testid="input-document-url"
+                        />
+                        <p className="text-xs text-slate-400 mt-1">Use the file uploader below to upload your document</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="documentTitle" className="text-slate-300">Document Title</Label>
+                        <Input
+                          id="documentTitle"
+                          name="documentTitle"
+                          placeholder="e.g., Investment Guide, Terms & Conditions"
+                          className="bg-slate-700/50 border-slate-600"
+                          data-testid="input-document-title"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="fileSize" className="text-slate-300">File Size (Optional)</Label>
+                        <Input
+                          id="fileSize"
+                          name="fileSize"
+                          placeholder="e.g., 2.5 MB"
+                          className="bg-slate-700/50 border-slate-600"
+                          data-testid="input-file-size"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="documentType" className="text-slate-300">Document Type (Optional)</Label>
+                        <Input
+                          id="documentType"
+                          name="documentType"
+                          placeholder="e.g., PDF, Word Document"
+                          className="bg-slate-700/50 border-slate-600"
+                          data-testid="input-document-type"
+                        />
+                      </div>
                     </div>
                   </div>
 
