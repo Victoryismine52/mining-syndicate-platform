@@ -751,6 +751,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Get upload URL for new slide
   app.post("/api/sites/:slug/slides/upload", isAuthenticated, checkSiteAccess, async (req, res) => {
     try {
+      const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getSlideUploadURL();
       res.json({ uploadURL });
     } catch (error) {

@@ -200,7 +200,6 @@ export class ObjectStorageService {
   async getDocumentUploadURL(): Promise<string> {
     // Use public documents directory for documents so they're accessible in deployments
     const publicPaths = this.getPublicObjectSearchPaths();
-    console.log('getDocumentUploadURL - publicPaths:', publicPaths);
     
     if (!publicPaths || publicPaths.length === 0) {
       throw new Error(
@@ -211,7 +210,6 @@ export class ObjectStorageService {
 
     const documentId = randomUUID();
     const publicDir = publicPaths[0]; // Use first public directory
-    console.log('getDocumentUploadURL - publicDir:', publicDir, 'documentId:', documentId);
     
     // Defensive check: ensure publicDir is not undefined/null/empty
     if (!publicDir || publicDir.trim() === '') {
@@ -223,7 +221,6 @@ export class ObjectStorageService {
     }
     
     const fullPath = `${publicDir}/documents/${documentId}`;
-    console.log('getDocumentUploadURL - fullPath:', fullPath);
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 

@@ -1,0 +1,953 @@
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (1).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (2).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (3).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (4).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (5).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (6).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (7).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (8).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (9).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (10).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (11).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (12).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (13).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (14).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload completed, result: {successful: Array(0), failed: Array(14)}
+contentscript.js:18 reconnecting...
+admin:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+admin:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+contentscript.js:18 reconnecting...
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (1).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (2).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (3).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (4).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (5).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (6).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (7).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (8).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (9).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (10).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (11).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (12).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (13).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Lenders (Staking Pool) (14).jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload completed, result: {successful: Array(0), failed: Array(14)}
+contentscript.js:18 reconnecting...
+index-RGrFhj_P.js:49  GET https://conduit.replit.app/api/auth/user net::ERR_CONNECTION_CLOSED
+(anonymous) @ index-RGrFhj_P.js:49
+a @ index-RGrFhj_P.js:49
+x @ index-RGrFhj_P.js:49
+start @ index-RGrFhj_P.js:49
+fetch @ index-RGrFhj_P.js:49
+nf @ index-RGrFhj_P.js:49
+fetch @ index-RGrFhj_P.js:49
+refetch @ index-RGrFhj_P.js:49
+onFocus @ index-RGrFhj_P.js:49
+(anonymous) @ index-RGrFhj_P.js:49
+(anonymous) @ index-RGrFhj_P.js:49
+batch @ index-RGrFhj_P.js:49
+onFocus @ index-RGrFhj_P.js:49
+(anonymous) @ index-RGrFhj_P.js:49
+await in (anonymous)
+(anonymous) @ index-RGrFhj_P.js:49
+onFocus @ index-RGrFhj_P.js:49
+(anonymous) @ index-RGrFhj_P.js:49
+r @ index-RGrFhj_P.js:49
+index-RGrFhj_P.js:498 Fetching upload URL from: /api/sites/david-hwang/slides/upload
+index-RGrFhj_P.js:498  POST https://conduit.replit.app/api/sites/david-hwang/slides/upload 500 (Internal Server Error)
+p @ index-RGrFhj_P.js:498
+f @ index-RGrFhj_P.js:498
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload error for Conduit Mining Pools - Full Slide 2 replacement.jpg : Error: Failed to get upload URL: 500
+    at p (index-RGrFhj_P.js:498:134666)
+    at async f (index-RGrFhj_P.js:498:131406)
+f @ index-RGrFhj_P.js:498
+await in f
+uV @ index-RGrFhj_P.js:38
+hV @ index-RGrFhj_P.js:38
+mV @ index-RGrFhj_P.js:38
+z2 @ index-RGrFhj_P.js:38
+$P @ index-RGrFhj_P.js:38
+(anonymous) @ index-RGrFhj_P.js:38
+Tw @ index-RGrFhj_P.js:41
+hP @ index-RGrFhj_P.js:38
+ev @ index-RGrFhj_P.js:38
+tw @ index-RGrFhj_P.js:38
+kV @ index-RGrFhj_P.js:38
+index-RGrFhj_P.js:498 Upload completed, result: {successful: Array(0), failed: Array(1)}
