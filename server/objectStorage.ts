@@ -62,6 +62,12 @@ export class ObjectStorageService {
 
   // Gets the public object search paths.
   getPublicObjectSearchPaths(): Array<string> {
+    console.log('Environment variables check:', {
+      PUBLIC_OBJECT_SEARCH_PATHS: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+      PRIVATE_OBJECT_DIR: process.env.PRIVATE_OBJECT_DIR,
+      DEFAULT_OBJECT_STORAGE_BUCKET_ID: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID
+    });
+    
     const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
     const paths = Array.from(
       new Set(
@@ -79,10 +85,14 @@ export class ObjectStorageService {
     }
     
     if (paths.length === 0) {
-      throw new Error(
-        "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
-          "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var (comma-separated paths)."
+      const error = new Error(
+        "Object storage not configured. Environment variables missing: " +
+          "PUBLIC_OBJECT_SEARCH_PATHS and PRIVATE_OBJECT_DIR. " +
+          "This usually happens in production deployments where object storage " +
+          "environment variables are not automatically available."
       );
+      console.error('Object storage configuration error:', error.message);
+      throw error;
     }
     return paths;
   }
