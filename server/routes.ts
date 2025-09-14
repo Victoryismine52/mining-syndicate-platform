@@ -14,13 +14,9 @@ import { sql } from "drizzle-orm";
 import rateLimit from "express-rate-limit";
 import { logger } from './logger';
 import { config } from './config';
-import { ObjectStorageService } from './objectStorage';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   logger.info('Registering routes...');
-  
-  // Initialize object storage service
-  const objectStorageService = new ObjectStorageService();
   
   // Setup Google authentication (includes session middleware)
   await setupAuth(app);
@@ -248,37 +244,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Migrate slide from private to public directory (admin only)
-  app.post("/api/migrate-slide", requireAuth, requireAdmin, async (req: any, res, next) => {
-    try {
-      const { slideObjectPath } = req.body;
-      
-      if (!slideObjectPath) {
-        return res.status(400).json({ error: 'slideObjectPath is required' });
-      }
-
-      logger.info('Migrating slide to public directory:', slideObjectPath);
-      
-      const publicPath = await objectStorageService.migrateSlideToPublic(slideObjectPath);
-      
-      if (publicPath) {
-        logger.info('Successfully migrated slide:', { slideObjectPath, publicPath });
-        res.json({ 
-          success: true, 
-          originalPath: slideObjectPath,
-          publicPath: publicPath
-        });
-      } else {
-        logger.warn('Failed to migrate slide:', slideObjectPath);
-        res.status(400).json({ 
-          error: 'Failed to migrate slide. Check if slide exists and is not already public.' 
-        });
-      }
-    } catch (error: any) {
-      logger.error('Error migrating slide:', error);
-      next(error);
-    }
-  });
 
   // Get all users endpoint (admin only) - for site manager assignment
   app.get("/api/users", isAuthenticated, requireAdmin, async (req: any, res, next) => {
