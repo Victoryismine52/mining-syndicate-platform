@@ -195,13 +195,33 @@ export class ObjectStorageService {
       console.log('Parsed object path:', { bucketName, objectName });
       
       const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
 
+      // In production deployments, private directories are not accessible
+      // Try public directory first for slides to ensure they work in production
+      if (objectPath.includes('/.private/slides/') && isPublishedDeployment) {
+        console.log('Production deployment: trying public directory first for slide access');
+        const publicPath = objectPath.replace('/.private/', '/public/');
+        console.log('Trying public path:', publicPath);
+        
+        const { bucketName: pubBucketName, objectName: pubObjectName } = parseObjectPath(publicPath);
+        const pubFile = bucket.file(pubObjectName);
+        const [pubExists] = await pubFile.exists();
+        
+        if (pubExists) {
+          console.log('Found slide in public directory (production mode)');
+          return pubFile;
+        }
+        
+        console.log('Slide not found in public directory, production deployment will fail for private slides');
+        // Fall through to try private (will likely fail in production but maintain development compatibility)
+      }
+
+      const file = bucket.file(objectName);
       const [exists] = await file.exists();
       console.log('File exists check:', { objectPath, exists });
       
       if (!exists) {
-        // For slides in private directory that fail in deployment, try to serve from public directory
+        // For slides in private directory that fail, try to serve from public directory
         if (objectPath.includes('/.private/slides/')) {
           console.log('Private slide not accessible, trying public directory fallback');
           const publicPath = objectPath.replace('/.private/', '/public/');
@@ -220,7 +240,7 @@ export class ObjectStorageService {
       }
 
       return file;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in getSlideFile:', {
         objectPath,
         error: error.message,
@@ -240,6 +260,60 @@ export class ObjectStorageService {
     // Extract the path from the URL by removing query parameters and domain
     const url = new URL(rawPath);
     return url.pathname;
+  }
+
+  // Migrate slides from private to public directory for production deployment access
+  async migrateSlideToPublic(privateObjectPath: string): Promise<string | null> {
+    try {
+      if (!HAS_OBJECT_STORAGE) {
+        throw new Error('Object storage not configured');
+      }
+
+      if (!privateObjectPath.includes('/.private/slides/')) {
+        console.log('Not a private slide path, skipping migration');
+        return null;
+      }
+
+      const publicPath = privateObjectPath.replace('/.private/', '/public/');
+      
+      console.log('Migrating slide from private to public:', {
+        privateObjectPath,
+        publicPath
+      });
+
+      const { bucketName: privateBucket, objectName: privateObject } = parseObjectPath(privateObjectPath);
+      const { bucketName: publicBucket, objectName: publicObject } = parseObjectPath(publicPath);
+      
+      const bucket = objectStorageClient.bucket(privateBucket);
+      const privateFile = bucket.file(privateObject);
+      const publicFile = bucket.file(publicObject);
+
+      // Check if private file exists
+      const [privateExists] = await privateFile.exists();
+      if (!privateExists) {
+        console.log('Private slide does not exist, cannot migrate');
+        return null;
+      }
+
+      // Check if public file already exists
+      const [publicExists] = await publicFile.exists();
+      if (publicExists) {
+        console.log('Public slide already exists, migration not needed');
+        return publicPath;
+      }
+
+      // Copy private file to public location
+      await privateFile.copy(publicFile);
+      console.log('Successfully migrated slide to public directory');
+      
+      return publicPath;
+    } catch (error: any) {
+      console.error('Error migrating slide to public:', {
+        privateObjectPath,
+        error: error.message
+      });
+      return null;
+    }
   }
 }
 
