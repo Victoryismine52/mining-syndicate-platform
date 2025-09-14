@@ -145,12 +145,23 @@ export function ObjectUploader({
     fileInputRef.current?.click();
   };
 
+  // Generate accept attribute based on acceptedFileTypes
+  const getAcceptAttribute = () => {
+    if (acceptedFileTypes === 'images') {
+      return 'image/*';
+    } else if (acceptedFileTypes === 'documents') {
+      return '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt';
+    } else {
+      return '*/*'; // Accept all file types
+    }
+  };
+
   return (
     <div>
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept={getAcceptAttribute()}
         multiple={maxNumberOfFiles > 1}
         onChange={handleFileSelect}
         style={{ display: 'none' }}
