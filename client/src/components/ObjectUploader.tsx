@@ -84,11 +84,14 @@ export function ObjectUploader({
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         try {
+          console.log('Starting upload for file:', file.name, 'type:', file.type, 'size:', file.size);
           
           // Get upload parameters for this file
           const { method, url } = await onGetUploadParameters();
+          console.log('Got upload URL:', url);
 
           // Upload file directly to signed URL
+          console.log('Uploading file to signed URL...');
           const uploadResponse = await fetch(url, {
             method,
             body: file,
@@ -97,12 +100,14 @@ export function ObjectUploader({
             },
           });
 
+          console.log('Upload response status:', uploadResponse.status, uploadResponse.statusText);
           if (!uploadResponse.ok) {
             throw new Error(`Upload failed with status ${uploadResponse.status}`);
           }
 
           // Extract the object path from the upload URL
           const uploadUrl = url.split('?')[0]; // Remove query parameters
+          console.log('Upload successful, final URL:', uploadUrl);
           
           successful.push({
             name: file.name,
