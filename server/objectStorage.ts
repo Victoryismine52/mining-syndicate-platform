@@ -153,7 +153,7 @@ export class ObjectStorageService {
 
   // Gets the upload URL for a slide image.
   async getSlideUploadURL(): Promise<string> {
-    // Use public directory for slides so they're accessible in deployments
+    // Use public documents directory for slides so they're accessible in deployments
     const publicPaths = this.getPublicObjectSearchPaths();
     if (!publicPaths || publicPaths.length === 0) {
       throw new Error(
@@ -164,7 +164,32 @@ export class ObjectStorageService {
 
     const slideId = randomUUID();
     const publicDir = publicPaths[0]; // Use first public directory
-    const fullPath = `${publicDir}/slides/${slideId}.jpg`;
+    const fullPath = `${publicDir}/documents/${slideId}.jpg`;
+
+    const { bucketName, objectName } = parseObjectPath(fullPath);
+
+    // Sign URL for PUT method with TTL
+    return signObjectURL({
+      bucketName,
+      objectName,
+      method: "PUT",
+      ttlSec: 900, // 15 minutes
+    });
+  }
+
+  async getDocumentUploadURL(): Promise<string> {
+    // Use public documents directory for documents so they're accessible in deployments
+    const publicPaths = this.getPublicObjectSearchPaths();
+    if (!publicPaths || publicPaths.length === 0) {
+      throw new Error(
+        "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
+          "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var."
+      );
+    }
+
+    const documentId = randomUUID();
+    const publicDir = publicPaths[0]; // Use first public directory
+    const fullPath = `${publicDir}/documents/${documentId}`;
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
@@ -196,22 +221,29 @@ export class ObjectStorageService {
       
       const bucket = objectStorageClient.bucket(bucketName);
 
-      // For old private slides, try public directory first (works in production)
-      if (objectPath.includes('/.private/slides/')) {
-        console.log('Private slide requested, trying public directory first');
-        const publicPath = objectPath.replace('/.private/', '/public/');
-        console.log('Trying public path:', publicPath);
+      // For all files (slides or documents), try public/documents directory first (works in production)
+      if (objectPath.includes('/.private/slides/') || objectPath.includes('/.private/documents/') || objectPath.includes('/public/slides/')) {
+        const fileType = objectPath.includes('slides') ? 'slide' : 'document';
+        console.log(`${fileType} requested, trying public/documents directory first`);
         
-        const { bucketName: pubBucketName, objectName: pubObjectName } = parseObjectPath(publicPath);
+        // Extract filename from original path
+        const pathParts = objectPath.split('/');
+        const filename = pathParts[pathParts.length - 1];
+        
+        // Try public/documents directory
+        const publicDocumentsPath = objectPath.replace('/.private/slides/', '/public/documents/').replace('/.private/documents/', '/public/documents/').replace('/public/slides/', '/public/documents/');
+        console.log('Trying public documents path:', publicDocumentsPath);
+        
+        const { bucketName: pubBucketName, objectName: pubObjectName } = parseObjectPath(publicDocumentsPath);
         const pubFile = bucket.file(pubObjectName);
         const [pubExists] = await pubFile.exists();
         
         if (pubExists) {
-          console.log('Found slide in public directory');
+          console.log(`Found ${fileType} in public/documents directory`);
           return pubFile;
         }
         
-        console.log('Slide not found in public directory, trying original private path');
+        console.log(`${fileType} not found in public/documents directory, trying original path`);
       }
 
       // Try the original path
