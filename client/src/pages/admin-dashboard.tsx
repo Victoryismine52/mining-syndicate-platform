@@ -743,16 +743,30 @@ function FormLibraryManagement() {
                             return { method: 'PUT', url: data.uploadURL };
                           }}
                           onComplete={(result) => {
-                            if (result.successful && result.successful.length > 0) {
-                              const uploadedFile = result.successful[0];
+                            console.log('Upload complete callback called with:', result);
+                            let uploadURL;
+                            
+                            // Handle both single file (string) and multiple files (object) results
+                            if (typeof result === 'string') {
+                              // Single file upload - result is just the URL
+                              uploadURL = result;
+                            } else if (result.successful && result.successful.length > 0) {
+                              // Multiple files upload - get URL from first successful file
+                              uploadURL = result.successful[0].uploadURL;
+                            }
+                            
+                            if (uploadURL) {
                               const documentUrlField = document.getElementById('documentUrl') as HTMLInputElement;
                               if (documentUrlField) {
-                                documentUrlField.value = uploadedFile.uploadURL;
+                                documentUrlField.value = uploadURL;
+                                console.log('Document URL field updated with:', uploadURL);
                               }
                               toast({
                                 title: "Success",
                                 description: "Document uploaded successfully!",
                               });
+                            } else {
+                              console.error('No upload URL received:', result);
                             }
                           }}
                           buttonClassName="w-full"
