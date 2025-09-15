@@ -3,6 +3,7 @@ import { Response } from "express";
 import { randomUUID } from "crypto";
 import { basename } from "path";
 import { MemoryStorage } from "./memoryStorage";
+import { logger } from './logger';
 
 // Check if we're in a published deployment (production)
 // Only use REPLIT_DEPLOYMENT as the definitive indicator
@@ -20,12 +21,23 @@ const REPLIT_SIDECAR_ENDPOINT = isPublishedDeployment
 // In deployment, we might only have one of these set
 const HAS_OBJECT_STORAGE = !!(process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS);
 
-console.log('Object Storage Configuration:', {
+// Validate PUBLIC_OBJECT_SEARCH_PATHS format
+if (process.env.PUBLIC_OBJECT_SEARCH_PATHS) {
+  const paths = process.env.PUBLIC_OBJECT_SEARCH_PATHS.split(',').map(p => p.trim());
+  const invalidPaths = paths.filter(path => !path.startsWith('/') || path.split('/').length < 2);
+  if (invalidPaths.length > 0) {
+    logger.error('❌ INVALID PUBLIC_OBJECT_SEARCH_PATHS format. Must be "/<bucket>" format, got:', invalidPaths);
+    logger.error('❌ Example correct format: "/my-bucket" or "/my-bucket,/another-bucket"');
+  }
+}
+
+logger.info('Object Storage Configuration:', {
   isPublishedDeployment,
   hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
   hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
   hasObjectStorage: HAS_OBJECT_STORAGE,
-  endpoint: REPLIT_SIDECAR_ENDPOINT
+  endpoint: REPLIT_SIDECAR_ENDPOINT,
+  publicPathsValue: process.env.PUBLIC_OBJECT_SEARCH_PATHS
 });
 
 // The object storage client is used to interact with the object storage service.
@@ -110,7 +122,7 @@ export class ObjectStorageService {
   // Get the single public directory - simplified without fallbacks
   private getPublicDirectory(): string {
     const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
-    console.log('Environment variables check:', {
+    logger.info('🔍 Environment variables check:', {
       PUBLIC_OBJECT_SEARCH_PATHS: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
       PRIVATE_OBJECT_DIR: process.env.PRIVATE_OBJECT_DIR,
       DEFAULT_OBJECT_STORAGE_BUCKET_ID: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID
@@ -125,7 +137,7 @@ export class ObjectStorageService {
       throw new Error("Object storage not configured. PUBLIC_OBJECT_SEARCH_PATHS environment variable required.");
     }
     
-    console.log('Using public directory:', paths[0]);
+    logger.info('🔍 Using public directory:', paths[0]);
     return paths[0]; // Use first public directory
   }
 
@@ -146,7 +158,7 @@ export class ObjectStorageService {
       const stream = file.createReadStream();
 
       stream.on("error", (err: Error) => {
-        console.error("Stream error:", err);
+        logger.error("Stream error:", err);
         if (!res.headersSent) {
           res.status(500).json({ error: "Error streaming file" });
         }
@@ -154,7 +166,7 @@ export class ObjectStorageService {
 
       stream.pipe(res);
     } catch (error) {
-      console.error("Error downloading file:", error);
+      logger.error("Error downloading file:", error);
       if (!res.headersSent) {
         res.status(500).json({ error: "Error downloading file" });
       }
@@ -163,23 +175,23 @@ export class ObjectStorageService {
 
   // Gets the upload URL for a slide image - simplified
   async getSlideUploadURL(fileExtension?: string): Promise<string> {
-    console.log('🔍 getSlideUploadURL started with extension:', fileExtension);
+    logger.info('🔍 getSlideUploadURL started with extension:', fileExtension);
     
     try {
       const slideId = randomUUID();
-      console.log('🔍 Generated slideId:', slideId);
+      logger.info('🔍 Generated slideId:', slideId);
       
       const publicDir = this.getPublicDirectory();
-      console.log('🔍 Public directory obtained:', publicDir);
+      logger.info('🔍 Public directory obtained:', publicDir);
       
       const extension = fileExtension || '.jpg'; // Default to .jpg but allow override
       const fullPath = `${publicDir}/slides/${slideId}${extension}`;
-      console.log('🔍 Full path constructed:', fullPath);
+      logger.info('🔍 Full path constructed:', fullPath);
       
       const { bucketName, objectName } = parseObjectPath(fullPath);
-      console.log('🔍 Parsed path - bucket:', bucketName, 'object:', objectName);
+      logger.info('🔍 Parsed path - bucket:', bucketName, 'object:', objectName);
 
-      console.log('🔍 Calling signObjectURL with:', {
+      logger.info('🔍 Calling signObjectURL with:', {
         bucketName,
         objectName,
         method: "PUT",
@@ -195,10 +207,10 @@ export class ObjectStorageService {
         ttlSec: 900, // 15 minutes
       });
       
-      console.log('🔍 Successfully got signed URL:', signedUrl);
+      logger.info('🔍 Successfully got signed URL:', signedUrl);
       return signedUrl;
     } catch (error) {
-      console.error('❌ Error in getSlideUploadURL:', error);
+      logger.error('❌ Error in getSlideUploadURL:', error);
       throw error;
     }
   }
@@ -218,7 +230,7 @@ export class ObjectStorageService {
       } catch (error) {
         // If sanitization fails, log the error and generate a secure filename instead
         const errorMessage = error instanceof Error ? error.message : 'Unknown sanitization error';
-        console.warn('Failed to sanitize fileName, generating secure alternative:', errorMessage);
+        logger.warn('Failed to sanitize fileName, generating secure alternative:', errorMessage);
         const extension = fileExtension || '.pdf';
         objectPath = `${publicDir}/documents/${documentId}${extension}`;
       }
@@ -330,12 +342,12 @@ async function signObjectURL({
   method: "GET" | "PUT" | "DELETE" | "HEAD";
   ttlSec: number;
 }): Promise<string> {
-  console.log('🔍 signObjectURL called with:', { bucketName, objectName, method, ttlSec });
-  console.log('🔍 HAS_OBJECT_STORAGE:', HAS_OBJECT_STORAGE);
-  console.log('🔍 REPLIT_SIDECAR_ENDPOINT:', REPLIT_SIDECAR_ENDPOINT);
+  logger.info('🔍 signObjectURL called with:', { bucketName, objectName, method, ttlSec });
+  logger.info('🔍 HAS_OBJECT_STORAGE:', HAS_OBJECT_STORAGE);
+  logger.info('🔍 REPLIT_SIDECAR_ENDPOINT:', REPLIT_SIDECAR_ENDPOINT);
   
   if (!HAS_OBJECT_STORAGE) {
-    console.log('🔍 Object storage not available, returning local path');
+    logger.info('🔍 Object storage not available, returning local path');
     return `/${bucketName}/${objectName}`;
   }
 
@@ -346,8 +358,8 @@ async function signObjectURL({
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
   
-  console.log('🔍 Request payload:', request);
-  console.log('🔍 Making fetch request to:', `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`);
+  logger.info('🔍 Request payload:', request);
+  logger.info('🔍 Making fetch request to:', `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`);
   
   try {
     const response = await fetch(
@@ -361,12 +373,19 @@ async function signObjectURL({
       }
     );
     
-    console.log('🔍 Response status:', response.status);
-    console.log('🔍 Response ok:', response.ok);
+    logger.info('🔍 Response status:', response.status);
+    logger.info('🔍 Response ok:', response.ok);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ Response error text:', errorText);
+      logger.error('❌ Sidecar response error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+        endpoint: REPLIT_SIDECAR_ENDPOINT,
+        bucket: bucketName,
+        object: objectName
+      });
       throw new Error(
         `Failed to sign object URL, errorcode: ${response.status}, ` +
           `make sure you're running on Replit. Error: ${errorText}`
@@ -374,12 +393,18 @@ async function signObjectURL({
     }
 
     const responseData = await response.json();
-    console.log('🔍 Response data:', responseData);
+    logger.info('🔍 Response data:', responseData);
     const { signed_url: signedURL } = responseData;
-    console.log('🔍 Extracted signed URL:', signedURL);
+    logger.info('🔍 Extracted signed URL:', signedURL);
     return signedURL;
   } catch (error) {
-    console.error('❌ Error in signObjectURL:', error);
+    logger.error('❌ Error in signObjectURL:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      bucket: bucketName,
+      object: objectName,
+      endpoint: REPLIT_SIDECAR_ENDPOINT
+    });
     throw error;
   }
 }
