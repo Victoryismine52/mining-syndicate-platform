@@ -85,8 +85,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const ttl = Math.min(parseInt(ttlSec as string) || 3600, 3600); // Cap at 1 hour
-      const objectStorage = new ObjectStorageService();
-      const url = await objectStorage.buildAssetUrl(path, ttl);
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.buildAssetUrl(path, ttl);
       
       res.json({ url });
     } catch (error) {
