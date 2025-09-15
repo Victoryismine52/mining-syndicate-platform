@@ -271,6 +271,39 @@ export class ObjectStorageService {
     return file;
   }
 
+  // Simple, direct URL builder - eliminates indirections
+  async buildAssetUrl(path: string, ttlSec: number = 3600): Promise<string> {
+    // Normalize path - handle relative, absolute, or full URLs
+    let normalizedPath = path;
+    if (path.startsWith('http')) {
+      // Extract path from full URL
+      normalizedPath = new URL(path).pathname;
+    } else if (!path.startsWith('/')) {
+      // Add bucket prefix for relative paths
+      normalizedPath = `${this.getPublicDirectory()}/${path}`;
+    }
+
+    // Security: only allow slides and documents
+    const bucket = this.getPublicDirectory();
+    const allowedPrefixes = [`${bucket}/slides/`, `${bucket}/documents/`];
+    if (!allowedPrefixes.some(prefix => normalizedPath.startsWith(prefix))) {
+      throw new Error('Invalid asset path - only slides and documents allowed');
+    }
+
+    // Return signed URL for production, normalized path for dev
+    if (HAS_OBJECT_STORAGE) {
+      const { bucketName, objectName } = parseObjectPath(normalizedPath);
+      return await signObjectURL({ 
+        bucketName,
+        objectName,
+        method: 'GET',
+        ttlSec: Math.min(ttlSec, 3600) // Cap at 1 hour
+      });
+    } else {
+      return normalizedPath; // Fallback for dev without object storage
+    }
+  }
+
   // Enhanced path normalization - extracts path from various storage URL formats
   normalizeSlideObjectPath(rawPath: string): string {
     // Handle various URL formats

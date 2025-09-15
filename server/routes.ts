@@ -14,6 +14,7 @@ import { sql } from "drizzle-orm";
 import rateLimit from "express-rate-limit";
 import { logger } from './logger';
 import { config } from './config';
+import { ObjectStorageService } from './objectStorage';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   logger.info('Registering routes...');
@@ -71,6 +72,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           isDeployment: !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT)
         }
       });
+    }
+  });
+
+  // Simple asset URL builder - direct, no indirections
+  app.get("/api/assets/url", async (req, res) => {
+    try {
+      const { path, ttlSec = 3600 } = req.query;
+      
+      if (!path || typeof path !== 'string') {
+        return res.status(400).json({ error: "path parameter is required" });
+      }
+      
+      const ttl = Math.min(parseInt(ttlSec as string) || 3600, 3600); // Cap at 1 hour
+      const objectStorage = new ObjectStorageService();
+      const url = await objectStorage.buildAssetUrl(path, ttl);
+      
+      res.json({ url });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      res.status(400).json({ error: message });
     }
   });
 
