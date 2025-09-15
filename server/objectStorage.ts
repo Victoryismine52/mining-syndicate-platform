@@ -1,6 +1,7 @@
 import { Storage, File } from "@google-cloud/storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
+import { basename } from "path";
 import { MemoryStorage } from "./memoryStorage";
 
 // Check if we're in a published deployment (production)
@@ -56,77 +57,69 @@ export class ObjectNotFoundError extends Error {
   }
 }
 
+/**
+ * Sanitizes a file name to prevent path traversal attacks and ensure safe storage
+ * @param fileName - The original file name to sanitize
+ * @returns A safe file name containing only allowed characters
+ */
+function sanitizeFileName(fileName: string): string {
+  if (!fileName || typeof fileName !== 'string') {
+    throw new Error('Invalid file name provided');
+  }
+
+  // Extract just the basename to prevent directory traversal
+  let safeName = basename(fileName);
+  
+  // Remove any remaining path separators and null bytes
+  safeName = safeName.replace(/[\/\\:*?"<>|]/g, '');
+  safeName = safeName.replace(/\0/g, '');
+  
+  // Allow only alphanumeric characters, dots, hyphens, underscores, and spaces
+  safeName = safeName.replace(/[^a-zA-Z0-9.\-_\s]/g, '');
+  
+  // Remove multiple consecutive dots to prevent .. attacks
+  safeName = safeName.replace(/\.{2,}/g, '.');
+  
+  // Trim whitespace and dots from start/end
+  safeName = safeName.trim().replace(/^\.+|\.+$/g, '');
+  
+  // Ensure the filename is not empty and not too long
+  if (!safeName || safeName.length === 0) {
+    throw new Error('File name resulted in empty string after sanitization');
+  }
+  
+  if (safeName.length > 255) {
+    // Truncate while preserving extension if possible
+    const lastDot = safeName.lastIndexOf('.');
+    if (lastDot > 0) {
+      const extension = safeName.substring(lastDot);
+      const nameWithoutExt = safeName.substring(0, lastDot);
+      safeName = nameWithoutExt.substring(0, 255 - extension.length) + extension;
+    } else {
+      safeName = safeName.substring(0, 255);
+    }
+  }
+  
+  return safeName;
+}
+
 // The object storage service is used to interact with the object storage service.
 export class ObjectStorageService {
   constructor() {}
 
-  // Gets the public object search paths.
-  getPublicObjectSearchPaths(): Array<string> {
-    console.log('Environment variables check:', {
-      PUBLIC_OBJECT_SEARCH_PATHS: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
-      PRIVATE_OBJECT_DIR: process.env.PRIVATE_OBJECT_DIR,
-      DEFAULT_OBJECT_STORAGE_BUCKET_ID: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID
-    });
-    
+  // Get the single public directory - simplified without fallbacks
+  private getPublicDirectory(): string {
     const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
-    const paths = Array.from(
-      new Set(
-        pathsStr
-          .split(",")
-          .map((path) => path.trim())
-          .filter((path) => path.length > 0)
-      )
-    );
-    
-    // In deployment, if no public paths are set, try to use private dir as fallback
-    if (paths.length === 0 && process.env.PRIVATE_OBJECT_DIR) {
-      console.log('No public paths found, using private dir as fallback');
-      return [process.env.PRIVATE_OBJECT_DIR];
-    }
+    const paths = pathsStr
+      .split(",")
+      .map((path) => path.trim())
+      .filter((path) => path.length > 0);
     
     if (paths.length === 0) {
-      const error = new Error(
-        "Object storage not configured. Environment variables missing: " +
-          "PUBLIC_OBJECT_SEARCH_PATHS and PRIVATE_OBJECT_DIR. " +
-          "This usually happens in production deployments where object storage " +
-          "environment variables are not automatically available."
-      );
-      console.error('Object storage configuration error:', error.message);
-      throw error;
+      throw new Error("Object storage not configured. PUBLIC_OBJECT_SEARCH_PATHS environment variable required.");
     }
-    return paths;
-  }
-
-  // Gets the private object directory.
-  getPrivateObjectDir(): string {
-    const dir = process.env.PRIVATE_OBJECT_DIR || "";
-    if (!dir) {
-      throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
-      );
-    }
-    return dir;
-  }
-
-  // Search for a public object from the search paths.
-  async searchPublicObject(filePath: string): Promise<File | null> {
-    for (const searchPath of this.getPublicObjectSearchPaths()) {
-      const fullPath = `${searchPath}/${filePath}`;
-
-      // Full path format: /<bucket_name>/<object_name>
-      const { bucketName, objectName } = parseObjectPath(fullPath);
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
-
-      // Check if file exists
-      const [exists] = await file.exists();
-      if (exists) {
-        return file;
-      }
-    }
-
-    return null;
+    
+    return paths[0]; // Use first public directory
   }
 
   // Downloads an object to the response.
@@ -161,34 +154,14 @@ export class ObjectStorageService {
     }
   }
 
-  // Gets the upload URL for a slide image.
-  async getSlideUploadURL(): Promise<string> {
-    // Use public slides directory for slides so they're accessible in deployments
-    const publicPaths = this.getPublicObjectSearchPaths();
-    if (!publicPaths || publicPaths.length === 0) {
-      throw new Error(
-        "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
-          "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var."
-      );
-    }
-
+  // Gets the upload URL for a slide image - simplified
+  async getSlideUploadURL(fileExtension?: string): Promise<string> {
     const slideId = randomUUID();
-    const publicDir = publicPaths[0]; // Use first public directory
-    
-    // Defensive check: ensure publicDir is not undefined/null/empty
-    if (!publicDir || publicDir.trim() === '') {
-      throw new Error(
-        `Invalid PUBLIC_OBJECT_SEARCH_PATHS: first path is "${publicDir}". ` +
-        `Paths array: ${JSON.stringify(publicPaths)}. ` +
-        `Raw env var: "${process.env.PUBLIC_OBJECT_SEARCH_PATHS}"`
-      );
-    }
-    
-    const fullPath = `${publicDir}/slides/${slideId}.jpg`;
-
+    const publicDir = this.getPublicDirectory();
+    const extension = fileExtension || '.jpg'; // Default to .jpg but allow override
+    const fullPath = `${publicDir}/slides/${slideId}${extension}`;
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
-    // Sign URL for PUT method with TTL
     return signObjectURL({
       bucketName,
       objectName,
@@ -197,34 +170,32 @@ export class ObjectStorageService {
     });
   }
 
-  async getDocumentUploadURL(): Promise<string> {
-    // Use public documents directory for documents so they're accessible in deployments
-    const publicPaths = this.getPublicObjectSearchPaths();
-    
-    if (!publicPaths || publicPaths.length === 0) {
-      throw new Error(
-        "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
-          "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var."
-      );
-    }
-
+  // Gets the upload URL for a document - with security sanitization  
+  async getDocumentUploadURL(fileName?: string, fileExtension?: string): Promise<string> {
     const documentId = randomUUID();
-    const publicDir = publicPaths[0]; // Use first public directory
+    const publicDir = this.getPublicDirectory();
     
-    // Defensive check: ensure publicDir is not undefined/null/empty
-    if (!publicDir || publicDir.trim() === '') {
-      throw new Error(
-        `Invalid PUBLIC_OBJECT_SEARCH_PATHS: first path is "${publicDir}". ` +
-        `Paths array: ${JSON.stringify(publicPaths)}. ` +
-        `Raw env var: "${process.env.PUBLIC_OBJECT_SEARCH_PATHS}"`
-      );
+    // Use provided fileName with proper sanitization or generate a secure one
+    let objectPath;
+    if (fileName) {
+      try {
+        // Sanitize the fileName to prevent path traversal attacks
+        const sanitizedFileName = sanitizeFileName(fileName);
+        objectPath = `${publicDir}/documents/${sanitizedFileName}`;
+      } catch (error) {
+        // If sanitization fails, log the error and generate a secure filename instead
+        const errorMessage = error instanceof Error ? error.message : 'Unknown sanitization error';
+        console.warn('Failed to sanitize fileName, generating secure alternative:', errorMessage);
+        const extension = fileExtension || '.pdf';
+        objectPath = `${publicDir}/documents/${documentId}${extension}`;
+      }
+    } else {
+      const extension = fileExtension || '.pdf'; // Default to .pdf for documents
+      objectPath = `${publicDir}/documents/${documentId}${extension}`;
     }
     
-    const fullPath = `${publicDir}/documents/${documentId}`;
+    const { bucketName, objectName } = parseObjectPath(objectPath);
 
-    const { bucketName, objectName } = parseObjectPath(fullPath);
-
-    // Sign URL for PUT method with TTL
     return signObjectURL({
       bucketName,
       objectName,
@@ -233,54 +204,63 @@ export class ObjectStorageService {
     });
   }
 
-  // Gets slide file from object storage path - uses consistent public/slides directory
+  // Gets slide file from object storage path - handles both absolute and relative paths
   async getSlideFile(objectPath: string): Promise<File> {
-    try {
-      if (!objectPath.startsWith("/")) {
-        objectPath = `/${objectPath}`;
-      }
-
-      console.log('Getting slide file:', { objectPath, hasObjectStorage: HAS_OBJECT_STORAGE });
-
-      // If we don't have object storage properly configured, throw an error
-      if (!HAS_OBJECT_STORAGE) {
-        throw new Error('Object storage not configured');
-      }
-
-      const { bucketName, objectName } = parseObjectPath(objectPath);
-      console.log('Parsed object path:', { bucketName, objectName });
-      
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
-      const [exists] = await file.exists();
-      
-      console.log('File exists check:', { objectPath, exists });
-      
-      if (!exists) {
-        throw new ObjectNotFoundError();
-      }
-
-      return file;
-    } catch (error: any) {
-      console.error('Error in getSlideFile:', {
-        objectPath,
-        error: error.message,
-        hasObjectStorage: HAS_OBJECT_STORAGE,
-        privateDir: process.env.PRIVATE_OBJECT_DIR,
-        publicPaths: process.env.PUBLIC_OBJECT_SEARCH_PATHS
-      });
-      throw error;
+    // Handle both absolute paths (/bucket/object) and relative paths (slides/id.jpg)
+    if (!objectPath.startsWith("/")) {
+      // Relative path - prefix with public directory
+      const publicDir = this.getPublicDirectory();
+      objectPath = `${publicDir}/${objectPath}`;
     }
+
+    if (!HAS_OBJECT_STORAGE) {
+      throw new Error('Object storage not configured');
+    }
+
+    const { bucketName, objectName } = parseObjectPath(objectPath);
+    const bucket = objectStorageClient.bucket(bucketName);
+    const file = bucket.file(objectName);
+    const [exists] = await file.exists();
+    
+    if (!exists) {
+      throw new ObjectNotFoundError();
+    }
+
+    return file;
   }
 
+  // Enhanced path normalization - extracts path from various storage URL formats
   normalizeSlideObjectPath(rawPath: string): string {
-    if (!rawPath.startsWith("https://storage.googleapis.com/")) {
-      return rawPath;
+    // Handle various URL formats
+    if (rawPath.startsWith("https://storage.googleapis.com/") ||
+        rawPath.startsWith("https://storage.cloud.google.com/") ||
+        rawPath.includes("googleapis.com") ||
+        rawPath.includes(".storage.")) {
+      try {
+        const url = new URL(rawPath);
+        return url.pathname;
+      } catch {
+        // If URL parsing fails, try to extract path manually
+        const pathMatch = rawPath.match(/\/([^/]+\/.*?)(?:\?|$)/);
+        if (pathMatch) {
+          return `/${pathMatch[1]}`;
+        }
+      }
     }
 
-    // Extract the path from the URL by removing query parameters and domain
-    const url = new URL(rawPath);
-    return url.pathname;
+    // Handle signed URLs with query parameters
+    if (rawPath.includes('?')) {
+      try {
+        const url = new URL(rawPath);
+        return url.pathname;
+      } catch {
+        // Fallback: remove query parameters manually
+        return rawPath.split('?')[0];
+      }
+    }
+
+    // Return as-is if already a path or unrecognized format
+    return rawPath;
   }
 
 }
