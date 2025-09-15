@@ -76,6 +76,7 @@ const config = {
   storageMode: env.STORAGE_MODE,
   sessionSecret: env.SESSION_SECRET,
   databaseUrl,
+  isProduction: isDeployed,
   replit: {
     domains: (env.REPLIT_DOMAINS ?? env.REPLIT_DEV_DOMAIN ?? 'conduit.replit.app')
       .split(',')

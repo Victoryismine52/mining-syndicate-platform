@@ -59,11 +59,11 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Secure in production, flexible in development
+      secure: config.isProduction, // Use deployment detection from config
       maxAge: sessionTtl,
-      sameSite: 'none', // Allow cross-site requests for development/production switching
+      sameSite: config.isProduction ? 'lax' : 'none', // Use lax for production, none for dev
       path: '/', // Ensure cookie is available on all paths
-      domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser decide domain
+      domain: undefined, // Let browser decide domain
     },
   });
 }
