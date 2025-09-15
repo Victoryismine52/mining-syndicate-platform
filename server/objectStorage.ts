@@ -163,18 +163,44 @@ export class ObjectStorageService {
 
   // Gets the upload URL for a slide image - simplified
   async getSlideUploadURL(fileExtension?: string): Promise<string> {
-    const slideId = randomUUID();
-    const publicDir = this.getPublicDirectory();
-    const extension = fileExtension || '.jpg'; // Default to .jpg but allow override
-    const fullPath = `${publicDir}/slides/${slideId}${extension}`;
-    const { bucketName, objectName } = parseObjectPath(fullPath);
+    console.log('🔍 getSlideUploadURL started with extension:', fileExtension);
+    
+    try {
+      const slideId = randomUUID();
+      console.log('🔍 Generated slideId:', slideId);
+      
+      const publicDir = this.getPublicDirectory();
+      console.log('🔍 Public directory obtained:', publicDir);
+      
+      const extension = fileExtension || '.jpg'; // Default to .jpg but allow override
+      const fullPath = `${publicDir}/slides/${slideId}${extension}`;
+      console.log('🔍 Full path constructed:', fullPath);
+      
+      const { bucketName, objectName } = parseObjectPath(fullPath);
+      console.log('🔍 Parsed path - bucket:', bucketName, 'object:', objectName);
 
-    return signObjectURL({
-      bucketName,
-      objectName,
-      method: "PUT",
-      ttlSec: 900, // 15 minutes
-    });
+      console.log('🔍 Calling signObjectURL with:', {
+        bucketName,
+        objectName,
+        method: "PUT",
+        ttlSec: 900,
+        HAS_OBJECT_STORAGE,
+        REPLIT_SIDECAR_ENDPOINT
+      });
+
+      const signedUrl = await signObjectURL({
+        bucketName,
+        objectName,
+        method: "PUT",
+        ttlSec: 900, // 15 minutes
+      });
+      
+      console.log('🔍 Successfully got signed URL:', signedUrl);
+      return signedUrl;
+    } catch (error) {
+      console.error('❌ Error in getSlideUploadURL:', error);
+      throw error;
+    }
   }
 
   // Gets the upload URL for a document - with security sanitization  
@@ -304,7 +330,12 @@ async function signObjectURL({
   method: "GET" | "PUT" | "DELETE" | "HEAD";
   ttlSec: number;
 }): Promise<string> {
+  console.log('🔍 signObjectURL called with:', { bucketName, objectName, method, ttlSec });
+  console.log('🔍 HAS_OBJECT_STORAGE:', HAS_OBJECT_STORAGE);
+  console.log('🔍 REPLIT_SIDECAR_ENDPOINT:', REPLIT_SIDECAR_ENDPOINT);
+  
   if (!HAS_OBJECT_STORAGE) {
+    console.log('🔍 Object storage not available, returning local path');
     return `/${bucketName}/${objectName}`;
   }
 
@@ -314,23 +345,41 @@ async function signObjectURL({
     method,
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
-  const response = await fetch(
-    `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    }
-  );
-  if (!response.ok) {
-    throw new Error(
-      `Failed to sign object URL, errorcode: ${response.status}, ` +
-        `make sure you're running on Replit`
+  
+  console.log('🔍 Request payload:', request);
+  console.log('🔍 Making fetch request to:', `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`);
+  
+  try {
+    const response = await fetch(
+      `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      }
     );
-  }
+    
+    console.log('🔍 Response status:', response.status);
+    console.log('🔍 Response ok:', response.ok);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Response error text:', errorText);
+      throw new Error(
+        `Failed to sign object URL, errorcode: ${response.status}, ` +
+          `make sure you're running on Replit. Error: ${errorText}`
+      );
+    }
 
-  const { signed_url: signedURL } = await response.json();
-  return signedURL;
+    const responseData = await response.json();
+    console.log('🔍 Response data:', responseData);
+    const { signed_url: signedURL } = responseData;
+    console.log('🔍 Extracted signed URL:', signedURL);
+    return signedURL;
+  } catch (error) {
+    console.error('❌ Error in signObjectURL:', error);
+    throw error;
+  }
 }
