@@ -6,10 +6,15 @@ import { MemoryStorage } from "./memoryStorage";
 import { logger } from './logger';
 
 // Check if we're in a published deployment (production)
-// Only use REPLIT_DEPLOYMENT as the definitive indicator
+// Use multiple indicators for more reliable detection
 const isPublishedDeployment = !!(
   process.env.REPLIT_DEPLOYMENT || 
-  process.env.REPL_DEPLOYMENT
+  process.env.REPL_DEPLOYMENT ||
+  // Additional checks for deployed environment
+  (process.env.REPLIT_DB_URL && process.env.REPLIT_DB_URL.includes('replit.com')) ||
+  (process.env.REPL_SLUG && process.env.REPL_OWNER) ||
+  // Check if hostname suggests deployed environment
+  (typeof process !== 'undefined' && process.env.HOSTNAME && process.env.HOSTNAME.includes('replit'))
 );
 
 // Use environment-appropriate endpoint
@@ -37,7 +42,14 @@ logger.info('Object Storage Configuration: %o', {
   hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
   hasObjectStorage: HAS_OBJECT_STORAGE,
   endpoint: REPLIT_SIDECAR_ENDPOINT,
-  publicPathsValue: process.env.PUBLIC_OBJECT_SEARCH_PATHS
+  publicPathsValue: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+  deploymentDetection: {
+    REPLIT_DEPLOYMENT: !!process.env.REPLIT_DEPLOYMENT,
+    REPL_DEPLOYMENT: !!process.env.REPL_DEPLOYMENT,
+    hasReplitDbUrl: !!(process.env.REPLIT_DB_URL && process.env.REPLIT_DB_URL.includes('replit.com')),
+    hasReplSlugAndOwner: !!(process.env.REPL_SLUG && process.env.REPL_OWNER),
+    hostnameContainsReplit: !!(process.env.HOSTNAME && process.env.HOSTNAME.includes('replit'))
+  }
 });
 
 // The object storage client is used to interact with the object storage service.

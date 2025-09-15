@@ -7,6 +7,8 @@ This project is a full-stack presentation platform for a mining syndicate busine
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
+**September 15, 2025**: Fixed critical object storage deployment detection issue. Enhanced detection logic now properly identifies production environment using multiple indicators (database URL, REPL variables) instead of relying solely on REPLIT_DEPLOYMENT. This resolves "getaddrinfo ENOTFOUND" errors where deployed apps tried to connect to localhost instead of util.replit.com.
+
 **August 30, 2025**: Database migration issue caused data loss. Resolved by manually recreating tables and restoring functionality. However, site-specific slide data was lost and needs to be re-uploaded.
 
 ## System Architecture

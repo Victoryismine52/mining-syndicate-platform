@@ -996,6 +996,41 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     await handleAssetRequest(req, res, 'document-files');
   });
 
+  // DEBUG ENDPOINT: Check object storage configuration
+  app.get('/debug/object-storage-config', (req, res) => {
+    const isPublishedDeployment = !!(
+      process.env.REPLIT_DEPLOYMENT || 
+      process.env.REPL_DEPLOYMENT ||
+      (process.env.REPLIT_DB_URL && process.env.REPLIT_DB_URL.includes('replit.com')) ||
+      (process.env.REPL_SLUG && process.env.REPL_OWNER) ||
+      (typeof process !== 'undefined' && process.env.HOSTNAME && process.env.HOSTNAME.includes('replit'))
+    );
+    
+    const endpoint = isPublishedDeployment ? "https://util.replit.com" : "http://127.0.0.1:1106";
+    
+    res.json({
+      isPublishedDeployment,
+      endpoint,
+      hasObjectStorage: !!(process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS),
+      environmentVariables: {
+        REPLIT_DEPLOYMENT: !!process.env.REPLIT_DEPLOYMENT,
+        REPL_DEPLOYMENT: !!process.env.REPL_DEPLOYMENT,
+        REPLIT_DB_URL: process.env.REPLIT_DB_URL ? process.env.REPLIT_DB_URL.substring(0, 50) + '...' : undefined,
+        REPL_SLUG: process.env.REPL_SLUG,
+        REPL_OWNER: process.env.REPL_OWNER,
+        HOSTNAME: process.env.HOSTNAME,
+        NODE_ENV: process.env.NODE_ENV,
+        PUBLIC_OBJECT_SEARCH_PATHS: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+        PRIVATE_OBJECT_DIR: process.env.PRIVATE_OBJECT_DIR ? 'SET' : 'NOT_SET'
+      },
+      detectionResults: {
+        hasReplitDbUrl: !!(process.env.REPLIT_DB_URL && process.env.REPLIT_DB_URL.includes('replit.com')),
+        hasReplSlugAndOwner: !!(process.env.REPL_SLUG && process.env.REPL_OWNER),
+        hostnameContainsReplit: !!(process.env.HOSTNAME && process.env.HOSTNAME.includes('replit'))
+      }
+    });
+  });
+
   // ==== GLOBAL SLIDESROUTES ====
 
   // Get all global slides (public endpoint for presentation viewer)
