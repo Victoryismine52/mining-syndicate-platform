@@ -850,11 +850,24 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
   // Unified asset handler for all object storage content
   const handleAssetRequest = async (req: any, res: any, assetType: string) => {
-    const objectPath = req.path.replace(`/${assetType}`, '');
+    let objectPath = req.path.replace(`/${assetType === 'slides' ? 'slide-images' : assetType}`, '');
+    
+    // For slides, ensure we're looking in the public/slides directory
+    if (assetType === 'slides' && !objectPath.includes('/slides/')) {
+      // Get the public paths and prepend the slides directory
+      try {
+        const publicPaths = objectStorageService.getPublicObjectSearchPaths();
+        if (publicPaths.length > 0) {
+          objectPath = `${publicPaths[0]}/slides${objectPath}`;
+        }
+      } catch (error) {
+        console.error('Failed to get public paths for slides:', error);
+      }
+    }
 
     // Use human-friendly asset labels for logging and responses
     const assetLabel =
-      assetType === 'slide-images'
+      assetType === 'slides'
         ? 'slide'
         : assetType === 'document-files'
           ? 'document'
@@ -964,7 +977,7 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
   // Backward compatibility shims
   app.get('/slide-images/*', async (req, res) => {
-    await handleAssetRequest(req, res, 'slide-images');
+    await handleAssetRequest(req, res, 'slides');
   });
 
   app.get('/document-files/*', async (req, res) => {

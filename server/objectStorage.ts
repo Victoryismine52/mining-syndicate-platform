@@ -163,7 +163,7 @@ export class ObjectStorageService {
 
   // Gets the upload URL for a slide image.
   async getSlideUploadURL(): Promise<string> {
-    // Use public documents directory for slides so they're accessible in deployments
+    // Use public slides directory for slides so they're accessible in deployments
     const publicPaths = this.getPublicObjectSearchPaths();
     if (!publicPaths || publicPaths.length === 0) {
       throw new Error(
@@ -184,7 +184,7 @@ export class ObjectStorageService {
       );
     }
     
-    const fullPath = `${publicDir}/documents/${slideId}.jpg`;
+    const fullPath = `${publicDir}/slides/${slideId}.jpg`;
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
@@ -233,7 +233,7 @@ export class ObjectStorageService {
     });
   }
 
-  // Gets slide file from object storage path - tries public first, then private for backward compatibility
+  // Gets slide file from object storage path - uses consistent public/slides directory
   async getSlideFile(objectPath: string): Promise<File> {
     try {
       if (!objectPath.startsWith("/")) {
@@ -251,35 +251,9 @@ export class ObjectStorageService {
       console.log('Parsed object path:', { bucketName, objectName });
       
       const bucket = objectStorageClient.bucket(bucketName);
-
-      // For all files (slides or documents), try public/documents directory first (works in production)
-      if (objectPath.includes('/.private/slides/') || objectPath.includes('/.private/documents/') || objectPath.includes('/public/slides/')) {
-        const fileType = objectPath.includes('slides') ? 'slide' : 'document';
-        console.log(`${fileType} requested, trying public/documents directory first`);
-        
-        // Extract filename from original path
-        const pathParts = objectPath.split('/');
-        const filename = pathParts[pathParts.length - 1];
-        
-        // All files now go to public/documents directory
-        const publicDocumentsPath = objectPath.replace('/.private/slides/', '/public/documents/').replace('/.private/documents/', '/public/documents/').replace('/public/slides/', '/public/documents/');
-        console.log('Trying public documents path:', publicDocumentsPath);
-        
-        const { bucketName: pubBucketName, objectName: pubObjectName } = parseObjectPath(publicDocumentsPath);
-        const pubFile = bucket.file(pubObjectName);
-        const [pubExists] = await pubFile.exists();
-        
-        if (pubExists) {
-          console.log(`Found ${fileType} in public/documents directory`);
-          return pubFile;
-        }
-        
-        console.log(`${fileType} not found in public/documents directory, trying original path`);
-      }
-
-      // Try the original path
       const file = bucket.file(objectName);
       const [exists] = await file.exists();
+      
       console.log('File exists check:', { objectPath, exists });
       
       if (!exists) {

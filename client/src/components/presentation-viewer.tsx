@@ -351,17 +351,10 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
         slideOrder: slide.slideOrder
       });
       
-      // For object storage paths, use the slide-images endpoint
+      // For all object storage paths, use the slide-images endpoint
       let imageUrl = slide.imageUrl;
-      if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
-        imageUrl = `/slide-images${imageUrl}`;
-        console.log('Transformed Replit objstore URL:', {
-          original: slide.imageUrl,
-          transformed: imageUrl
-        });
-      } else if (imageUrl && !imageUrl.startsWith('http')) {
-        // Handle other non-HTTP URLs
-        console.log('Non-HTTP URL detected:', imageUrl);
+      if (imageUrl && !imageUrl.startsWith('http')) {
+        // All non-HTTP URLs go through the slide-images endpoint
         if (!imageUrl.startsWith('/slide-images')) {
           imageUrl = `/slide-images${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
           console.log('Added slide-images prefix:', {
@@ -467,12 +460,15 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
             } else {
               // Handle image slides - use imageUrl and apply same processing as site slides
               let imageUrl = slide.imageUrl;
-              if (imageUrl && imageUrl.startsWith('/replit-objstore-')) {
-                imageUrl = `/slide-images${imageUrl}`;
-                console.log('Global slide URL transformation:', {
-                  original: slide.imageUrl,
-                  transformed: imageUrl
-                });
+              if (imageUrl && !imageUrl.startsWith('http')) {
+                // All non-HTTP URLs go through the slide-images endpoint
+                if (!imageUrl.startsWith('/slide-images')) {
+                  imageUrl = `/slide-images${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
+                  console.log('Global slide URL transformation:', {
+                    original: slide.imageUrl,
+                    transformed: imageUrl
+                  });
+                }
               }
               
               return {
