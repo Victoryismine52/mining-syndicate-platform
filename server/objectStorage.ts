@@ -4,23 +4,11 @@ import { randomUUID } from "crypto";
 import { basename } from "path";
 import { MemoryStorage } from "./memoryStorage";
 import { logger } from './logger';
+import { config } from './config';
 
-// Check if we're in a published deployment (production)
-// Use multiple indicators for more reliable detection
-const isPublishedDeployment = !!(
-  process.env.REPLIT_DEPLOYMENT || 
-  process.env.REPL_DEPLOYMENT ||
-  // Additional checks for deployed environment
-  (process.env.REPLIT_DB_URL && process.env.REPLIT_DB_URL.includes('replit.com')) ||
-  (process.env.REPL_SLUG && process.env.REPL_OWNER) ||
-  // Check if hostname suggests deployed environment
-  (typeof process !== 'undefined' && process.env.HOSTNAME && process.env.HOSTNAME.includes('replit'))
-);
-
-// Use environment-appropriate endpoint
-const REPLIT_SIDECAR_ENDPOINT = isPublishedDeployment 
-  ? "https://util.replit.com" 
-  : "http://127.0.0.1:1106";
+// Use shared config for deployment detection and endpoint
+const isPublishedDeployment = config.objectStorage.isDeployed;
+const REPLIT_SIDECAR_ENDPOINT = config.objectStorage.endpoint;
 
 // Check if we're running on Replit with object storage enabled
 // In deployment, we might only have one of these set
@@ -45,10 +33,7 @@ logger.info('Object Storage Configuration: %o', {
   publicPathsValue: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
   deploymentDetection: {
     REPLIT_DEPLOYMENT: !!process.env.REPLIT_DEPLOYMENT,
-    REPL_DEPLOYMENT: !!process.env.REPL_DEPLOYMENT,
-    hasReplitDbUrl: !!(process.env.REPLIT_DB_URL && process.env.REPLIT_DB_URL.includes('replit.com')),
-    hasReplSlugAndOwner: !!(process.env.REPL_SLUG && process.env.REPL_OWNER),
-    hostnameContainsReplit: !!(process.env.HOSTNAME && process.env.HOSTNAME.includes('replit'))
+    REPL_DEPLOYMENT: !!process.env.REPL_DEPLOYMENT
   }
 });
 

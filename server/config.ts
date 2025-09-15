@@ -24,11 +24,20 @@ const envSchema = z.object({
   PUBLIC_OBJECT_SEARCH_PATHS: z.string().optional(),
   PRIVATE_OBJECT_DIR: z.string().optional(),
   LOG_LEVEL: z.string().default('info'),
+  REPLIT_DEPLOYMENT: z.string().optional(),
+  REPL_DEPLOYMENT: z.string().optional(),
 });
 
 const env = envSchema.parse(process.env);
 
 const authDisabled = env.AUTH_DISABLED === 'true';
+
+// Single source of truth for deployment detection - only use explicit deployment flags
+const isDeployed = Boolean(env.REPLIT_DEPLOYMENT || env.REPL_DEPLOYMENT);
+
+// Object storage endpoint selection
+const objectStorageEndpoint = env.REPLIT_SIDECAR_ENDPOINT || 
+  (isDeployed ? "https://util.replit.com" : "http://127.0.0.1:1106");
 
 const databaseUrl = env.NODE_ENV === 'test'
   ? env.TEST_DATABASE_URL ?? env.DATABASE_URL
@@ -75,6 +84,8 @@ const config = {
       env.GOOGLE_OAUTH_CALLBACK_URL ?? 'https://conduit.replit.app/api/auth/google/callback',
   },
   objectStorage: {
+    isDeployed,
+    endpoint: objectStorageEndpoint,
     replitSidecarEndpoint: env.REPLIT_SIDECAR_ENDPOINT,
     publicObjectSearchPaths: env.PUBLIC_OBJECT_SEARCH_PATHS,
     privateObjectDir: env.PRIVATE_OBJECT_DIR,
