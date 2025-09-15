@@ -851,6 +851,15 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
   // Unified asset handler for all object storage content
   const handleAssetRequest = async (req: any, res: any, assetType: string) => {
+    logger.info('🔧 ASSET REQUEST DEBUG: %s | Type: %s | ENV: %s | PROD: %s', req.path, assetType, process.env.NODE_ENV, !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT));
+    logger.info('🔧 OBJECT STORAGE CONFIG: %o', {
+      hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
+      hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+      publicPaths: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+      privateDir: process.env.PRIVATE_OBJECT_DIR,
+      endpoint: (process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT) ? "https://util.replit.com" : "http://127.0.0.1:1106"
+    });
+    
     let objectPath = req.path.replace(`/${assetType === 'slides' ? 'slide-images' : assetType}`, '');
     
     // For slides, ensure we're looking in the public/slides directory
@@ -978,10 +987,12 @@ export function registerSiteRoutes(app: Express, storage?: any) {
 
   // Backward compatibility shims
   app.get('/slide-images/*', async (req, res) => {
+    logger.info('🖼️ SLIDE IMAGE REQUEST: %s | ENV: %s | PROD: %s', req.path, process.env.NODE_ENV, !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT));
     await handleAssetRequest(req, res, 'slides');
   });
 
   app.get('/document-files/*', async (req, res) => {
+    logger.info('📄 DOCUMENT REQUEST: %s | ENV: %s | PROD: %s', req.path, process.env.NODE_ENV, !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT));
     await handleAssetRequest(req, res, 'document-files');
   });
 
