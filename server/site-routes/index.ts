@@ -24,14 +24,14 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     try {
       // 🔍 LOG OBJECT STORAGE CONFIG IMMEDIATELY WHEN ADMIN PAGE IS ACCESSED
       logger.info('🚀 ADMIN PAGE ACCESS - Logging object storage configuration for debugging');
-      logger.info('🔍 Environment Variables:', {
+      logger.info('🔍 Environment Variables: %o', {
         PUBLIC_OBJECT_SEARCH_PATHS: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
         PRIVATE_OBJECT_DIR: process.env.PRIVATE_OBJECT_DIR,
         REPLIT_DEPLOYMENT: process.env.REPLIT_DEPLOYMENT,
         REPL_DEPLOYMENT: process.env.REPL_DEPLOYMENT,
         NODE_ENV: process.env.NODE_ENV
       });
-      logger.info('🔍 Object Storage Status:', {
+      logger.info('🔍 Object Storage Status: %o', {
         hasObjectStorage: !!(process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS),
         isProduction: !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT),
         endpoint: (process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT) ? "https://util.replit.com" : "http://127.0.0.1:1106"
