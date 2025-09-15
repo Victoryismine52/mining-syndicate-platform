@@ -115,8 +115,22 @@ export class ObjectStorageService {
       .map((path) => path.trim())
       .filter((path) => path.length > 0);
     
+    // In deployed environment, if PUBLIC_OBJECT_SEARCH_PATHS is not set but we have PRIVATE_OBJECT_DIR,
+    // derive the public path from the private path structure
     if (paths.length === 0) {
-      throw new Error("Object storage not configured. PUBLIC_OBJECT_SEARCH_PATHS environment variable required.");
+      const privateDir = process.env.PRIVATE_OBJECT_DIR;
+      if (privateDir) {
+        // Extract bucket from private dir path like "/replit-objstore-xxx/.private"
+        const bucketMatch = privateDir.match(/^(\/replit-objstore-[^\/]+)/);
+        if (bucketMatch) {
+          const bucketPath = bucketMatch[1];
+          const publicPath = `${bucketPath}/public`;
+          console.log('Derived public path from private dir:', { privateDir, publicPath });
+          return publicPath;
+        }
+      }
+      
+      throw new Error("Object storage not configured. PUBLIC_OBJECT_SEARCH_PATHS environment variable required and cannot derive from PRIVATE_OBJECT_DIR.");
     }
     
     return paths[0]; // Use first public directory
