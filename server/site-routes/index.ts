@@ -22,6 +22,21 @@ export function registerSiteRoutes(app: Express, storage?: any) {
   // Get site by siteId (no access control for basic site info - admin panel handles its own access control)
   app.get("/api/sites/:slug", async (req, res) => {
     try {
+      // 🔍 LOG OBJECT STORAGE CONFIG IMMEDIATELY WHEN ADMIN PAGE IS ACCESSED
+      logger.info('🚀 ADMIN PAGE ACCESS - Logging object storage configuration for debugging');
+      logger.info('🔍 Environment Variables:', {
+        PUBLIC_OBJECT_SEARCH_PATHS: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+        PRIVATE_OBJECT_DIR: process.env.PRIVATE_OBJECT_DIR,
+        REPLIT_DEPLOYMENT: process.env.REPLIT_DEPLOYMENT,
+        REPL_DEPLOYMENT: process.env.REPL_DEPLOYMENT,
+        NODE_ENV: process.env.NODE_ENV
+      });
+      logger.info('🔍 Object Storage Status:', {
+        hasObjectStorage: !!(process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS),
+        isProduction: !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT),
+        endpoint: (process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT) ? "https://util.replit.com" : "http://127.0.0.1:1106"
+      });
+      
       const site = await siteStorage.getSite(req.params.slug);
       if (!site) {
         return res.status(404).json({ error: "Site not found" });
