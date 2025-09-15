@@ -138,6 +138,21 @@ export class ObjectStorageService {
     return paths[0]; // Use first public directory
   }
 
+  // Get all public object search paths as an array
+  getPublicObjectSearchPaths(): string[] {
+    const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
+    const paths = pathsStr
+      .split(",")
+      .map((path) => path.trim())
+      .filter((path) => path.length > 0);
+    
+    if (paths.length === 0) {
+      throw new Error("Object storage not configured. PUBLIC_OBJECT_SEARCH_PATHS environment variable required.");
+    }
+    
+    return paths;
+  }
+
   // Downloads an object to the response.
   async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
     try {
