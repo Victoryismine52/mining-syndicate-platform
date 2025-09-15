@@ -32,8 +32,15 @@ const env = envSchema.parse(process.env);
 
 const authDisabled = env.AUTH_DISABLED === 'true';
 
-// Single source of truth for deployment detection - only use explicit deployment flags
-const isDeployed = Boolean(env.REPLIT_DEPLOYMENT || env.REPL_DEPLOYMENT);
+// Deployment detection - use only reliable deployment flags
+// Note: HOSTNAME is internal container name, not web hostname, so don't use it for detection
+const isDeployed = Boolean(
+  // Primary deployment flags (most reliable)
+  env.REPLIT_DEPLOYMENT || 
+  env.REPL_DEPLOYMENT ||
+  // Only use NODE_ENV=production as backup (if explicitly set for production)
+  (typeof process !== 'undefined' && process.env.NODE_ENV === 'production')
+);
 
 // Object storage endpoint selection
 const objectStorageEndpoint = env.REPLIT_SIDECAR_ENDPOINT || 

@@ -996,6 +996,33 @@ export function registerSiteRoutes(app: Express, storage?: any) {
     await handleAssetRequest(req, res, 'document-files');
   });
 
+  // DEBUG ENDPOINT: Check deployment detection for production debugging
+  app.get('/debug/deployment', (req, res) => {
+    const isDeployed = Boolean(
+      process.env.REPLIT_DEPLOYMENT || 
+      process.env.REPL_DEPLOYMENT ||
+      (process.env.NODE_ENV === 'production')
+    );
+    
+    res.json({
+      isDeployed,
+      objectStorageEndpoint: isDeployed ? "https://util.replit.com" : "http://127.0.0.1:1106",
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        HOSTNAME: process.env.HOSTNAME,
+        REPLIT_DEPLOYMENT: !!process.env.REPLIT_DEPLOYMENT,
+        REPL_DEPLOYMENT: !!process.env.REPL_DEPLOYMENT,
+        hasObjectStorage: !!(process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS),
+      },
+      deploymentChecks: {
+        hasReplitDeployment: !!process.env.REPLIT_DEPLOYMENT,
+        hasReplDeployment: !!process.env.REPL_DEPLOYMENT,
+        isNodeEnvProduction: process.env.NODE_ENV === 'production'
+      },
+      note: "Fixed: Removed hostname check as it was incorrectly detecting dev as production"
+    });
+  });
+
 
   // ==== GLOBAL SLIDESROUTES ====
 
