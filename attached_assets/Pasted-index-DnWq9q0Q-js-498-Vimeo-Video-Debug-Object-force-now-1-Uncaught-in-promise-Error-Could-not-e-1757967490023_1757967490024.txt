@@ -1,0 +1,54 @@
+index-DnWq9q0Q.js:498 Vimeo Video Debug: Object
+force-now:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+index-DnWq9q0Q.js:498 Vimeo Video Debug: Object
+index-DnWq9q0Q.js:498 Slide composition data: Object
+index-DnWq9q0Q.js:498 Final slides array: Object
+index-DnWq9q0Q.js:498 Slide composition data: Object
+index-DnWq9q0Q.js:498 Final slides array: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Processing slide: Object
+index-DnWq9q0Q.js:498 Added slide-images prefix: Object
+index-DnWq9q0Q.js:498 Final processed slide: Object
+index-DnWq9q0Q.js:498 Slide composition data: Object
+index-DnWq9q0Q.js:498 Final slides array: Object
+faed6848-3832-455f-9c6b-8728542e2b0f.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+hook.js:608 Image failed to load: /slide-images/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb9e5/.private/slides/faed6848-3832-455f-9c6b-8728542e2b0f.jpg t
+overrideMethod @ hook.js:608
