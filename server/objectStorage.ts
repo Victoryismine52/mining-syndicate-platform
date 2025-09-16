@@ -37,26 +37,57 @@ logger.info('Object Storage Configuration: %o', {
   }
 });
 
-// The object storage client is used to interact with the object storage service.
-export const objectStorageClient: any = HAS_OBJECT_STORAGE
-  ? new Storage({
-      credentials: {
-        audience: "replit",
-        subject_token_type: "access_token",
-        token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-        type: "external_account",
-        credential_source: {
-          url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-          format: {
-            type: "json",
-            subject_token_field_name: "access_token",
-          },
+// Create storage client with fallback for production deployments
+function createStorageClient() {
+  if (!HAS_OBJECT_STORAGE) {
+    return new MemoryStorage();
+  }
+
+  // In production deployments, try different authentication methods
+  if (isPublishedDeployment) {
+    logger.info('🔧 Attempting production object storage configuration...');
+    
+    // Try using Application Default Credentials for production
+    try {
+      return new Storage({
+        // Use default credentials in production - Replit should provide these
+        projectId: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID || "",
+      });
+    } catch (error) {
+      logger.warn('⚠️ Default credentials failed, trying manual config: %o', error);
+    }
+    
+    // Fallback to environment-based config if available
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+      logger.info('🔧 Using environment-provided credentials');
+      return new Storage({
+        projectId: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID || "",
+      });
+    }
+  }
+
+  // Development/local configuration with sidecar endpoint
+  return new Storage({
+    credentials: {
+      audience: "replit",
+      subject_token_type: "access_token",
+      token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+      type: "external_account",
+      credential_source: {
+        url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+        format: {
+          type: "json",
+          subject_token_field_name: "access_token",
         },
-        universe_domain: "googleapis.com",
       },
-      projectId: "",
-    })
-  : new MemoryStorage();
+      universe_domain: "googleapis.com",
+    },
+    projectId: "",
+  });
+}
+
+// The object storage client is used to interact with the object storage service.
+export const objectStorageClient: any = createStorageClient();
 
 export class ObjectNotFoundError extends Error {
   constructor() {
