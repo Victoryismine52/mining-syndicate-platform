@@ -896,6 +896,22 @@ export function registerSiteRoutes(app: Express, storage?: any) {
         hasObjectStorage: !!process.env.PRIVATE_OBJECT_DIR
       });
 
+      // Check if this is a private asset that requires authentication
+      const isPrivateAsset = objectPath.includes('/.private/');
+      
+      if (isPrivateAsset) {
+        // Private assets require authentication
+        if (!req.isAuthenticated || !req.isAuthenticated()) {
+          logger.warn(`Rejected private asset request - not authenticated:`, { objectPath, assetType: assetLabel });
+          return res.status(401).json({ error: 'Authentication required for private assets' });
+        }
+        logger.info(`Authenticated user accessing private asset:`, { 
+          objectPath, 
+          assetType: assetLabel,
+          user: req.user?.email || 'unknown'
+        });
+      }
+
       // Validate allowed paths
       const allowedPrefixes = [
         '/replit-objstore-',
