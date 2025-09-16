@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
+import { useAssetUrl } from "@/hooks/use-asset-url";
 import { MiningPoolModal } from "./mining-pool-modal";
 import { LendingPoolModal } from "./lending-pool-modal";
 import { FinalActionSlide } from "./final-action-slide";
@@ -34,6 +35,46 @@ const getFormIcon = (iconName: string) => {
     default: return <FileText className="w-6 h-6 text-white" />;
   }
 };
+
+// Slide Image Component with proper asset URL resolution
+interface SlideImageProps {
+  content: string;
+  title: string;
+  slideId: string;
+}
+
+function SlideImage({ content, title, slideId }: SlideImageProps) {
+  const { data: imageUrl, isLoading, error } = useAssetUrl(content);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center max-w-full max-h-full">
+        <div className="text-white text-lg">Loading image...</div>
+      </div>
+    );
+  }
+
+  if (error || !imageUrl) {
+    return (
+      <div className="flex items-center justify-center max-w-full max-h-full">
+        <div className="text-white text-lg">Failed to load image</div>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      key={`${slideId}-${Date.now()}`}
+      src={`${imageUrl}?_cb=${Date.now()}`}
+      alt={title}
+      className="max-w-full max-h-full object-contain"
+      draggable={false}
+      onError={(e) => {
+        console.error('Image failed to load:', { content, imageUrl }, e);
+      }}
+    />
+  );
+}
 
 // Get color theme for form cards
 function getFormColorTheme(colorOverride?: string) {
@@ -351,23 +392,11 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
         slideOrder: slide.slideOrder
       });
       
-      // For all object storage paths, use the slide-images endpoint
-      let imageUrl = slide.imageUrl;
-      if (imageUrl && !imageUrl.startsWith('http')) {
-        // All non-HTTP URLs go through the slide-images endpoint
-        if (!imageUrl.startsWith('/slide-images')) {
-          imageUrl = `/slide-images${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
-          console.log('Added slide-images prefix:', {
-            original: slide.imageUrl,
-            transformed: imageUrl
-          });
-        }
-      }
-      
+      // Use the image URL directly from metadata - no transformations needed
       const processedSlide = {
         id: slide.id,
         title: slide.title,
-        content: imageUrl,
+        content: slide.imageUrl, // Use metadata path directly
         type: "image" as const,
         slideType: "site" as const,
       };
@@ -458,23 +487,11 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
                 globalSlide: slide,
               };
             } else {
-              // Handle image slides - use imageUrl and apply same processing as site slides
-              let imageUrl = slide.imageUrl;
-              if (imageUrl && !imageUrl.startsWith('http')) {
-                // All non-HTTP URLs go through the slide-images endpoint
-                if (!imageUrl.startsWith('/slide-images')) {
-                  imageUrl = `/slide-images${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
-                  console.log('Global slide URL transformation:', {
-                    original: slide.imageUrl,
-                    transformed: imageUrl
-                  });
-                }
-              }
-              
+              // Handle image slides - use imageUrl directly from metadata
               return {
                 id: slide.id,
                 title: slide.title,
-                content: imageUrl,
+                content: slide.imageUrl, // Use metadata path directly
                 type: "image" as const,
                 slideType: "global" as const,
                 globalSlide: slide,
@@ -660,18 +677,10 @@ export function PresentationViewer({ siteId, siteType, onOpenLearnMore }: Presen
         ) : (
           // Render regular image slide
           <>
-            <img
-              key={`${currentSlideData.id}-${Date.now()}`}
-              src={`${currentSlideData.content}?_cb=${Date.now()}`}
-              alt={currentSlideData.title}
-              className="max-w-full max-h-full object-contain"
-              draggable={false}
-              onLoad={() => {
-                // Image loaded successfully
-              }}
-              onError={(e) => {
-                console.error('Image failed to load:', currentSlideData.content, e);
-              }}
+            <SlideImage 
+              content={currentSlideData.content}
+              title={currentSlideData.title}
+              slideId={currentSlideData.id}
             />
             
             {/* Navigation Overlay for image slides */}

@@ -31,9 +31,21 @@ export function useAssetUrl(path: string | null, ttlSec: number = 3600) {
 
 /**
  * Simple hook for slide images
+ * If slidePath is already a full storage path, use it directly
+ * Otherwise, prefix with slides/ for legacy compatibility
  */
 export function useSlideImageUrl(slidePath: string | null) {
-  return useAssetUrl(slidePath ? `slides/${slidePath}` : null);
+  if (!slidePath) return useAssetUrl(null);
+  
+  // If it's already a full storage path, use it directly
+  if (slidePath.startsWith('/replit-objstore-') || 
+      slidePath.startsWith('/public/') || 
+      slidePath.startsWith('/.private/')) {
+    return useAssetUrl(slidePath);
+  }
+  
+  // Legacy relative paths get slides/ prefix
+  return useAssetUrl(`slides/${slidePath}`);
 }
 
 /**

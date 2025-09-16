@@ -1,0 +1,253 @@
+index-DnWq9q0Q.js:498 Vimeo Video Debug: {originalId: '1113801168', cleanId: '1113801168', finalUrl: 'https://player.vimeo.com/video/1113801168?autoplay…=1&title=0&byline=0&portrait=0&dnt=1&h=31591eb5fb'}
+index-DnWq9q0Q.js:498 Vimeo Video Debug: {originalId: '1113801168', cleanId: '1113801168', finalUrl: 'https://player.vimeo.com/video/1113801168?autoplay…=1&title=0&byline=0&portrait=0&dnt=1&h=31591eb5fb'}
+index-DnWq9q0Q.js:498 Vimeo Video Debug: {originalId: '1113801168', cleanId: '1113801168', finalUrl: 'https://player.vimeo.com/video/1113801168?autoplay…=1&title=0&byline=0&portrait=0&dnt=1&h=31591eb5fb'}
+index-DnWq9q0Q.js:498 Slide composition data: {siteId: 'bryan-rheem', siteType: 'pitch-site', siteSlides: {…}, dynamicFormSlide: {…}, globalSlides: {…}, …}
+index-DnWq9q0Q.js:498 Final slides array: {count: 1, slides: Array(1)}
+index-DnWq9q0Q.js:498 Slide composition data: {siteId: 'bryan-rheem', siteType: 'pitch-site', siteSlides: {…}, dynamicFormSlide: {…}, globalSlides: {…}, …}
+index-DnWq9q0Q.js:498 Final slides array: {count: 1, slides: Array(1)}
+index-DnWq9q0Q.js:498 Processing slide: {id: '4f14e0d4-28d8-43b3-809e-d4881bf963b5', title: 'Conduit Mining Pools - Lenders (Staking Pool) (1)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', isVisible: true, slideOrder: '0'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '4f14e0d4-28d8-43b3-809e-d4881bf963b5', title: 'Conduit Mining Pools - Lenders (Staking Pool) (1)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '4fc6bc48-9921-4f0c-b2f8-65ec8a6ad7ba', title: 'Conduit Mining Pools - Lenders (Staking Pool) (2)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', isVisible: true, slideOrder: '1'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '4fc6bc48-9921-4f0c-b2f8-65ec8a6ad7ba', title: 'Conduit Mining Pools - Lenders (Staking Pool) (2)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'bee9252c-6be5-4008-918a-dadaf6d30b46', title: 'Conduit Mining Pools - Lenders (Staking Pool) (3)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', isVisible: true, slideOrder: '2'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'bee9252c-6be5-4008-918a-dadaf6d30b46', title: 'Conduit Mining Pools - Lenders (Staking Pool) (3)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '6cf3cc13-ff2d-40e9-9548-c666ccc81b1c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (4)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', isVisible: true, slideOrder: '3'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '6cf3cc13-ff2d-40e9-9548-c666ccc81b1c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (4)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '5984da99-bf73-4b21-963f-fc61a69643df', title: 'Conduit Mining Pools - Lenders (Staking Pool) (5)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', isVisible: true, slideOrder: '4'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '5984da99-bf73-4b21-963f-fc61a69643df', title: 'Conduit Mining Pools - Lenders (Staking Pool) (5)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'dc618c84-4383-4abd-90d2-3e5b78251423', title: 'Conduit Mining Pools - Lenders (Staking Pool) (6)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', isVisible: true, slideOrder: '5'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'dc618c84-4383-4abd-90d2-3e5b78251423', title: 'Conduit Mining Pools - Lenders (Staking Pool) (6)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '0e7a5980-d0bc-4aae-ac52-4bd4155e040c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (7)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', isVisible: true, slideOrder: '6'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '0e7a5980-d0bc-4aae-ac52-4bd4155e040c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (7)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'cb16dae2-7588-43b0-9054-6fed83b183cb', title: 'Conduit Mining Pools - Lenders (Staking Pool) (8)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', isVisible: true, slideOrder: '7'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'cb16dae2-7588-43b0-9054-6fed83b183cb', title: 'Conduit Mining Pools - Lenders (Staking Pool) (8)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'e1aef838-9035-48a8-95bb-4ebad2fedf4b', title: 'Conduit Mining Pools - Lenders (Staking Pool) (9)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', isVisible: true, slideOrder: '8'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'e1aef838-9035-48a8-95bb-4ebad2fedf4b', title: 'Conduit Mining Pools - Lenders (Staking Pool) (9)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'e3cb8f17-ad92-4d28-9657-1512d00a5916', title: 'Conduit Mining Pools - Lenders (Staking Pool) (10)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', isVisible: true, slideOrder: '9'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'e3cb8f17-ad92-4d28-9657-1512d00a5916', title: 'Conduit Mining Pools - Lenders (Staking Pool) (10)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '85bf85be-c911-4d88-841f-17e865f192e7', title: 'Conduit Mining Pools - Lenders (Staking Pool) (11)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', isVisible: true, slideOrder: '10'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '85bf85be-c911-4d88-841f-17e865f192e7', title: 'Conduit Mining Pools - Lenders (Staking Pool) (11)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'afd8b75e-8967-413d-8a8a-f81eb0991196', title: 'Conduit Mining Pools - Lenders (Staking Pool) (12)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', isVisible: true, slideOrder: '11'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'afd8b75e-8967-413d-8a8a-f81eb0991196', title: 'Conduit Mining Pools - Lenders (Staking Pool) (12)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'c5be662b-fcd4-4550-9849-64abb4b56a01', title: 'Conduit Mining Pools - Lenders (Staking Pool) (13)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', isVisible: true, slideOrder: '12'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'c5be662b-fcd4-4550-9849-64abb4b56a01', title: 'Conduit Mining Pools - Lenders (Staking Pool) (13)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '79be304c-0445-4cf4-bad1-198c24c2ad5c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (14)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', isVisible: true, slideOrder: '13'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '79be304c-0445-4cf4-bad1-198c24c2ad5c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (14)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Slide composition data: {siteId: 'bryan-rheem', siteType: 'pitch-site', siteSlides: {…}, dynamicFormSlide: {…}, globalSlides: {…}, …}
+index-DnWq9q0Q.js:498 Final slides array: {count: 15, slides: Array(15)}
+08b419f4-b144-4a71-9f00-6624b1089bca.jpg:1  GET https://conduit.replit.app/slide-images/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb9e5/.private/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg?_cb=1757980222205 500 (Internal Server Error)
+Image
+hj @ index-DnWq9q0Q.js:41
+DI @ index-DnWq9q0Q.js:41
+VU @ index-DnWq9q0Q.js:41
+GU @ index-DnWq9q0Q.js:41
+Ol @ index-DnWq9q0Q.js:41
+gj @ index-DnWq9q0Q.js:41
+Nl @ index-DnWq9q0Q.js:39
+(anonymous) @ index-DnWq9q0Q.js:41
+setTimeout
+s @ index-DnWq9q0Q.js:49
+o @ index-DnWq9q0Q.js:49
+batch @ index-DnWq9q0Q.js:49
+Ra @ index-DnWq9q0Q.js:49
+setData @ index-DnWq9q0Q.js:49
+onSuccess @ index-DnWq9q0Q.js:49
+f @ index-DnWq9q0Q.js:49
+Promise.then
+x @ index-DnWq9q0Q.js:49
+start @ index-DnWq9q0Q.js:49
+fetch @ index-DnWq9q0Q.js:49
+nf @ index-DnWq9q0Q.js:49
+onSubscribe @ index-DnWq9q0Q.js:49
+subscribe @ index-DnWq9q0Q.js:49
+(anonymous) @ index-DnWq9q0Q.js:49
+iI @ index-DnWq9q0Q.js:39
+Tg @ index-DnWq9q0Q.js:41
+gd @ index-DnWq9q0Q.js:41
+GU @ index-DnWq9q0Q.js:41
+Ol @ index-DnWq9q0Q.js:41
+gj @ index-DnWq9q0Q.js:41
+Nl @ index-DnWq9q0Q.js:39
+(anonymous) @ index-DnWq9q0Q.js:41
+index-DnWq9q0Q.js:498 Image failed to load: /slide-images/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb9e5/.private/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg t {_reactName: 'onError', _targetInst: null, type: 'error', nativeEvent: Event, target: img.max-w-full.max-h-full.object-contain, …}
+overrideMethod @ hook.js:608
+onError @ index-DnWq9q0Q.js:498
+uV @ index-DnWq9q0Q.js:38
+hV @ index-DnWq9q0Q.js:38
+mV @ index-DnWq9q0Q.js:38
+z2 @ index-DnWq9q0Q.js:38
+$P @ index-DnWq9q0Q.js:38
+(anonymous) @ index-DnWq9q0Q.js:38
+Tw @ index-DnWq9q0Q.js:41
+hP @ index-DnWq9q0Q.js:38
+ev @ index-DnWq9q0Q.js:38
+tw @ index-DnWq9q0Q.js:38
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+bryan-rheem:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+bryan-rheem:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+bryan-rheem:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+index-DnWq9q0Q.js:498 Vimeo Video Debug: {originalId: '1113801168', cleanId: '1113801168', finalUrl: 'https://player.vimeo.com/video/1113801168?autoplay…=1&title=0&byline=0&portrait=0&dnt=1&h=31591eb5fb'}
+index-DnWq9q0Q.js:498 Vimeo Video Debug: {originalId: '1113801168', cleanId: '1113801168', finalUrl: 'https://player.vimeo.com/video/1113801168?autoplay…=1&title=0&byline=0&portrait=0&dnt=1&h=31591eb5fb'}
+ Processing slide: {id: '4f14e0d4-28d8-43b3-809e-d4881bf963b5', title: 'Conduit Mining Pools - Lenders (Staking Pool) (1)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', isVisible: true, slideOrder: '0'}
+ Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg'}
+ Final processed slide: {id: '4f14e0d4-28d8-43b3-809e-d4881bf963b5', title: 'Conduit Mining Pools - Lenders (Staking Pool) (1)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', type: 'image', slideType: 'site'}
+ Processing slide: {id: '4fc6bc48-9921-4f0c-b2f8-65ec8a6ad7ba', title: 'Conduit Mining Pools - Lenders (Staking Pool) (2)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', isVisible: true, slideOrder: '1'}
+ Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg'}
+ Final processed slide: {id: '4fc6bc48-9921-4f0c-b2f8-65ec8a6ad7ba', title: 'Conduit Mining Pools - Lenders (Staking Pool) (2)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'bee9252c-6be5-4008-918a-dadaf6d30b46', title: 'Conduit Mining Pools - Lenders (Staking Pool) (3)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', isVisible: true, slideOrder: '2'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'bee9252c-6be5-4008-918a-dadaf6d30b46', title: 'Conduit Mining Pools - Lenders (Staking Pool) (3)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '6cf3cc13-ff2d-40e9-9548-c666ccc81b1c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (4)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', isVisible: true, slideOrder: '3'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '6cf3cc13-ff2d-40e9-9548-c666ccc81b1c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (4)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '5984da99-bf73-4b21-963f-fc61a69643df', title: 'Conduit Mining Pools - Lenders (Staking Pool) (5)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', isVisible: true, slideOrder: '4'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '5984da99-bf73-4b21-963f-fc61a69643df', title: 'Conduit Mining Pools - Lenders (Staking Pool) (5)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'dc618c84-4383-4abd-90d2-3e5b78251423', title: 'Conduit Mining Pools - Lenders (Staking Pool) (6)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', isVisible: true, slideOrder: '5'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'dc618c84-4383-4abd-90d2-3e5b78251423', title: 'Conduit Mining Pools - Lenders (Staking Pool) (6)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '0e7a5980-d0bc-4aae-ac52-4bd4155e040c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (7)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', isVisible: true, slideOrder: '6'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '0e7a5980-d0bc-4aae-ac52-4bd4155e040c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (7)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'cb16dae2-7588-43b0-9054-6fed83b183cb', title: 'Conduit Mining Pools - Lenders (Staking Pool) (8)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', isVisible: true, slideOrder: '7'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'cb16dae2-7588-43b0-9054-6fed83b183cb', title: 'Conduit Mining Pools - Lenders (Staking Pool) (8)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'e1aef838-9035-48a8-95bb-4ebad2fedf4b', title: 'Conduit Mining Pools - Lenders (Staking Pool) (9)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', isVisible: true, slideOrder: '8'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'e1aef838-9035-48a8-95bb-4ebad2fedf4b', title: 'Conduit Mining Pools - Lenders (Staking Pool) (9)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'e3cb8f17-ad92-4d28-9657-1512d00a5916', title: 'Conduit Mining Pools - Lenders (Staking Pool) (10)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', isVisible: true, slideOrder: '9'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'e3cb8f17-ad92-4d28-9657-1512d00a5916', title: 'Conduit Mining Pools - Lenders (Staking Pool) (10)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '85bf85be-c911-4d88-841f-17e865f192e7', title: 'Conduit Mining Pools - Lenders (Staking Pool) (11)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', isVisible: true, slideOrder: '10'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '85bf85be-c911-4d88-841f-17e865f192e7', title: 'Conduit Mining Pools - Lenders (Staking Pool) (11)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'afd8b75e-8967-413d-8a8a-f81eb0991196', title: 'Conduit Mining Pools - Lenders (Staking Pool) (12)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', isVisible: true, slideOrder: '11'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'afd8b75e-8967-413d-8a8a-f81eb0991196', title: 'Conduit Mining Pools - Lenders (Staking Pool) (12)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'c5be662b-fcd4-4550-9849-64abb4b56a01', title: 'Conduit Mining Pools - Lenders (Staking Pool) (13)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', isVisible: true, slideOrder: '12'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'c5be662b-fcd4-4550-9849-64abb4b56a01', title: 'Conduit Mining Pools - Lenders (Staking Pool) (13)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '79be304c-0445-4cf4-bad1-198c24c2ad5c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (14)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', isVisible: true, slideOrder: '13'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '79be304c-0445-4cf4-bad1-198c24c2ad5c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (14)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Slide composition data: {siteId: 'bryan-rheem', siteType: 'pitch-site', siteSlides: {…}, dynamicFormSlide: {…}, globalSlides: {…}, …}
+index-DnWq9q0Q.js:498 Final slides array: {count: 15, slides: Array(15)}
+index-DnWq9q0Q.js:498 Vimeo Video Debug: {originalId: '1113801168', cleanId: '1113801168', finalUrl: 'https://player.vimeo.com/video/1113801168?autoplay…=1&title=0&byline=0&portrait=0&dnt=1&h=31591eb5fb'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '4f14e0d4-28d8-43b3-809e-d4881bf963b5', title: 'Conduit Mining Pools - Lenders (Staking Pool) (1)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', isVisible: true, slideOrder: '0'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '4f14e0d4-28d8-43b3-809e-d4881bf963b5', title: 'Conduit Mining Pools - Lenders (Staking Pool) (1)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '4fc6bc48-9921-4f0c-b2f8-65ec8a6ad7ba', title: 'Conduit Mining Pools - Lenders (Staking Pool) (2)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', isVisible: true, slideOrder: '1'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '4fc6bc48-9921-4f0c-b2f8-65ec8a6ad7ba', title: 'Conduit Mining Pools - Lenders (Staking Pool) (2)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/293a43f1-9293-434c-84ba-5eb1fd31661d.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'bee9252c-6be5-4008-918a-dadaf6d30b46', title: 'Conduit Mining Pools - Lenders (Staking Pool) (3)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', isVisible: true, slideOrder: '2'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'bee9252c-6be5-4008-918a-dadaf6d30b46', title: 'Conduit Mining Pools - Lenders (Staking Pool) (3)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4dcda2de-e635-4f63-88bf-5ad41a16fca5.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '6cf3cc13-ff2d-40e9-9548-c666ccc81b1c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (4)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', isVisible: true, slideOrder: '3'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '6cf3cc13-ff2d-40e9-9548-c666ccc81b1c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (4)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/f399c9a3-6aa0-42e0-8b40-cee610c551dc.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '5984da99-bf73-4b21-963f-fc61a69643df', title: 'Conduit Mining Pools - Lenders (Staking Pool) (5)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', isVisible: true, slideOrder: '4'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '5984da99-bf73-4b21-963f-fc61a69643df', title: 'Conduit Mining Pools - Lenders (Staking Pool) (5)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/e567192a-957a-4095-8e46-4bcb4ac3f793.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'dc618c84-4383-4abd-90d2-3e5b78251423', title: 'Conduit Mining Pools - Lenders (Staking Pool) (6)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', isVisible: true, slideOrder: '5'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'dc618c84-4383-4abd-90d2-3e5b78251423', title: 'Conduit Mining Pools - Lenders (Staking Pool) (6)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/b233e8db-f704-4438-8224-289e229dec5f.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '0e7a5980-d0bc-4aae-ac52-4bd4155e040c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (7)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', isVisible: true, slideOrder: '6'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '0e7a5980-d0bc-4aae-ac52-4bd4155e040c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (7)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/2b32e050-e0a7-4661-a4b2-c2cf80155f72.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'cb16dae2-7588-43b0-9054-6fed83b183cb', title: 'Conduit Mining Pools - Lenders (Staking Pool) (8)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', isVisible: true, slideOrder: '7'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'cb16dae2-7588-43b0-9054-6fed83b183cb', title: 'Conduit Mining Pools - Lenders (Staking Pool) (8)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d9fc3fda-a832-4689-9deb-db37a094085e.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'e1aef838-9035-48a8-95bb-4ebad2fedf4b', title: 'Conduit Mining Pools - Lenders (Staking Pool) (9)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', isVisible: true, slideOrder: '8'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'e1aef838-9035-48a8-95bb-4ebad2fedf4b', title: 'Conduit Mining Pools - Lenders (Staking Pool) (9)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57865341-f2cf-4b53-b5f2-ded379ae8948.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'e3cb8f17-ad92-4d28-9657-1512d00a5916', title: 'Conduit Mining Pools - Lenders (Staking Pool) (10)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', isVisible: true, slideOrder: '9'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'e3cb8f17-ad92-4d28-9657-1512d00a5916', title: 'Conduit Mining Pools - Lenders (Staking Pool) (10)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/20c98e3e-3786-4b86-9c1e-0cb59d004225.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '85bf85be-c911-4d88-841f-17e865f192e7', title: 'Conduit Mining Pools - Lenders (Staking Pool) (11)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', isVisible: true, slideOrder: '10'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '85bf85be-c911-4d88-841f-17e865f192e7', title: 'Conduit Mining Pools - Lenders (Staking Pool) (11)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/57d89ab7-756e-49d5-926c-f283dbe7107b.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'afd8b75e-8967-413d-8a8a-f81eb0991196', title: 'Conduit Mining Pools - Lenders (Staking Pool) (12)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', isVisible: true, slideOrder: '11'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'afd8b75e-8967-413d-8a8a-f81eb0991196', title: 'Conduit Mining Pools - Lenders (Staking Pool) (12)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/4ea699c0-4064-42b5-910d-ab660b857f29.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: 'c5be662b-fcd4-4550-9849-64abb4b56a01', title: 'Conduit Mining Pools - Lenders (Staking Pool) (13)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', isVisible: true, slideOrder: '12'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: 'c5be662b-fcd4-4550-9849-64abb4b56a01', title: 'Conduit Mining Pools - Lenders (Staking Pool) (13)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/abc4a5c7-94df-4bc5-930c-b7e636fe7d5a.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Processing slide: {id: '79be304c-0445-4cf4-bad1-198c24c2ad5c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (14)', originalImageUrl: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', isVisible: true, slideOrder: '13'}
+index-DnWq9q0Q.js:498 Added slide-images prefix: {original: '/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', transformed: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg'}
+index-DnWq9q0Q.js:498 Final processed slide: {id: '79be304c-0445-4cf4-bad1-198c24c2ad5c', title: 'Conduit Mining Pools - Lenders (Staking Pool) (14)', content: '/slide-images/replit-objstore-710b3bc9-3d04-49c1-a…e/slides/d1730f49-fa80-4ac9-957e-1b3cfbb7ecc9.jpg', type: 'image', slideType: 'site'}
+index-DnWq9q0Q.js:498 Slide composition data: {siteId: 'bryan-rheem', siteType: 'pitch-site', siteSlides: {…}, dynamicFormSlide: {…}, globalSlides: {…}, …}
+index-DnWq9q0Q.js:498 Final slides array: {count: 15, slides: Array(15)}
+08b419f4-b144-4a71-9f00-6624b1089bca.jpg:1  GET https://conduit.replit.app/slide-images/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb9e5/.private/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg?_cb=1757981636079 500 (Internal Server Error)
+Image
+hj @ index-DnWq9q0Q.js:41
+DI @ index-DnWq9q0Q.js:41
+VU @ index-DnWq9q0Q.js:41
+GU @ index-DnWq9q0Q.js:41
+Ol @ index-DnWq9q0Q.js:41
+gj @ index-DnWq9q0Q.js:41
+Nl @ index-DnWq9q0Q.js:39
+(anonymous) @ index-DnWq9q0Q.js:41
+index-DnWq9q0Q.js:498 Image failed to load: /slide-images/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb9e5/.private/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg t {_reactName: 'onError', _targetInst: null, type: 'error', nativeEvent: Event, target: img.max-w-full.max-h-full.object-contain, …}
+overrideMethod @ hook.js:608
+onError @ index-DnWq9q0Q.js:498
+uV @ index-DnWq9q0Q.js:38
+hV @ index-DnWq9q0Q.js:38
+mV @ index-DnWq9q0Q.js:38
+z2 @ index-DnWq9q0Q.js:38
+$P @ index-DnWq9q0Q.js:38
+(anonymous) @ index-DnWq9q0Q.js:38
+Tw @ index-DnWq9q0Q.js:41
+hP @ index-DnWq9q0Q.js:38
+ev @ index-DnWq9q0Q.js:38
+tw @ index-DnWq9q0Q.js:38
+08b419f4-b144-4a71-9f00-6624b1089bca.jpg:1  GET https://conduit.replit.app/slide-images/replit-objstore-710b3bc9-3d04-49c1-a930-0c4605afb9e5/.private/slides/08b419f4-b144-4a71-9f00-6624b1089bca.jpg?_cb=1757981636055 500 (Internal Server Error)
+Image
+hj @ index-DnWq9q0Q.js:41
+DI @ index-DnWq9q0Q.js:41
+VU @ index-DnWq9q0Q.js:41
+GU @ index-DnWq9q0Q.js:41
+Ol @ index-DnWq9q0Q.js:41
+gj @ index-DnWq9q0Q.js:41
+Nl @ index-DnWq9q0Q.js:39
+(anonymous) @ index-DnWq9q0Q.js:41
