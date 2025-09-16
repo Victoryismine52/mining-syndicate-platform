@@ -1,0 +1,47 @@
+h1-check.js:107 Uncaught (in promise) TypeError: Cannot convert undefined or null to object
+    at Object.keys (<anonymous>)
+    at h1-check.js:107:132888
+(anonymous) @ h1-check.js:107
+admin?tab=managers:1 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+admin?tab=managers:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+admin?tab=managers:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+contentscript.js:18 reconnecting...
+67362344-5562-40d7-aabd-a7707308cc79.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+1a00afef-57a8-4ef7-86d5-c070568775b4.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+6630e657-4bc5-42f2-84a0-6dd8c6221c84.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+d312f58d-5b8c-4956-85af-c47812364969.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+bbbca9f0-d3f4-4b43-8cc9-dfdb6b4f319c.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+9585d2a2-6e45-4bb4-8188-8d9d640378fa.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+4098e0c6-f64a-4266-95e9-273d3073b15a.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+6ba74d7f-a9be-4d07-8a0a-dccc6724b93b.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+aef7acd7-dd55-4d91-b2ef-95991e38ea4d.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+15b74709-a12c-4374-9d20-946624b60097.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+38064b65-688f-4f82-b659-c137c0fd63e8.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+ce939fa4-6c37-4e66-868e-9c99183ccdc5.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+f5d22343-6fc4-470a-96ea-68663984c025.jpg:1  Failed to load resource: the server responded with a status of 500 ()
+index-DnWq9q0Q.js:498 Fetching upload URL from: /api/sites/node-pool/slides/upload
+/api/sites/node-pool/slides/upload:1  Failed to load resource: the server responded with a status of 500 ()
+index-DnWq9q0Q.js:38 Upload error for Conduit Mining Pools - Full Slide 2 replacement.jpg : Error: Failed to get upload URL: 500
+    at p (index-DnWq9q0Q.js:498:134526)
+    at async f (index-DnWq9q0Q.js:498:131266)
+overrideMethod @ hook.js:608
+await in overrideMethod
+uV @ index-DnWq9q0Q.js:38
+hV @ index-DnWq9q0Q.js:38
+mV @ index-DnWq9q0Q.js:38
+z2 @ index-DnWq9q0Q.js:38
+$P @ index-DnWq9q0Q.js:38
+(anonymous) @ index-DnWq9q0Q.js:38
+Tw @ index-DnWq9q0Q.js:41
+hP @ index-DnWq9q0Q.js:38
+ev @ index-DnWq9q0Q.js:38
+tw @ index-DnWq9q0Q.js:38
+kV @ index-DnWq9q0Q.js:38
+index-DnWq9q0Q.js:498 Upload completed, result: Object
