@@ -989,9 +989,35 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       // Only send response if headers haven't been sent
       if (!res.headersSent) {
         if (error instanceof ObjectNotFoundError) {
-          return res.status(404).json({ error: `${assetLabel} not found` });
+          return res.status(404).json({ 
+            error: `${assetLabel} not found`,
+            details: {
+              objectPath,
+              originalPath: req.path,
+              message: error.message
+            }
+          });
         }
-        res.status(500).json({ error: `Failed to serve ${assetLabel}` });
+        
+        // Provide detailed error information for debugging
+        const errorDetails = {
+          objectPath,
+          originalPath: req.path,
+          assetType: assetLabel,
+          message: error?.message || 'Unknown error',
+          errorType: error?.constructor?.name || 'Unknown',
+          hasObjectStorage: !!(process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS),
+          objectStorageConfig: {
+            hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
+            hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+            isDeployment: !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT)
+          }
+        };
+        
+        res.status(500).json({ 
+          error: `Failed to serve ${assetLabel}`,
+          details: errorDetails
+        });
       }
     }
   };
@@ -1037,6 +1063,79 @@ export function registerSiteRoutes(app: Express, storage?: any) {
       },
       note: "Fixed: Removed hostname check as it was incorrectly detecting dev as production"
     });
+  });
+
+  // DEBUG ENDPOINT: Validate slide loading process
+  app.get('/debug/slide-path/:path(*)', async (req, res) => {
+    try {
+      const originalPath = `/${req.params.path}`;
+      logger.info('🔍 DEBUG SLIDE PATH REQUEST:', { originalPath });
+      
+      // Get detailed information about the slide path
+      const pathAnalysis = {
+        originalPath,
+        isPrivate: originalPath.includes('/.private/'),
+        isSlide: originalPath.includes('/slides/'),
+        bucketMatch: originalPath.match(/\/replit-objstore-[^\/]+/)?.[0] || null,
+        filename: originalPath.split('/').pop() || null,
+      };
+
+      // Check object storage configuration
+      const objectStorageConfig = {
+        hasPrivateDir: !!process.env.PRIVATE_OBJECT_DIR,
+        hasPublicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+        privateDir: process.env.PRIVATE_OBJECT_DIR,
+        publicPaths: process.env.PUBLIC_OBJECT_SEARCH_PATHS,
+        isDeployment: !!(process.env.REPLIT_DEPLOYMENT || process.env.REPL_DEPLOYMENT)
+      };
+
+      // Check if path would be allowed
+      const allowedPrefixes = [
+        '/replit-objstore-',
+        '/.private/',
+        '/public/',
+        '/documents/',
+        '/legal/'
+      ];
+      const isAllowed = allowedPrefixes.some(prefix => originalPath.startsWith(prefix));
+
+      // Try to get file info if object storage is available
+      let fileStatus = null;
+      try {
+        if (process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS) {
+          const file = await objectStorageService.getSlideFile(originalPath);
+          const [exists] = await file.exists();
+          fileStatus = { exists, bucketName: file.bucket.name, fileName: file.name };
+        }
+      } catch (fileError) {
+        fileStatus = { 
+          error: fileError.message, 
+          errorType: fileError.constructor.name 
+        };
+      }
+
+      res.json({
+        success: true,
+        pathAnalysis,
+        objectStorageConfig,
+        security: {
+          isAllowed,
+          allowedPrefixes,
+          requiresAuth: pathAnalysis.isPrivate
+        },
+        fileStatus,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      logger.error('Error in debug slide path:', error);
+      res.json({
+        success: false,
+        error: error.message,
+        errorType: error.constructor.name,
+        timestamp: new Date().toISOString()
+      });
+    }
   });
 
 
