@@ -298,11 +298,18 @@ export class ObjectStorageService {
       normalizedPath = `${this.getPublicDirectory()}/${path}`;
     }
 
-    // Security: only allow slides and documents
-    const bucket = this.getPublicDirectory();
-    const allowedPrefixes = [`${bucket}/slides/`, `${bucket}/documents/`];
+    // Security: allow slides and documents from both public and private directories
+    const publicBucket = this.getPublicDirectory();
+    const privateBucket = this.getPrivateDirectory();
+    const allowedPrefixes = [
+      `${publicBucket}/slides/`, 
+      `${publicBucket}/documents/`,
+      `${privateBucket}/slides/`, 
+      `${privateBucket}/documents/`
+    ];
+    
     if (!allowedPrefixes.some(prefix => normalizedPath.startsWith(prefix))) {
-      throw new Error('Invalid asset path - only slides and documents allowed');
+      throw new Error('Invalid asset path - only slides and documents allowed from public or private directories');
     }
 
     // Return signed URL for production, normalized path for dev
