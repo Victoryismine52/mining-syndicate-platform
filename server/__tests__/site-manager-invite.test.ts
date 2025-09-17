@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import express from 'express';
 import { request as pwRequest, APIRequestContext } from 'playwright';
 
-const SITE_ID = 'invite-site';
+const SITE_SLUG = 'invite-site';
 const usersData: any[] = [];
 
 vi.mock('../db', () => {
@@ -13,7 +13,7 @@ vi.mock('../db', () => {
         leftJoin: vi.fn().mockReturnThis(),
         where: vi.fn(async () => {
           const { siteStorage } = await import('../site-storage');
-          const managers = await siteStorage.getSiteManagers(SITE_ID);
+          const managers = await siteStorage.getSiteManagers(SITE_SLUG);
           return managers.map((m: any) => ({
             id: m.id,
             siteId: m.siteId,
@@ -75,7 +75,7 @@ describe('site manager invites', () => {
     context = await pwRequest.newContext({ baseURL: started.baseURL });
 
     const { siteStorage } = await import('../site-storage');
-    await siteStorage.createSite({ siteId: SITE_ID, name: 'Test', siteType: 'standard' } as any);
+    await siteStorage.createSite({ siteId: SITE_SLUG, name: 'Test', siteType: 'standard' } as any);
   });
 
   afterEach(async () => {
@@ -90,12 +90,12 @@ describe('site manager invites', () => {
 
   it('reflects account existence in manager listing', async () => {
     const inviteEmail = 'invitee@example.com';
-    const res = await context.post(`/api/sites/${SITE_ID}/managers`, {
+    const res = await context.post(`/api/sites/${SITE_SLUG}/managers`, {
       data: { userEmail: inviteEmail },
     });
     expect(res.status()).toBe(200);
 
-    let getRes = await context.get(`/api/sites/${SITE_ID}/managers`);
+    let getRes = await context.get(`/api/sites/${SITE_SLUG}/managers`);
     expect(getRes.status()).toBe(200);
     let managers = await getRes.json();
     expect(managers[0]).toMatchObject({ userEmail: inviteEmail, hasAccount: false });
@@ -103,7 +103,7 @@ describe('site manager invites', () => {
     const { storage } = await import('../storage');
     await storage.createUser({ email: inviteEmail, firstName: 'A', lastName: 'B' });
 
-    getRes = await context.get(`/api/sites/${SITE_ID}/managers`);
+    getRes = await context.get(`/api/sites/${SITE_SLUG}/managers`);
     managers = await getRes.json();
     expect(managers[0]).toMatchObject({ userEmail: inviteEmail, hasAccount: true });
   });
